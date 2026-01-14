@@ -15,14 +15,26 @@ function FilmDetail() {
   })
 
   if (isLoading) return <p>Chargement...</p>
+  if (!data) return null
 
   return (
-    <div>
-      <h2>{data.Title}</h2>
-      <img src={data.Poster} width="200" />
-      <p>{data.Plot}</p>
-      <p>Année : {data.Year}</p>
-      <p>Réalisateur : {data.Director}</p>
+    <div className="max-w-4xl mx-auto bg-white p-6 rounded shadow">
+      <div className="flex gap-6">
+        <img
+          src={data.Poster}
+          alt={data.Title}
+          className="w-64 rounded"
+        />
+
+        <div>
+          <h2 className="text-3xl font-bold mb-2">{data.Title}</h2>
+          <p className="text-gray-600 mb-4">{data.Plot}</p>
+
+          <p><strong>Année :</strong> {data.Year}</p>
+          <p><strong>Réalisateur :</strong> {data.Director}</p>
+        </div>
+      </div>
     </div>
   )
 }
+

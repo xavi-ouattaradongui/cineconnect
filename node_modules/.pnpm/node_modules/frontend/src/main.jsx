@@ -1,3 +1,5 @@
+import "./index.css"
+
 import React from "react"
 import ReactDOM from "react-dom/client"
 import { RouterProvider, createRouter } from "@tanstack/react-router"
@@ -14,4 +16,5 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     </QueryClientProvider>
   </React.StrictMode>
 )
+
 
