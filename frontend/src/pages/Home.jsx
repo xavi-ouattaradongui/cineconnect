@@ -30,7 +30,7 @@ export default function Home() {
 
             {/* Contenu */}
             <div className="relative z-10 px-6 md:px-10 py-8 md:py-12 max-w-2xl">
-              <p className="text-xs md:text-sm text-gray-300 mb-2">⭐ {fullMovie.imdbRating}/10</p>
+              <p className="text-xs md:text-sm text-gray-300 mb-2">⭐{fullMovie.imdbRating}</p>
               <h2 className="text-3xl md:text-5xl font-bold mb-4 line-clamp-3">{fullMovie.Title}</h2>
               <p className="text-sm md:text-base text-gray-200 leading-relaxed mb-6 line-clamp-4">
                 {fullMovie.Plot}
@@ -55,7 +55,7 @@ export default function Home() {
 
       {/* CATEGORIES */}
       <div className="px-10 mb-8">
-        <h1 className="text-3xl font-bold mb-4">Catégories</h1>
+        <h1 className="text-3xl font-bold mb-4">Parcourir par catégorie</h1>
         <div className="flex flex-wrap gap-3">
           {/* Bouton Tous */}
           <button
