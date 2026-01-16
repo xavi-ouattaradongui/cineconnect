@@ -1,28 +1,45 @@
-import { Outlet, createRootRoute } from "@tanstack/react-router"
-import { Link } from "@tanstack/react-router"
+import { RootRoute, Route, createRouter, Outlet } from "@tanstack/react-router";
+import Navbar from "../components/Navbar";
+import Home from "../pages/Home";
+import MovieDetails from "../pages/MovieDetails";
+import ErrorPage from "../pages/ErrorPage";
 
-export const Route = createRootRoute({
+// Root route
+export const rootRoute = new RootRoute({
   component: () => (
-    <div className="min-h-screen bg-gray-100">
-      <nav className="bg-white shadow px-6 py-4 flex gap-6">
-        <Link to="/" className="font-bold text-xl">
-          🎬 CinéConnect
-        </Link>
-        <Link to="/films" className="text-gray-700 hover:text-black">
-          Films
-        </Link>
-        <Link to="/profil" className="text-gray-700 hover:text-black">
-          Profil
-        </Link>
-        <Link to="/discussion" className="text-gray-700 hover:text-black">
-          Discussion
-        </Link>
-      </nav>
-
-      <main className="p-6">
-        <Outlet />
-      </main>
+    <div>
+      <Navbar />
+      <Outlet />
     </div>
   ),
-})
+});
+
+// Routes enfants
+export const homeRoute = new Route({
+  getParentRoute: () => rootRoute,
+  path: "/",
+  component: Home,
+});
+
+export const filmRoute = new Route({
+  getParentRoute: () => rootRoute,
+  path: "film/$id",
+  component: MovieDetails,
+});
+
+export const errorRoute = new Route({
+  getParentRoute: () => rootRoute,
+  path: "*",
+  component: ErrorPage,
+});
+
+// Créer routeTree
+const routeTree = rootRoute.addChildren([homeRoute, filmRoute, errorRoute]);
+
+// Créer router
+export const router = createRouter({ routeTree });
+
+
+
+
 

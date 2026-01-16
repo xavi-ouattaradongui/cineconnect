@@ -1,16 +1,19 @@
-const API_KEY = import.meta.env.VITE_OMDB_API_KEY
-const BASE_URL = "https://www.omdbapi.com/"
+import axios from "axios";
 
-export async function searchMovies(query) {
-  const res = await fetch(
-    `${BASE_URL}?apikey=${API_KEY}&s=${query}`
-  )
-  return res.json()
-}
+const API_KEY = "63fa368e";
 
-export async function getMovieById(id) {
-  const res = await fetch(
-    `${BASE_URL}?apikey=${API_KEY}&i=${id}`
-  )
-  return res.json()
-}
+export const omdb = axios.create({
+  baseURL: "https://www.omdbapi.com/",
+  params: { apikey: API_KEY },
+});
+
+export const searchMovies = async (title) => {
+  const { data } = await omdb.get("/", { params: { s: title } });
+  return data;
+};
+
+export const getMovieDetails = async (id) => {
+  const { data } = await omdb.get("/", { params: { i: id, plot: "full" } });
+  return data;
+};
+
