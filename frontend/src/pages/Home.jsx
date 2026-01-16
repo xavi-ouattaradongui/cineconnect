@@ -5,7 +5,6 @@ import MovieCard from "../components/MovieCard";
 import Loader from "../components/Loader";
 import { useSearchMovies, useMovie } from "../hooks/useMovies";
 
-
 const categoryIcons = {
   Action: <RotateCcw size={18} />,
   Comédie: <Smile size={18} />,
@@ -17,7 +16,10 @@ const categoryIcons = {
 
 export default function Home() {
   const [selectedCategory, setSelectedCategory] = useState(null);
-  const [displayCount, setDisplayCount] = useState(12);
+
+  // ✔️ 6 films par catégorie sur la page d’accueil
+  const [displayCount] = useState(6);
+
   const categories = [
     "Action",
     "Comédie",
@@ -27,7 +29,7 @@ export default function Home() {
     "Romance",
   ];
 
-  // Film du héro - toujours basé sur "Action"
+  // Film du héro - basé sur "action"
   const { data: heroData } = useSearchMovies("action");
   const heroMovies = heroData?.Search || [];
   const bestMovie = heroMovies.length > 0 ? heroMovies[0] : null;
@@ -47,9 +49,7 @@ export default function Home() {
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent"></div>
 
-          {/* Contenu */}
           <div className="absolute bottom-0 left-0 p-8 w-full">
-            {/* Badges */}
             <div className="flex items-center gap-3 mb-3">
               <span className="bg-red-500/20 text-red-300 border border-red-500/30 backdrop-blur-md px-2 py-0.5 rounded text-[10px] font-medium tracking-wide uppercase">
                 À la une
@@ -60,7 +60,6 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Titre & Description */}
             <h1 className="text-4xl sm:text-5xl font-semibold text-white tracking-tight mb-3">
               {fullMovie.Title}
             </h1>
@@ -68,7 +67,6 @@ export default function Home() {
               {fullMovie.Plot}
             </p>
 
-            {/* Boutons */}
             <div className="flex gap-3">
               <Link
                 to={`/film/${fullMovie.imdbID}`}
@@ -86,14 +84,13 @@ export default function Home() {
       )}
 
       {/* CATEGORIES */}
-      <section className="w-full space-y-4 px-10 mb-8">
+      <section className="w-full space-y-4 px-10 mb-8 mt-10">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <h3 className="text-sm font-medium uppercase tracking-widest text-gray-400 shrink-0">
             Parcourir par catégorie
           </h3>
         </div>
 
-        {/* Catégories Scrollable */}
         <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
           {/* Bouton Tous */}
           <button
@@ -133,7 +130,7 @@ export default function Home() {
         </h2>
 
         {selectedCategory ? (
-          <SingleCategoryView category={selectedCategory} displayCount={displayCount} />
+          <SingleCategoryView category={selectedCategory} />
         ) : (
           <AllCategoriesView categories={categories} displayCount={displayCount} />
         )}
@@ -142,9 +139,15 @@ export default function Home() {
   );
 }
 
-function SingleCategoryView({ category, displayCount }) {
+/* ------------------------------------------
+   🔥 SINGLE CATEGORY VIEW (tous les films)
+------------------------------------------- */
+
+function SingleCategoryView({ category }) {
   const { data, isLoading } = useSearchMovies(category);
-  const movies = (data?.Search || []).slice(0, displayCount);
+
+  // ✔️ Affiche TOUS les films — aucun slice ici
+  const movies = data?.Search || [];
 
   if (isLoading) return <Loader />;
 
@@ -159,6 +162,10 @@ function SingleCategoryView({ category, displayCount }) {
   );
 }
 
+/* ------------------------------------------
+   🏠 VIEW ACCUEIL (6 films par catégorie)
+------------------------------------------- */
+
 function AllCategoriesView({ categories, displayCount }) {
   return (
     <div className="space-y-8">
@@ -171,6 +178,8 @@ function AllCategoriesView({ categories, displayCount }) {
 
 function CategorySection({ category, displayCount }) {
   const { data, isLoading } = useSearchMovies(category);
+
+  // ✔️ On affiche uniquement 6 films à l'accueil
   const movies = (data?.Search || []).slice(0, displayCount);
 
   if (isLoading) return <Loader />;
@@ -195,6 +204,7 @@ function CategorySection({ category, displayCount }) {
           Voir plus →
         </button>
       </div>
+
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
         {movies.map((m) => (
           <MovieCard key={m.imdbID} movie={m} />
@@ -203,3 +213,4 @@ function CategorySection({ category, displayCount }) {
     </div>
   );
 }
+

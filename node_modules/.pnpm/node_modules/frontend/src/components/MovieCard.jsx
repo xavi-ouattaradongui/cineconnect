@@ -1,54 +1,78 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
+import { Plus, Check } from "lucide-react";
 import { useMovie } from "../hooks/useMovies";
 
 export default function MovieCard({ movie }) {
-  const [isFavorite, setIsFavorite] = useState(false);
+  const [isInList, setIsInList] = useState(false);
   const { data: fullMovie } = useMovie(movie.imdbID);
 
-  const handleAddFavorite = (e) => {
+  const handleAddToList = (e) => {
     e.preventDefault();
-    setIsFavorite(!isFavorite);
+    setIsInList(!isInList);
+  };
+
+  const getRatingColor = (rating) => {
+    const rate = parseFloat(rating);
+    if (rate >= 8)
+      return "bg-green-400/10 text-green-400 border-green-400/20";
+    if (rate >= 7)
+      return "bg-yellow-400/10 text-yellow-400 border-yellow-400/20";
+    return "bg-red-400/10 text-red-400 border-red-400/20";
   };
 
   return (
-    <Link to={`/film/${movie.imdbID}`} className="block group">
+    <Link
+      to={`/film/${movie.imdbID}`}
+      className="group relative flex flex-col gap-3"
+    >
       {/* IMAGE AVEC CADRE */}
-      <div className="relative rounded-xl overflow-hidden bg-zinc-900 mb-3">
+      <div className="relative aspect-[2/3] overflow-hidden rounded-xl bg-zinc-900 border border-white/5">
         <img
           src={movie.Poster}
           alt={movie.Title}
-          className="w-full h-72 object-cover group-hover:scale-110 transition duration-300"
+          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 opacity-80 group-hover:opacity-100"
         />
 
         {/* OVERLAY SOMBRE AU HOVER */}
-        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition duration-300"></div>
+        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300"></div>
 
-        {/* BOUTON FAVORI - VISIBLE AU HOVER */}
+        {/* BOUTON AJOUTER À MA LISTE - VISIBLE AU HOVER */}
         <button
-          onClick={handleAddFavorite}
-          className="absolute top-2 right-2 bg-red-600 hover:bg-red-700 text-white p-2 rounded-full transition opacity-0 group-hover:opacity-100"
+          onClick={handleAddToList}
+          className="absolute top-2 right-2 p-2 bg-black/50 backdrop-blur-sm rounded-full text-white/50 hover:text-white hover:bg-red-600 transition-all opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 duration-300"
+          title="Ajouter à ma liste"
         >
-          {isFavorite ? "♥" : "♡"}
+          {isInList ? (
+            <Check size={16} />
+          ) : (
+            <Plus size={16} />
+          )}
         </button>
-
-        {/* NOTE */}
-        {fullMovie?.imdbRating && (
-          <div className="absolute bottom-2 left-2 bg-yellow-500 text-black font-bold px-2 py-1 rounded text-sm opacity-0 group-hover:opacity-100 transition">
-            {fullMovie.imdbRating}
-          </div>
-        )}
       </div>
 
-      {/* INFOS SANS CADRE */}
+      {/* INFOS */}
       <div>
-        <h3 className="text-lg font-semibold group-hover:text-red-600 transition">
-          {movie.Title}
-        </h3>
-        <p className="text-sm text-gray-400">{movie.Year}</p>
-        {fullMovie?.Genre && (
-          <p className="text-xs text-gray-500 mt-1">{fullMovie.Genre}</p>
-        )}
+        <div className="flex justify-between items-start mb-1 gap-2">
+          <h3 className="text-sm font-medium text-white truncate group-hover:text-red-400 transition-colors">
+            {movie.Title}
+          </h3>
+          {fullMovie?.imdbRating && (
+            <span
+              className={`flex items-center gap-1 text-[10px] font-bold px-1.5 py-0.5 rounded border whitespace-nowrap ${getRatingColor(
+                fullMovie.imdbRating
+              )}`}
+            >
+              {fullMovie.imdbRating}
+            </span>
+          )}
+        </div>
+        <div className="flex items-center justify-between text-xs text-gray-500">
+          <span>{movie.Year}</span>
+          {fullMovie?.Genre && (
+            <span>{fullMovie.Genre.split(",")[0]}</span>
+          )}
+        </div>
       </div>
     </Link>
   );
