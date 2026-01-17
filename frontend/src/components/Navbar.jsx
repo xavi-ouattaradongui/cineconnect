@@ -17,7 +17,7 @@ export default function Navbar({ onSearch }) {
         <div className="flex items-center gap-8">
           <Link
             to="/"
-            className="text-lg font-semibold tracking-tighter text-white flex items-center gap-2 hover:text-white transition-colors"
+            className="text-lg font-semibold tracking-tighter text-white flex items-center gap-2 hover:text-red-600 transition-colors"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -42,19 +42,19 @@ export default function Navbar({ onSearch }) {
           <div className="hidden md:flex items-center gap-6 text-sm">
             <Link
               to="/"
-              className="text-gray-400 hover:text-white transition-colors"
+              className="text-gray-400 hover:text-red-600 transition-colors"
             >
               Découvrir
             </Link>
             <Link
               to="#"
-              className="text-gray-400 hover:text-white transition-colors"
+              className="text-gray-400 hover:text-red-600 transition-colors"
             >
               Ma Liste
             </Link>
             <Link
               to="#"
-              className="text-gray-400 hover:text-white transition-colors"
+              className="text-gray-400 hover:text-red-600 transition-colors"
             >
               Communauté
             </Link>
