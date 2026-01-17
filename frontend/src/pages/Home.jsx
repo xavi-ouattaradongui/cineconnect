@@ -30,7 +30,7 @@ export default function Home() {
   ];
 
   // Film du héro - basé sur "action"
-  const { data: heroData } = useSearchMovies("action");
+  const { data: heroData } = useSearchMovies("batman");
   const heroMovies = heroData?.Search || [];
   const bestMovie = heroMovies.length > 0 ? heroMovies[0] : null;
   const { data: fullMovie } = useMovie(bestMovie?.imdbID);

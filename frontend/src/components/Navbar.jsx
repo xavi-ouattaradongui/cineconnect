@@ -1,6 +1,5 @@
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
-import SearchBar from "./SearchBar";
 
 export default function Navbar({ onSearch }) {
   const [searchValue, setSearchValue] = useState("");
@@ -18,7 +17,7 @@ export default function Navbar({ onSearch }) {
         <div className="flex items-center gap-8">
           <Link
             to="/"
-            className="text-lg font-semibold tracking-tighter text-white flex items-center gap-2 hover:text-red-600 transition-colors"
+            className="text-lg font-semibold tracking-tighter text-white flex items-center gap-2 hover:text-white transition-colors"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -43,7 +42,7 @@ export default function Navbar({ onSearch }) {
           <div className="hidden md:flex items-center gap-6 text-sm">
             <Link
               to="/"
-              className="text-white hover:text-red-600 transition-colors"
+              className="text-gray-400 hover:text-white transition-colors"
             >
               Découvrir
             </Link>
