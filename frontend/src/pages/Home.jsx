@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { Link } from "@tanstack/react-router";
-import { Star, Plus, RotateCcw, Smile, Ghost, Zap, Shield, Heart } from "lucide-react";
+import { Link, useRouterState } from "@tanstack/react-router";
+import { Star, Plus, RotateCcw, Smile, Ghost, Zap, Shield, Heart, Check } from "lucide-react";
 import MovieCard from "../components/MovieCard";
 import Loader from "../components/Loader";
 import { useSearchMovies, useMovie } from "../hooks/useMovies";
+import { useMyList } from "../contexts/MyListContext";
 
 const categoryIcons = {
   Action: <RotateCcw size={18} />,
@@ -34,13 +35,32 @@ export default function Home() {
   const heroMovies = heroData?.Search || [];
   const bestMovie = heroMovies.length > 0 ? heroMovies[0] : null;
   const { data: fullMovie } = useMovie(bestMovie?.imdbID);
+  const { addToList, removeFromList, isInList } = useMyList();
+
+  const handleHeroListClick = () => {
+    if (!fullMovie) return;
+    const id = fullMovie.imdbID;
+    if (isInList(id)) {
+      removeFromList(id);
+    } else {
+      addToList({
+        imdbID: id,
+        Title: fullMovie.Title,
+        Poster: fullMovie.Poster,
+        Year: fullMovie.Year,
+      });
+    }
+  };
+
+  const { location } = useRouterState();
+  const query = location.search?.q || "";
 
   return (
     <div className="w-full">
       <div className="h-24"></div>
 
       {/* HERO SECTION */}
-      {fullMovie && (
+      {!query && fullMovie && (
         <div className="relative w-full h-[350px] rounded-2xl overflow-hidden group">
           <img
             src={fullMovie.Poster}
@@ -74,9 +94,21 @@ export default function Home() {
               >
                 Détails
               </Link>
-              <button className="bg-white/10 text-white border border-white/10 px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-white/20 transition-colors flex items-center gap-2">
-                <Plus size={16} />
-                Ajouter à ma liste
+              <button
+                onClick={handleHeroListClick}
+                className="bg-white/10 text-white border border-white/10 px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-white/20 transition-colors flex items-center gap-2"
+              >
+                {isInList(fullMovie.imdbID) ? (
+                  <>
+                    <Check size={16} />
+                    Dans ma liste
+                  </>
+                ) : (
+                  <>
+                    <Plus size={16} />
+                    Ajouter à ma liste
+                  </>
+                )}
               </button>
             </div>
           </div>
@@ -84,52 +116,60 @@ export default function Home() {
       )}
 
       {/* CATEGORIES */}
-      <section className="w-full space-y-4 px-10 mb-8 mt-10">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <h3 className="text-sm font-medium uppercase tracking-widest text-gray-400 shrink-0">
-            Parcourir par catégorie
-          </h3>
-        </div>
+      {!query && (
+        <section className="w-full space-y-4 px-10 mb-8 mt-10">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <h3 className="text-sm font-medium uppercase tracking-widest text-gray-400 shrink-0">
+              Parcourir par catégorie
+            </h3>
+          </div>
 
-        <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-          {/* Bouton Tous */}
-          <button
-            onClick={() => setSelectedCategory(null)}
-            className={`whitespace-nowrap flex items-center gap-2 px-4 py-2 rounded-full font-semibold transition-all text-sm ${
-              selectedCategory === null
-                ? "bg-white text-black border border-white"
-                : "bg-white/5 border border-white/10 text-gray-400 hover:text-white hover:bg-white/10 hover:border-white/20"
-            }`}
-          >
-            Tous
-          </button>
-
-          {/* Boutons Catégories */}
-          {categories.map((category) => (
+          <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+            {/* Bouton Tous */}
             <button
-              key={category}
-              data-category={category}
-              onClick={() => setSelectedCategory(category)}
+              onClick={() => setSelectedCategory(null)}
               className={`whitespace-nowrap flex items-center gap-2 px-4 py-2 rounded-full font-semibold transition-all text-sm ${
-                selectedCategory === category
+                selectedCategory === null
                   ? "bg-white text-black border border-white"
                   : "bg-white/5 border border-white/10 text-gray-400 hover:text-white hover:bg-white/10 hover:border-white/20"
               }`}
             >
-              {categoryIcons[category]}
-              {category}
+              Tous
             </button>
-          ))}
-        </div>
-      </section>
+
+            {/* Boutons Catégories */}
+            {categories.map((category) => (
+              <button
+                key={category}
+                data-category={category}
+                onClick={() => setSelectedCategory(category)}
+                className={`whitespace-nowrap flex items-center gap-2 px-4 py-2 rounded-full font-semibold transition-all text-sm ${
+                  selectedCategory === category
+                    ? "bg-white text-black border border-white"
+                    : "bg-white/5 border border-white/10 text-gray-400 hover:text-white hover:bg-white/10 hover:border-white/20"
+                }`}
+              >
+                {categoryIcons[category]}
+                {category}
+              </button>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* FILMS */}
       <div className="px-10 py-8">
         <h2 className="text-lg font-medium text-white tracking-tight border-b border-white/10 pb-4 mb-6">
-          {selectedCategory ? selectedCategory : "Tous les films"}
+          {query
+            ? `Résultats pour "${query}"`
+            : selectedCategory
+            ? selectedCategory
+            : "Tous les films"}
         </h2>
 
-        {selectedCategory ? (
+        {query ? (
+          <SearchResultsView query={query} />
+        ) : selectedCategory ? (
           <SingleCategoryView category={selectedCategory} />
         ) : (
           <AllCategoriesView categories={categories} displayCount={displayCount} />
@@ -210,6 +250,23 @@ function CategorySection({ category, displayCount }) {
           <MovieCard key={m.imdbID} movie={m} />
         ))}
       </div>
+    </div>
+  );
+}
+
+function SearchResultsView({ query }) {
+  const { data, isLoading } = useSearchMovies(query);
+  const movies = data?.Search || [];
+
+  if (isLoading) return <Loader />;
+
+  return (
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-x-4 gap-y-8">
+      {movies.length > 0 ? (
+        movies.map((m) => <MovieCard key={m.imdbID} movie={m} />)
+      ) : (
+        <p className="text-gray-600 text-sm">Aucun film trouvé pour "{query}".</p>
+      )}
     </div>
   );
 }

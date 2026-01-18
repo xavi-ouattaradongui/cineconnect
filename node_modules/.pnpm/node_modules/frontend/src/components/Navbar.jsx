@@ -1,12 +1,30 @@
-import { Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { Link, useRouter, useRouterState } from "@tanstack/react-router";
+import { useState, useEffect } from "react";
+import { useSearchMovies } from "../hooks/useMovies";
 
 export default function Navbar({ onSearch }) {
   const [searchValue, setSearchValue] = useState("");
+  const [isFocused, setIsFocused] = useState(false);
+  const router = useRouter();
+  const { location } = useRouterState();
+
+  // Synchronise l’input avec ?q
+  useEffect(() => {
+    setSearchValue(location.search?.q || "");
+  }, [location.search?.q]);
+
+  // Recherche dès la 1ère lettre
+  const { data, isLoading } = useSearchMovies(searchValue);
+  const suggestions = data?.Search?.slice(0, 5) || [];
+  const showDropdown = isFocused && searchValue.length > 0;
 
   const handleSearch = (e) => {
     const value = e.target.value;
     setSearchValue(value);
+    router.navigate({
+      to: "/",
+      search: (prev) => ({ ...prev, q: value || undefined }),
+    });
     if (onSearch) onSearch(value);
   };
 
@@ -64,7 +82,7 @@ export default function Navbar({ onSearch }) {
         {/* SEARCH & PROFILE */}
         <div className="flex items-center gap-4">
           {/* SEARCH */}
-          <div className="hidden sm:flex items-center bg-white/5 border border-white/5 rounded-full px-3 py-1.5 focus-within:ring-1 focus-within:ring-white/20 focus-within:border-white/20 transition-all">
+          <div className="hidden sm:flex items-center bg-white/5 border border-white/5 rounded-full px-3 py-1.5 focus-within:ring-1 focus-within:ring-white/20 focus-within:border-white/20 transition-all relative">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="16"
@@ -85,11 +103,48 @@ export default function Navbar({ onSearch }) {
               placeholder="Rechercher un film..."
               value={searchValue}
               onChange={handleSearch}
+              onFocus={() => setIsFocused(true)}
+              onBlur={() => setTimeout(() => setIsFocused(false), 150)}
               className="bg-transparent border-none outline-none text-sm text-white ml-2 placeholder:text-gray-500 w-48"
             />
             <div className="text-[10px] border border-white/10 rounded px-1 text-gray-500">
               ⌘K
             </div>
+
+            {/* Suggestions */}
+            {showDropdown && (
+              <div className="absolute top-full left-0 mt-2 w-72 sm:w-80 bg-zinc-900 border border-white/10 rounded-lg shadow-xl overflow-hidden">
+                {isLoading ? (
+                  <div className="px-3 py-2 text-xs text-gray-400">
+                    Recherche...
+                  </div>
+                ) : suggestions.length > 0 ? (
+                  suggestions.map((m) => (
+                    <Link
+                      key={m.imdbID}
+                      to={`/film/${m.imdbID}`}
+                      className="flex items-center gap-3 px-3 py-2 hover:bg-white/5 transition-colors"
+                    >
+                      <img
+                        src={m.Poster}
+                        alt={m.Title}
+                        className="h-10 w-7 object-cover rounded"
+                      />
+                      <div className="flex-1">
+                        <div className="text-sm text-white line-clamp-1">
+                          {m.Title}
+                        </div>
+                        <div className="text-xs text-gray-500">{m.Year}</div>
+                      </div>
+                    </Link>
+                  ))
+                ) : (
+                  <div className="px-3 py-2 text-xs text-gray-400">
+                    Aucun résultat
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           {/* PROFILE */}
