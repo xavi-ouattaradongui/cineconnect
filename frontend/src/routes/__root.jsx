@@ -1,4 +1,4 @@
-import { RootRoute, Route, createRouter, Outlet } from "@tanstack/react-router";
+import { RootRoute, Route, createRouter, Outlet, useLocation } from "@tanstack/react-router";
 import Navbar from "../components/Navbar";
 import Home from "../pages/Home";
 import MovieDetails from "../pages/MovieDetails";
@@ -8,15 +8,22 @@ import MyList from "../pages/MyList";
 import Profile from "../pages/Profile";
 import ProfileEdit from "../pages/ProfileEdit";
 import ProfileSecurity from "../pages/ProfileSecurity";
+import Login from "../pages/Login";
+import Register from "../pages/Register";
 
 // Root route
 export const rootRoute = new RootRoute({
-  component: () => (
-    <div>
-      <Navbar />
-      <Outlet />
-    </div>
-  ),
+  component: () => {
+    const location = useLocation();
+    const hideNavbar = location.pathname === "/login" || location.pathname === "/register";
+
+    return (
+      <div>
+        {!hideNavbar && <Navbar />}
+        <Outlet />
+      </div>
+    );
+  },
 });
 
 // Routes enfants
@@ -62,6 +69,18 @@ export const profileSecurityRoute = new Route({
   component: ProfileSecurity,
 });
 
+export const loginRoute = new Route({
+  getParentRoute: () => rootRoute,
+  path: "login",
+  component: Login,
+});
+
+export const registerRoute = new Route({
+  getParentRoute: () => rootRoute,
+  path: "register",
+  component: Register,
+});
+
 export const errorRoute = new Route({
   getParentRoute: () => rootRoute,
   path: "*",
@@ -77,6 +96,8 @@ const routeTree = rootRoute.addChildren([
   profileRoute,
   profileEditRoute,
   profileSecurityRoute,
+  loginRoute,
+  registerRoute,
   errorRoute,
 ]);
 
