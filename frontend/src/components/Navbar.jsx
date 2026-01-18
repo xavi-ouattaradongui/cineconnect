@@ -1,12 +1,58 @@
 import { Link, useRouter, useRouterState } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { useSearchMovies } from "../hooks/useMovies";
+import { useAuth } from "../contexts/AuthContext";
+import {
+  Skull,
+  Ghost,
+  Zap,
+  Heart,
+  Star,
+  Flame,
+  Crown,
+  Swords,
+  Sparkles,
+  Moon,
+  Sun,
+  Camera,
+} from "lucide-react";
+
+const AVATAR_ICONS = {
+  skull: Skull,
+  ghost: Ghost,
+  zap: Zap,
+  heart: Heart,
+  star: Star,
+  flame: Flame,
+  crown: Crown,
+  swords: Swords,
+  sparkles: Sparkles,
+  moon: Moon,
+  sun: Sun,
+  camera: Camera,
+};
+
+const AVATAR_COLORS = {
+  skull: "from-gray-500 to-gray-700",
+  ghost: "from-purple-500 to-indigo-600",
+  zap: "from-yellow-500 to-orange-600",
+  heart: "from-pink-500 to-red-600",
+  star: "from-yellow-400 to-amber-600",
+  flame: "from-orange-500 to-red-600",
+  crown: "from-yellow-500 to-yellow-600",
+  swords: "from-gray-400 to-gray-600",
+  sparkles: "from-cyan-400 to-blue-600",
+  moon: "from-indigo-400 to-purple-600",
+  sun: "from-yellow-400 to-orange-500",
+  camera: "from-gray-500 to-slate-700",
+};
 
 export default function Navbar({ onSearch }) {
   const [searchValue, setSearchValue] = useState("");
   const [isFocused, setIsFocused] = useState(false);
   const router = useRouter();
   const { location } = useRouterState();
+  const { user } = useAuth();
 
   // Synchronise l’input avec ?q
   useEffect(() => {
@@ -26,6 +72,29 @@ export default function Navbar({ onSearch }) {
       search: (prev) => ({ ...prev, q: value || undefined }),
     });
     if (onSearch) onSearch(value);
+  };
+
+  const getAvatarIcon = () => {
+    if (!user) return null;
+    const Icon = AVATAR_ICONS[user.avatar];
+    if (Icon) {
+      return <Icon size={16} className="text-white" />;
+    }
+    return (
+      <span className="text-xs font-bold text-white">
+        {user.displayName
+          .split(" ")
+          .map((word) => word[0])
+          .join("")
+          .toUpperCase()
+          .slice(0, 2)}
+      </span>
+    );
+  };
+
+  const getAvatarColor = () => {
+    if (!user) return "from-red-500 to-red-600";
+    return AVATAR_COLORS[user.avatar] || "from-red-500 to-red-600";
   };
 
   return (
@@ -143,9 +212,13 @@ export default function Navbar({ onSearch }) {
 
           {/* PROFILE */}
           <Link to="/profil" className="relative group">
-            <div className="h-8 w-8 rounded-full bg-gradient-to-br from-red-500 to-red-600 p-[1px]">
-              <div className="h-full w-full rounded-full bg-zinc-900 flex items-center justify-center text-xs font-medium text-white group-hover:bg-transparent transition-all">
-                JD
+            <div
+              className={`h-8 w-8 rounded-full bg-gradient-to-br ${getAvatarColor()} p-[1px]`}
+            >
+              <div
+                className={`h-full w-full rounded-full bg-gradient-to-br ${getAvatarColor()} flex items-center justify-center text-xs font-medium group-hover:opacity-80 transition-all`}
+              >
+                {getAvatarIcon()}
               </div>
             </div>
             <div className="absolute top-0 right-0 h-2.5 w-2.5 bg-green-500 rounded-full border-2 border-black"></div>

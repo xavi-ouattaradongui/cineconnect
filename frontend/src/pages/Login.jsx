@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useRouter } from "@tanstack/react-router";
 import { Mail, Lock, Eye, EyeOff, User } from "lucide-react";
+import { useAuth } from "../contexts/AuthContext";
 
 export default function Login() {
   const [emailOrUsername, setEmailOrUsername] = useState("");
@@ -8,6 +9,7 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const { login } = useAuth();
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -15,7 +17,18 @@ export default function Login() {
     try {
       // Simule une connexion
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      // Redirection vers la page d'accueil
+
+      // Simule les données reçues du serveur
+      const userData = {
+        id: "123",
+        username: emailOrUsername.includes("@") ? "jean_dupont" : emailOrUsername,
+        email: emailOrUsername.includes("@") ? emailOrUsername : "jean@example.com",
+        displayName: "Jean Dupont",
+        avatar:
+          "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=400&auto=format&fit=crop",
+      };
+
+      login(userData);
       router.navigate({ to: "/" });
     } catch (error) {
       console.error("Erreur de connexion:", error);

@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { Link, useRouter } from "@tanstack/react-router";
 import { Mail, Lock, User, Eye, EyeOff } from "lucide-react";
+import { useAuth } from "../contexts/AuthContext";
 
 export default function Register() {
+  const [displayName, setDisplayName] = useState("");
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -11,6 +13,7 @@ export default function Register() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const { login } = useAuth();
 
   const handleRegister = async (e) => {
     e.preventDefault();
@@ -20,10 +23,19 @@ export default function Register() {
     }
     setIsLoading(true);
     try {
-      // Simule une inscription
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      // Redirection vers la page de connexion
-      router.navigate({ to: "/login" });
+
+      const userData = {
+        id: Date.now().toString(),
+        username: username,
+        email: email,
+        displayName: displayName,
+        avatar:
+          "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=400&auto=format&fit=crop",
+      };
+
+      login(userData);
+      router.navigate({ to: "/" });
     } catch (error) {
       console.error("Erreur d'inscription:", error);
     } finally {
@@ -59,17 +71,39 @@ export default function Register() {
 
         {/* Form */}
         <form onSubmit={handleRegister} className="space-y-4">
-          {/* Username */}
+          {/* Display Name */}
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-300">Nom d'utilisateur</label>
+            <label className="text-sm font-medium text-gray-300">
+              Nom d'affichage
+            </label>
             <div className="relative">
               <User size={16} className="absolute left-3 top-3.5 text-gray-500" />
               <input
                 type="text"
+                value={displayName}
+                onChange={(e) => setDisplayName(e.target.value)}
+                placeholder="Jean Dupont"
+                className="w-full bg-white/5 border border-white/10 rounded-lg pl-10 pr-4 py-3 text-white placeholder:text-gray-600 focus:outline-none focus:ring-1 focus:ring-indigo-500/50 focus:border-indigo-500/30 transition-all"
+                required
+              />
+            </div>
+          </div>
+
+          {/* Username */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-gray-300">
+              Nom d'utilisateur
+            </label>
+            <div className="relative">
+              <span className="absolute left-3 top-3.5 text-gray-500 text-sm">
+                @
+              </span>
+              <input
+                type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                placeholder="votre_nom"
-                className="w-full bg-white/5 border border-white/10 rounded-lg pl-10 pr-4 py-3 text-white placeholder:text-gray-600 focus:outline-none focus:ring-1 focus:ring-indigo-500/50 focus:border-indigo-500/30 transition-all"
+                placeholder="jean_dupont"
+                className="w-full bg-white/5 border border-white/10 rounded-lg pl-8 pr-4 py-3 text-white placeholder:text-gray-600 focus:outline-none focus:ring-1 focus:ring-indigo-500/50 focus:border-indigo-500/30 transition-all"
                 required
               />
             </div>
@@ -116,7 +150,9 @@ export default function Register() {
 
           {/* Confirm Password */}
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-300">Confirmer le mot de passe</label>
+            <label className="text-sm font-medium text-gray-300">
+              Confirmer le mot de passe
+            </label>
             <div className="relative">
               <Lock size={16} className="absolute left-3 top-3.5 text-gray-500" />
               <input

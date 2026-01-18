@@ -1,19 +1,99 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useRouter } from "@tanstack/react-router";
 import {
   List,
   Heart,
-  MessageSquare,
-  Users,
-  UserPlus,
   Pencil,
+  LogOut,
+  Skull,
+  Ghost,
+  Zap,
+  Flame,
+  Crown,
+  Swords,
+  Sparkles,
+  Moon,
+  Sun,
+  Camera,
+  Star,
 } from "lucide-react";
 import { useFavorites } from "../contexts/FavoritesContext";
 import { useMyList } from "../contexts/MyListContext";
+import { useAuth } from "../contexts/AuthContext";
 import MovieCard from "../components/MovieCard";
+
+const AVATAR_ICONS = {
+  skull: Skull,
+  ghost: Ghost,
+  zap: Zap,
+  heart: Heart,
+  star: Star,
+  flame: Flame,
+  crown: Crown,
+  swords: Swords,
+  sparkles: Sparkles,
+  moon: Moon,
+  sun: Sun,
+  camera: Camera,
+};
+
+const AVATAR_COLORS = {
+  skull: "from-gray-500 to-gray-700",
+  ghost: "from-purple-500 to-indigo-600",
+  zap: "from-yellow-500 to-orange-600",
+  heart: "from-pink-500 to-red-600",
+  star: "from-yellow-400 to-amber-600",
+  flame: "from-orange-500 to-red-600",
+  crown: "from-yellow-500 to-yellow-600",
+  swords: "from-gray-400 to-gray-600",
+  sparkles: "from-cyan-400 to-blue-600",
+  moon: "from-indigo-400 to-purple-600",
+  sun: "from-yellow-400 to-orange-500",
+  camera: "from-gray-500 to-slate-700",
+};
 
 export default function Profile() {
   const { favorites } = useFavorites();
   const { myList } = useMyList();
+  const { user, logout } = useAuth();
+  const router = useRouter();
+
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <p>Veuillez vous connecter</p>
+      </div>
+    );
+  }
+
+  const handleLogout = () => {
+    logout();
+    router.navigate({ to: "/login" });
+  };
+
+  const getInitials = (displayName) => {
+    return displayName
+      .split(" ")
+      .map((word) => word[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
+  const getAvatarIcon = () => {
+    const Icon = AVATAR_ICONS[user.avatar];
+    if (Icon) {
+      return <Icon size={40} className="text-white" />;
+    }
+    return (
+      <span className="text-2xl font-bold text-white">
+        {getInitials(user.displayName)}
+      </span>
+    );
+  };
+
+  const getAvatarColor = () => {
+    return AVATAR_COLORS[user.avatar] || "from-red-500 to-purple-600";
+  };
 
   return (
     <div className="min-h-screen bg-black text-gray-400">
@@ -43,31 +123,42 @@ export default function Profile() {
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
               <div className="flex items-center gap-6">
-                <div className="relative h-24 w-24 shrink-0 rounded-full bg-gradient-to-br from-red-500 to-purple-600 p-[2px] shadow-2xl shadow-red-500/10">
-                  <img
-                    src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=400&auto=format&fit=crop"
-                    alt="Profile"
-                    className="h-full w-full rounded-full object-cover border-4 border-black"
-                  />
+                <div
+                  className={`relative h-24 w-24 shrink-0 rounded-full bg-gradient-to-br ${getAvatarColor()} p-[2px] shadow-2xl shadow-red-500/10`}
+                >
+                  <div
+                    className={`h-full w-full rounded-full bg-gradient-to-br ${getAvatarColor()} border-4 border-black flex items-center justify-center`}
+                  >
+                    {getAvatarIcon()}
+                  </div>
                   <div className="absolute bottom-1 right-1 h-5 w-5 bg-emerald-500 border-4 border-black rounded-full" />
                 </div>
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
                     <h1 className="text-3xl font-semibold text-white">
-                      Jean Dupont
+                      {user.displayName}
                     </h1>
                   </div>
-                  <p className="text-sm font-medium">@jeandupont</p>
+                  <p className="text-sm font-medium">@{user.username}</p>
                 </div>
               </div>
 
-              <Link
-                to="/profil/edition"
-                className="flex items-center gap-2 bg-white/5 hover:bg-white/10 text-white border border-white/10 px-4 py-2 rounded-lg text-xs font-medium transition shadow-sm"
-              >
-                <Pencil size={14} />
-                Modifier le profil
-              </Link>
+              <div className="flex gap-2">
+                <Link
+                  to="/profil/edition"
+                  className="flex items-center gap-2 bg-white/5 hover:bg-white/10 text-white border border-white/10 px-4 py-2 rounded-lg text-xs font-medium transition shadow-sm"
+                >
+                  <Pencil size={14} />
+                  Modifier le profil
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center gap-2 bg-red-600/10 hover:bg-red-600/20 text-red-400 border border-red-600/20 px-4 py-2 rounded-lg text-xs font-medium transition shadow-sm"
+                >
+                  <LogOut size={14} />
+                  Se déconnecter
+                </button>
+              </div>
             </div>
 
             {/* Favoris */}
