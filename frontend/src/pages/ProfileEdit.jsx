@@ -87,7 +87,7 @@ export default function ProfileEdit() {
 
   const getAvatarColor = () => {
     const preset = AVATAR_PRESETS.find(p => p.id === avatar);
-    return preset?.color || "from-indigo-500 to-purple-600";
+    return preset?.color || "from-yellow-500 to-orange-600";
   };
 
   return (

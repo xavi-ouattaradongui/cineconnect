@@ -2,6 +2,7 @@ import { useParams } from "@tanstack/react-router";
 import { useMovie } from "../hooks/useMovies";
 import { useFavorites } from "../contexts/FavoritesContext";
 import { useMyList } from "../contexts/MyListContext";
+import { useAuth } from "../contexts/AuthContext";
 import { Heart, Plus, Check, ArrowLeft, Star, Share2, Send } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import Loader from "../components/Loader";
@@ -11,6 +12,7 @@ export default function MovieDetails() {
   const { data: movie, isLoading, error } = useMovie(id);
   const { addFavorite, removeFavorite, isFavorite } = useFavorites();
   const { addToList, removeFromList, isInList } = useMyList();
+  const { user } = useAuth();
   const [messages, setMessages] = useState([]);
   const [messageText, setMessageText] = useState("");
   const messagesEndRef = useRef(null);
@@ -48,11 +50,19 @@ export default function MovieDetails() {
           id: Date.now(),
           text: messageText,
           author: "Vous",
+          username: user?.username || "anonyme",
           timestamp: new Date().toLocaleTimeString("fr-FR", {
             hour: "2-digit",
             minute: "2-digit",
           }),
-          avatar: "JD",
+          avatar: user?.avatar || "user",
+          avatarInitials: user?.displayName
+            ?.split(" ")
+            .map((word) => word[0])
+            .join("")
+            .toUpperCase()
+            .slice(0, 2) || "?",
+          isOwn: true,
         },
       ]);
       setMessageText("");
@@ -267,28 +277,30 @@ export default function MovieDetails() {
                   </div>
                 ) : (
                   messages.map((msg, idx) => (
-                    <div key={msg.id} className={`flex ${idx % 2 === 0 ? "justify-start" : "justify-end"}`}>
-                      <div className={`flex gap-3 max-w-xs ${idx % 2 === 1 ? "flex-row-reverse" : ""}`}>
-                        <div className={`h-8 w-8 rounded-full bg-gradient-to-br flex items-center justify-center text-xs font-semibold flex-shrink-0 ${
-                          idx % 2 === 0 
-                            ? "from-indigo-500 to-purple-600" 
-                            : "from-blue-500 to-cyan-600"
+                    <div key={msg.id} className={`flex ${msg.isOwn ? "justify-end" : "justify-start"}`}>
+                      <div className={`flex gap-3 max-w-xs ${msg.isOwn ? "flex-row-reverse" : ""}`}>
+                        <div className={`h-8 w-8 rounded-full bg-gradient-to-br flex items-center justify-center text-xs font-semibold flex-shrink-0 text-white ${
+                          msg.isOwn
+                            ? "from-blue-500 to-cyan-600"
+                            : "from-indigo-500 to-purple-600"
                         }`}>
-                          {msg.avatar}
+                          {msg.avatarInitials}
                         </div>
-                        <div className={`${idx % 2 === 0 ? "text-left" : "text-right"}`}>
+                        <div className={`${msg.isOwn ? "text-right" : "text-left"}`}>
                           <div className="flex items-center gap-2 mb-1">
-                            <span className="text-sm font-medium text-white">{msg.author}</span>
+                            <span className="text-sm font-medium text-white">
+                              {msg.isOwn ? "Vous" : msg.username}
+                            </span>
                             <span className="text-xs text-gray-600">{msg.timestamp}</span>
                           </div>
                           <div className={`px-4 py-2.5 rounded-2xl ${
-                            idx % 2 === 0
-                              ? "bg-white/10 text-gray-200 rounded-bl-none"
-                              : "bg-indigo-600/30 text-gray-100 rounded-br-none"
+                            msg.isOwn
+                              ? "bg-indigo-600/30 text-gray-100 rounded-br-none"
+                              : "bg-white/10 text-gray-200 rounded-bl-none"
                           }`}>
                             <p className="text-sm break-words">{msg.text}</p>
-                </div>
-              </div>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   ))

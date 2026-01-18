@@ -44,20 +44,20 @@ export default function MovieCard({ movie }) {
       className="group relative flex flex-col gap-3"
     >
       {/* IMAGE AVEC CADRE */}
-      <div className="relative aspect-[2/3] overflow-hidden rounded-xl bg-zinc-900 border border-white/5">
+      <div className="relative aspect-[2/3] overflow-hidden rounded-xl bg-gray-200 dark:bg-zinc-900 border border-gray-300 dark:border-white/5">
         <img
           src={movie.Poster}
           alt={movie.Title}
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 opacity-80 group-hover:opacity-100"
         />
 
-        {/* OVERLAY SOMBRE */}
-        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300"></div>
+        {/* OVERLAY */}
+        <div className="absolute inset-0 bg-white/0 dark:bg-black/0 group-hover:bg-white/20 dark:group-hover:bg-black/20 transition-colors duration-300"></div>
 
-        {/* BOUTON FAVORIS (haut gauche) */}
+        {/* BOUTON FAVORIS */}
         <button
           onClick={handleFavorite}
-          className="absolute top-2 left-2 p-2 bg-black/50 backdrop-blur-sm rounded-full text-white/50 hover:text-red-500 hover:bg-black/70 transition-all opacity-0 group-hover:opacity-100 transform -translate-y-2 group-hover:translate-y-0 duration-300"
+          className="absolute top-2 left-2 p-2 bg-white/80 dark:bg-black/50 backdrop-blur-sm rounded-full text-gray-600 dark:text-white/50 hover:text-red-500 hover:bg-white dark:hover:bg-black/70 transition-all opacity-0 group-hover:opacity-100 transform -translate-y-2 group-hover:translate-y-0 duration-300"
           title="Ajouter aux favoris"
         >
           <Heart
@@ -67,10 +67,10 @@ export default function MovieCard({ movie }) {
           />
         </button>
 
-        {/* BOUTON AJOUTER À LA LISTE (haut droite) */}
+        {/* BOUTON AJOUTER À LA LISTE */}
         <button
           onClick={handleAddToList}
-          className="absolute top-2 right-2 p-2 bg-black/50 backdrop-blur-sm rounded-full text-white/50 hover:text-white hover:bg-red-600 transition-all opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 duration-300"
+          className="absolute top-2 right-2 p-2 bg-white/80 dark:bg-black/50 backdrop-blur-sm rounded-full text-gray-600 dark:text-white/50 hover:text-white hover:bg-red-600 transition-all opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 duration-300"
           title="Ajouter à ma liste"
         >
           {isInList(movie.imdbID) ? <Check size={16} /> : <Plus size={16} />}
@@ -80,7 +80,7 @@ export default function MovieCard({ movie }) {
       {/* INFOS */}
       <div>
         <div className="flex justify-between items-start mb-1 gap-2">
-          <h3 className="text-sm font-medium text-white truncate group-hover:text-red-400 transition-colors">
+          <h3 className="text-sm font-medium text-black dark:text-white truncate group-hover:text-red-400 transition-colors">
             {movie.Title}
           </h3>
           {fullMovie?.imdbRating && (

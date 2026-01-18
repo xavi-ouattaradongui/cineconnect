@@ -12,8 +12,6 @@ import {
   Crown,
   Swords,
   Sparkles,
-  Moon,
-  Sun,
   Camera,
 } from "lucide-react";
 
@@ -27,8 +25,6 @@ const AVATAR_ICONS = {
   crown: Crown,
   swords: Swords,
   sparkles: Sparkles,
-  moon: Moon,
-  sun: Sun,
   camera: Camera,
 };
 
@@ -42,8 +38,6 @@ const AVATAR_COLORS = {
   crown: "from-yellow-500 to-yellow-600",
   swords: "from-gray-400 to-gray-600",
   sparkles: "from-cyan-400 to-blue-600",
-  moon: "from-indigo-400 to-purple-600",
-  sun: "from-yellow-400 to-orange-500",
   camera: "from-gray-500 to-slate-700",
 };
 
@@ -93,18 +87,18 @@ export default function Navbar({ onSearch }) {
   };
 
   const getAvatarColor = () => {
-    if (!user) return "from-red-500 to-red-600";
-    return AVATAR_COLORS[user.avatar] || "from-red-500 to-red-600";
+    if (!user) return "from-fuchsia-500 to-violet-600";
+    return AVATAR_COLORS[user.avatar] || "from-fuchsia-500 to-violet-600";
   };
 
   return (
-    <nav className="fixed top-0 w-full z-50 border-b border-white/5 bg-black/80 backdrop-blur-xl">
+    <nav className="fixed top-0 w-full z-50 border-b border-gray-200 dark:border-white/5 bg-white/80 dark:bg-black/80 backdrop-blur-xl">
       <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
         {/* LOGO */}
         <div className="flex items-center gap-8">
           <Link
             to="/"
-            className="text-lg font-semibold tracking-tighter text-white flex items-center gap-2 hover:text-red-600 transition-colors"
+            className="text-lg font-semibold tracking-tighter text-black dark:text-white flex items-center gap-2 hover:text-red-600 transition-colors"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -129,13 +123,13 @@ export default function Navbar({ onSearch }) {
           <div className="hidden md:flex items-center gap-6 text-sm">
             <Link
               to="/"
-              className="text-gray-400 hover:text-red-600 transition-colors"
+              className="text-gray-600 dark:text-gray-400 hover:text-red-600 transition-colors"
             >
               Découvrir
             </Link>
             <Link
               to="/ma-liste"
-              className="text-gray-400 hover:text-red-600 transition-colors"
+              className="text-gray-600 dark:text-gray-400 hover:text-red-600 transition-colors"
             >
               Ma Liste
             </Link>
@@ -145,7 +139,7 @@ export default function Navbar({ onSearch }) {
         {/* SEARCH & PROFILE */}
         <div className="flex items-center gap-4">
           {/* SEARCH */}
-          <div className="hidden sm:flex items-center bg-white/5 border border-white/5 rounded-full px-3 py-1.5 focus-within:ring-1 focus-within:ring-white/20 focus-within:border-white/20 transition-all relative">
+          <div className="hidden sm:flex items-center bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/5 rounded-full px-3 py-1.5 focus-within:ring-1 focus-within:ring-gray-300 dark:focus-within:ring-white/20 transition-all relative">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="16"
@@ -168,15 +162,15 @@ export default function Navbar({ onSearch }) {
               onChange={handleSearch}
               onFocus={() => setIsFocused(true)}
               onBlur={() => setTimeout(() => setIsFocused(false), 150)}
-              className="bg-transparent border-none outline-none text-sm text-white ml-2 placeholder:text-gray-500 w-48"
+              className="bg-transparent border-none outline-none text-sm text-black dark:text-white ml-2 placeholder:text-gray-500 w-48"
             />
-            <div className="text-[10px] border border-white/10 rounded px-1 text-gray-500">
+            <div className="text-[10px] border border-gray-300 dark:border-white/10 rounded px-1 text-gray-500">
               ⌘K
             </div>
 
             {/* Suggestions */}
             {showDropdown && (
-              <div className="absolute top-full left-0 mt-2 w-72 sm:w-80 bg-zinc-900 border border-white/10 rounded-lg shadow-xl overflow-hidden">
+              <div className="absolute top-full left-0 mt-2 w-72 sm:w-80 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-white/10 rounded-lg shadow-xl overflow-hidden">
                 {isLoading ? (
                   <div className="px-3 py-2 text-xs text-gray-400">
                     Recherche...

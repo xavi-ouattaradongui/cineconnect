@@ -95,8 +95,10 @@ export default function Profile() {
     return AVATAR_COLORS[user.avatar] || "from-red-500 to-purple-600";
   };
 
+  const hasIconPreset = !!AVATAR_ICONS[user.avatar];
+
   return (
-    <div className="min-h-screen bg-black text-gray-400">
+    <div className="min-h-screen bg-white dark:bg-black text-gray-600 dark:text-gray-400">
       <div className="h-16" />
       <main className="max-w-6xl mx-auto pt-12 px-6 pb-16">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-10">
@@ -104,14 +106,14 @@ export default function Profile() {
           <aside className="md:col-span-3 space-y-1">
             <Link
               to="/ma-liste"
-              className="flex items-center gap-3 text-sm font-medium rounded-lg px-3 py-2 hover:bg-white/5 hover:text-white transition"
+              className="flex items-center gap-3 text-sm font-medium rounded-lg px-3 py-2 hover:bg-gray-100 dark:hover:bg-white/5 hover:text-black dark:hover:text-white transition"
             >
               <List size={16} />
               Listes & Collections
             </Link>
             <Link
               to="/favoris"
-              className="flex items-center gap-3 text-sm font-medium rounded-lg px-3 py-2 hover:bg-white/5 hover:text-white transition"
+              className="flex items-center gap-3 text-sm font-medium rounded-lg px-3 py-2 hover:bg-gray-100 dark:hover:bg-white/5 hover:text-black dark:hover:text-white transition"
             >
               <Heart size={16} />
               Favoris
@@ -123,19 +125,22 @@ export default function Profile() {
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
               <div className="flex items-center gap-6">
+                {/* Avatar uniforme (pas d’anneau) */}
                 <div
-                  className={`relative h-24 w-24 shrink-0 rounded-full bg-gradient-to-br ${getAvatarColor()} p-[2px] shadow-2xl shadow-red-500/10`}
+                  className={`relative h-24 w-24 shrink-0 rounded-full flex items-center justify-center ${
+                    hasIconPreset
+                      ? `bg-gradient-to-br ${getAvatarColor()}`
+                      : "bg-gradient-to-br from-fuchsia-500 to-violet-600"
+                  }`}
                 >
-                  <div
-                    className={`h-full w-full rounded-full bg-gradient-to-br ${getAvatarColor()} border-4 border-black flex items-center justify-center`}
-                  >
-                    {getAvatarIcon()}
-                  </div>
-                  <div className="absolute bottom-1 right-1 h-5 w-5 bg-emerald-500 border-4 border-black rounded-full" />
+                  {getAvatarIcon()}
+                  <div className="absolute bottom-1 right-1 h-5 w-5 bg-emerald-500 rounded-full border-2 border-white dark:border-black" />
                 </div>
+
+                {/* User names */}
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <h1 className="text-3xl font-semibold text-white">
+                    <h1 className="text-3xl font-semibold text-black dark:text-white">
                       {user.displayName}
                     </h1>
                   </div>
@@ -143,17 +148,18 @@ export default function Profile() {
                 </div>
               </div>
 
+              {/* Actions */}
               <div className="flex gap-2">
                 <Link
                   to="/profil/edition"
-                  className="flex items-center gap-2 bg-white/5 hover:bg-white/10 text-white border border-white/10 px-4 py-2 rounded-lg text-xs font-medium transition shadow-sm"
+                  className="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 dark:bg-white/5 dark:hover:bg-white/10 text-black dark:text-white border border-gray-200 dark:border-white/10 px-4 py-2 rounded-lg text-xs font-medium transition shadow-sm"
                 >
                   <Pencil size={14} />
                   Modifier le profil
                 </Link>
                 <button
                   onClick={handleLogout}
-                  className="flex items-center gap-2 bg-red-600/10 hover:bg-red-600/20 text-red-400 border border-red-600/20 px-4 py-2 rounded-lg text-xs font-medium transition shadow-sm"
+                  className="flex items-center gap-2 bg-red-50 hover:bg-red-100 dark:bg-red-600/10 dark:hover:bg-red-600/20 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-600/20 px-4 py-2 rounded-lg text-xs font-medium transition shadow-sm"
                 >
                   <LogOut size={14} />
                   Se déconnecter
@@ -164,13 +170,13 @@ export default function Profile() {
             {/* Favoris */}
             <section className="space-y-4">
               <div className="flex items-center justify-between">
-                <h2 className="flex items-center gap-2 text-sm font-medium text-white">
+                <h2 className="flex items-center gap-2 text-sm font-medium text-black dark:text-white">
                   <Heart size={14} className="text-red-500" />
                   Favoris Récents
                 </h2>
                 <Link
                   to="/favoris"
-                  className="text-xs text-gray-400 hover:text-white transition"
+                  className="text-xs text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition"
                 >
                   Voir tout
                 </Link>
@@ -192,13 +198,13 @@ export default function Profile() {
             {/* Ma Liste */}
             <section className="space-y-4">
               <div className="flex items-center justify-between">
-                <h2 className="flex items-center gap-2 text-sm font-medium text-white">
+                <h2 className="flex items-center gap-2 text-sm font-medium text-black dark:text-white">
                   <List size={14} className="text-blue-400" />
                   Listes Récentes
                 </h2>
                 <Link
                   to="/ma-liste"
-                  className="text-xs text-gray-400 hover:text-white transition"
+                  className="text-xs text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition"
                 >
                   Voir tout
                 </Link>

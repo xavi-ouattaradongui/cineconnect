@@ -6,17 +6,20 @@ import { router } from "./routes/__root";
 import "./index.css";
 import { FavoritesProvider } from "./contexts/FavoritesContext";
 import { MyListProvider } from "./contexts/MyListContext";
+import { AuthProvider } from "./contexts/AuthContext";
 
 const queryClient = new QueryClient();
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
-      <FavoritesProvider>
-        <MyListProvider>
-          <RouterProvider router={router} />
-        </MyListProvider>
-      </FavoritesProvider>
+      <AuthProvider>
+        <FavoritesProvider>
+          <MyListProvider>
+            <RouterProvider router={router} />
+          </MyListProvider>
+        </FavoritesProvider>
+      </AuthProvider>
     </QueryClientProvider>
   </React.StrictMode>
 );

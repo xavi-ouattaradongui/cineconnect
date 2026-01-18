@@ -6,11 +6,12 @@ export default function Favorites() {
   const { favorites } = useFavorites();
 
   return (
-    <div className="min-h-screen bg-black text-white pt-24 px-8 pb-8">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-white dark:bg-black text-gray-900 dark:text-white">
+      <div className="h-16" />
+      <main className="max-w-7xl mx-auto pt-12 px-6 pb-16">
         {favorites.length > 0 && (
           <div className="mb-8">
-            <h1 className="text-4xl font-bold mb-2">Mes Favoris</h1>
+            <h1 className="text-3xl font-bold mb-8">Mes Favoris</h1>
             <p className="text-gray-400">
               {favorites.length} film{favorites.length > 1 ? "s" : ""} dans vos
               favoris
@@ -37,7 +38,7 @@ export default function Favorites() {
             ))}
           </div>
         )}
-      </div>
+      </main>
     </div>
   );
 }

@@ -96,13 +96,13 @@ export default function Home() {
   const query = location.search?.q || "";
 
   return (
-    <div className="w-full">
+    <div className="w-full bg-white dark:bg-black">
       <div className="h-24"></div>
 
       {/* HERO SECTION */}
       {!query && (
         heroPicking ? (
-          <div className="relative w-full h-[350px] rounded-2xl overflow-hidden bg-white/5 animate-pulse" />
+          <div className="relative w-full h-[350px] rounded-2xl overflow-hidden bg-gray-200 dark:bg-white/5 animate-pulse" />
         ) : fullMovie ? (
           <div className="relative w-full h-[350px] rounded-2xl overflow-hidden group">
             <img
@@ -163,7 +163,7 @@ export default function Home() {
       {!query && (
         <section className="w-full space-y-4 px-10 mb-8 mt-10">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <h3 className="text-sm font-medium uppercase tracking-widest text-gray-400 shrink-0">
+            <h3 className="text-sm font-medium uppercase tracking-widest text-gray-600 dark:text-gray-400 shrink-0">
               Parcourir par catégorie
             </h3>
           </div>
@@ -174,8 +174,8 @@ export default function Home() {
               onClick={() => setSelectedCategory(null)}
               className={`whitespace-nowrap flex items-center gap-2 px-4 py-2 rounded-full font-semibold transition-all text-sm ${
                 selectedCategory === null
-                  ? "bg-white text-black border border-white"
-                  : "bg-white/5 border border-white/10 text-gray-400 hover:text-white hover:bg-white/10 hover:border-white/20"
+                  ? "bg-black dark:bg-white text-white dark:text-black border border-black dark:border-white"
+                  : "bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white hover:bg-gray-200 dark:hover:bg-white/10"
               }`}
             >
               Tous
@@ -203,7 +203,7 @@ export default function Home() {
 
       {/* FILMS */}
       <div className="px-10 py-8">
-        <h2 className="text-lg font-medium text-white tracking-tight border-b border-white/10 pb-4 mb-6">
+        <h2 className="text-lg font-medium text-black dark:text-white tracking-tight border-b border-gray-200 dark:border-white/10 pb-4 mb-6">
           {query
             ? `Résultats pour "${query}"`
             : selectedCategory
@@ -277,13 +277,13 @@ function CategorySection({ category, displayCount }) {
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-xl font-bold flex items-center gap-2">
+        <h3 className="text-xl font-bold flex items-center gap-2 text-black dark:text-white">
           {categoryIcons[category]}
           {category}
         </h3>
         <button
           onClick={handleSeeMore}
-          className="text-white hover:text-gray-200 font-semibold flex items-center gap-2 transition border border-white/20 px-3 py-1.5 rounded-lg hover:bg-white/10"
+          className="text-black dark:text-white hover:text-gray-600 dark:hover:text-gray-200 font-semibold flex items-center gap-2 transition border border-gray-300 dark:border-white/20 px-3 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10"
         >
           Voir plus →
         </button>
@@ -309,7 +309,7 @@ function SearchResultsView({ query }) {
       {movies.length > 0 ? (
         movies.map((m) => <MovieCard key={m.imdbID} movie={m} />)
       ) : (
-        <p className="text-gray-600 text-sm">Aucun film trouvé pour "{query}".</p>
+        <p className="text-gray-600 dark:text-gray-600 text-sm">Aucun film trouvé pour "{query}".</p>
       )}
     </div>
   );
