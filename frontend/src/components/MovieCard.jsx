@@ -1,15 +1,22 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { Plus, Check } from "lucide-react";
+import { Plus, Check, Heart } from "lucide-react";
 import { useMovie } from "../hooks/useMovies";
 
 export default function MovieCard({ movie }) {
   const [isInList, setIsInList] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(false);
+
   const { data: fullMovie } = useMovie(movie.imdbID);
 
   const handleAddToList = (e) => {
     e.preventDefault();
     setIsInList(!isInList);
+  };
+
+  const handleFavorite = (e) => {
+    e.preventDefault();
+    setIsFavorite(!isFavorite);
   };
 
   const getRatingColor = (rating) => {
@@ -34,20 +41,29 @@ export default function MovieCard({ movie }) {
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 opacity-80 group-hover:opacity-100"
         />
 
-        {/* OVERLAY SOMBRE AU HOVER */}
+        {/* OVERLAY SOMBRE */}
         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300"></div>
 
-        {/* BOUTON AJOUTER À MA LISTE - VISIBLE AU HOVER */}
+        {/* BOUTON FAVORIS (haut gauche) */}
+        <button
+          onClick={handleFavorite}
+          className="absolute top-2 left-2 p-2 bg-black/50 backdrop-blur-sm rounded-full text-white/50 hover:text-red-500 hover:bg-black/70 transition-all opacity-0 group-hover:opacity-100 transform -translate-y-2 group-hover:translate-y-0 duration-300"
+          title="Ajouter aux favoris"
+        >
+          <Heart
+            size={16}
+            fill={isFavorite ? "#ef4444" : "transparent"} // Rouge si favori
+            className={isFavorite ? "text-red-500" : ""}
+          />
+        </button>
+
+        {/* BOUTON AJOUTER À LA LISTE (haut droite) */}
         <button
           onClick={handleAddToList}
           className="absolute top-2 right-2 p-2 bg-black/50 backdrop-blur-sm rounded-full text-white/50 hover:text-white hover:bg-red-600 transition-all opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 duration-300"
           title="Ajouter à ma liste"
         >
-          {isInList ? (
-            <Check size={16} />
-          ) : (
-            <Plus size={16} />
-          )}
+          {isInList ? <Check size={16} /> : <Plus size={16} />}
         </button>
       </div>
 
@@ -77,3 +93,4 @@ export default function MovieCard({ movie }) {
     </Link>
   );
 }
+
