@@ -5,6 +5,9 @@ import MovieDetails from "../pages/MovieDetails";
 import ErrorPage from "../pages/ErrorPage";
 import Favorites from "../pages/Favorites";
 import MyList from "../pages/MyList";
+import Profile from "../pages/Profile";
+import ProfileEdit from "../pages/ProfileEdit";
+import ProfileSecurity from "../pages/ProfileSecurity";
 
 // Root route
 export const rootRoute = new RootRoute({
@@ -41,6 +44,24 @@ export const myListRoute = new Route({
   component: MyList,
 });
 
+export const profileRoute = new Route({
+  getParentRoute: () => rootRoute,
+  path: "profil",
+  component: Profile,
+});
+
+export const profileEditRoute = new Route({
+  getParentRoute: () => rootRoute,
+  path: "profil/edition",
+  component: ProfileEdit,
+});
+
+export const profileSecurityRoute = new Route({
+  getParentRoute: () => rootRoute,
+  path: "profil/securite",
+  component: ProfileSecurity,
+});
+
 export const errorRoute = new Route({
   getParentRoute: () => rootRoute,
   path: "*",
@@ -48,7 +69,16 @@ export const errorRoute = new Route({
 });
 
 // Créer routeTree
-const routeTree = rootRoute.addChildren([homeRoute, filmRoute, favoritesRoute, myListRoute, errorRoute]);
+const routeTree = rootRoute.addChildren([
+  homeRoute,
+  filmRoute,
+  favoritesRoute,
+  myListRoute,
+  profileRoute,
+  profileEditRoute,
+  profileSecurityRoute,
+  errorRoute,
+]);
 
 // Créer router
 export const router = createRouter({ routeTree });

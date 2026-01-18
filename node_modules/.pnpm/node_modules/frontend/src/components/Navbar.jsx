@@ -148,14 +148,14 @@ export default function Navbar({ onSearch }) {
           </div>
 
           {/* PROFILE */}
-          <button className="relative group">
+          <Link to="/profil" className="relative group">
             <div className="h-8 w-8 rounded-full bg-gradient-to-br from-red-500 to-red-600 p-[1px]">
               <div className="h-full w-full rounded-full bg-zinc-900 flex items-center justify-center text-xs font-medium text-white group-hover:bg-transparent transition-all">
                 JD
               </div>
             </div>
             <div className="absolute top-0 right-0 h-2.5 w-2.5 bg-green-500 rounded-full border-2 border-black"></div>
-          </button>
+          </Link>
         </div>
       </div>
     </nav>
