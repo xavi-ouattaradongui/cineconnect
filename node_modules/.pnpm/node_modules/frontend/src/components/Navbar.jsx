@@ -47,16 +47,16 @@ export default function Navbar({ onSearch }) {
               Découvrir
             </Link>
             <Link
-              to="#"
+              to="/ma-liste"
               className="text-gray-400 hover:text-red-600 transition-colors"
             >
               Ma Liste
             </Link>
             <Link
-              to="#"
+              to="/favoris"
               className="text-gray-400 hover:text-red-600 transition-colors"
             >
-              Communauté
+              Favoris
             </Link>
           </div>
         </div>

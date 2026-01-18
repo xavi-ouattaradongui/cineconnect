@@ -3,6 +3,8 @@ import Navbar from "../components/Navbar";
 import Home from "../pages/Home";
 import MovieDetails from "../pages/MovieDetails";
 import ErrorPage from "../pages/ErrorPage";
+import Favorites from "../pages/Favorites";
+import MyList from "../pages/MyList";
 
 // Root route
 export const rootRoute = new RootRoute({
@@ -27,6 +29,18 @@ export const filmRoute = new Route({
   component: MovieDetails,
 });
 
+export const favoritesRoute = new Route({
+  getParentRoute: () => rootRoute,
+  path: "favoris",
+  component: Favorites,
+});
+
+export const myListRoute = new Route({
+  getParentRoute: () => rootRoute,
+  path: "ma-liste",
+  component: MyList,
+});
+
 export const errorRoute = new Route({
   getParentRoute: () => rootRoute,
   path: "*",
@@ -34,7 +48,7 @@ export const errorRoute = new Route({
 });
 
 // Créer routeTree
-const routeTree = rootRoute.addChildren([homeRoute, filmRoute, errorRoute]);
+const routeTree = rootRoute.addChildren([homeRoute, filmRoute, favoritesRoute, myListRoute, errorRoute]);
 
 // Créer router
 export const router = createRouter({ routeTree });
