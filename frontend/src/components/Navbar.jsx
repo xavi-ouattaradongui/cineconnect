@@ -70,12 +70,6 @@ export default function Navbar({ onSearch }) {
             >
               Ma Liste
             </Link>
-            <Link
-              to="/favoris"
-              className="text-gray-400 hover:text-red-600 transition-colors"
-            >
-              Favoris
-            </Link>
           </div>
         </div>
 

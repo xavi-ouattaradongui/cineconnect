@@ -36,25 +36,6 @@ export default function Profile() {
               <Heart size={16} />
               Favoris
             </Link>
-            <button className="flex items-center gap-3 text-sm font-medium rounded-lg px-3 py-2 hover:bg-white/5 hover:text-white transition w-full text-left">
-              <MessageSquare size={16} />
-              Messages
-            </button>
-
-            <div className="pt-6 border-t border-white/10">
-              <p className="px-3 text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
-                Social
-              </p>
-              <button className="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg hover:bg-white/5 hover:text-white transition w-full text-left">
-                <Users size={16} />
-                Abonnés <span className="ml-auto text-xs opacity-60">128</span>
-              </button>
-              <button className="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg hover:bg-white/5 hover:text-white transition w-full text-left">
-                <UserPlus size={16} />
-                Abonnements{" "}
-                <span className="ml-auto text-xs opacity-60">42</span>
-              </button>
-            </div>
           </aside>
 
           {/* Main content */}
@@ -94,7 +75,7 @@ export default function Profile() {
               <div className="flex items-center justify-between">
                 <h2 className="flex items-center gap-2 text-sm font-medium text-white">
                   <Heart size={14} className="text-red-500" />
-                  Favoris
+                  Favoris Récents
                 </h2>
                 <Link
                   to="/favoris"
@@ -122,7 +103,7 @@ export default function Profile() {
               <div className="flex items-center justify-between">
                 <h2 className="flex items-center gap-2 text-sm font-medium text-white">
                   <List size={14} className="text-blue-400" />
-                  Ma Liste
+                  Listes Récentes
                 </h2>
                 <Link
                   to="/ma-liste"

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { Star, Plus, RotateCcw, Smile, Ghost, Zap, Shield, Heart, Check } from "lucide-react";
 import MovieCard from "../components/MovieCard";
@@ -30,11 +30,51 @@ export default function Home() {
     "Romance",
   ];
 
-  // Film du héro - basé sur "action"
-  const { data: heroData } = useSearchMovies("batman");
+  // Reco hero : catégorie aléatoire + meilleur noté de cette catégorie
+  const heroQuery = useMemo(
+    () => categories[Math.floor(Math.random() * categories.length)],
+    [] // une seule fois par montage
+  );
+  const { data: heroData } = useSearchMovies(heroQuery);
   const heroMovies = heroData?.Search || [];
-  const bestMovie = heroMovies.length > 0 ? heroMovies[0] : null;
-  const { data: fullMovie } = useMovie(bestMovie?.imdbID);
+
+  const [heroBestId, setHeroBestId] = useState(null);
+  const [heroPicking, setHeroPicking] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    const pickBest = async () => {
+      if (!heroMovies.length) return;
+      setHeroPicking(true);
+      const candidates = heroMovies.slice(0, 6); // limite pour éviter trop d'appels
+      const results = await Promise.all(
+        candidates.map(async (m) => {
+          try {
+            const res = await fetch(
+              `https://www.omdbapi.com/?apikey=${import.meta.env.VITE_OMDB_API_KEY}&i=${m.imdbID}`
+            );
+            const data = await res.json();
+            const rating = parseFloat(data.imdbRating) || 0;
+            return { movie: m, rating };
+          } catch {
+            return { movie: m, rating: 0 };
+          }
+        })
+      );
+      if (cancelled || results.length === 0) return;
+      const best = results.reduce((best, cur) =>
+        cur.rating > best.rating ? cur : best
+      );
+      setHeroBestId(best.movie.imdbID);
+      setHeroPicking(false);
+    };
+    pickBest();
+    return () => {
+      cancelled = true;
+    };
+  }, [heroMovies]);
+
+  const { data: fullMovie } = useMovie(heroBestId);
   const { addToList, removeFromList, isInList } = useMyList();
 
   const handleHeroListClick = () => {
@@ -60,59 +100,63 @@ export default function Home() {
       <div className="h-24"></div>
 
       {/* HERO SECTION */}
-      {!query && fullMovie && (
-        <div className="relative w-full h-[350px] rounded-2xl overflow-hidden group">
-          <img
-            src={fullMovie.Poster}
-            alt={fullMovie.Title}
-            className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent"></div>
+      {!query && (
+        heroPicking ? (
+          <div className="relative w-full h-[350px] rounded-2xl overflow-hidden bg-white/5 animate-pulse" />
+        ) : fullMovie ? (
+          <div className="relative w-full h-[350px] rounded-2xl overflow-hidden group">
+            <img
+              src={fullMovie.Poster}
+              alt={fullMovie.Title}
+              className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent"></div>
 
-          <div className="absolute bottom-0 left-0 p-8 w-full">
-            <div className="flex items-center gap-3 mb-3">
-              <span className="bg-red-500/20 text-red-300 border border-red-500/30 backdrop-blur-md px-2 py-0.5 rounded text-[10px] font-medium tracking-wide uppercase">
-                À la une
-              </span>
-              <div className="flex items-center gap-1 text-yellow-500 text-xs font-medium">
-                <Star size={12} fill="currentColor" />
-                {fullMovie.imdbRating}
+            <div className="absolute bottom-0 left-0 p-8 w-full">
+              <div className="flex items-center gap-3 mb-3">
+                <span className="bg-red-500/20 text-red-300 border border-red-500/30 backdrop-blur-md px-2 py-0.5 rounded text-[10px] font-medium tracking-wide uppercase">
+                  À la une
+                </span>
+                <div className="flex items-center gap-1 text-yellow-500 text-xs font-medium">
+                  <Star size={12} fill="currentColor" />
+                  {fullMovie.imdbRating}
+                </div>
+              </div>
+
+              <h1 className="text-4xl sm:text-5xl font-semibold text-white tracking-tight mb-3">
+                {fullMovie.Title}
+              </h1>
+              <p className="text-gray-300 text-sm max-w-lg mb-6 leading-relaxed line-clamp-2">
+                {fullMovie.Plot}
+              </p>
+
+              <div className="flex gap-3">
+                <Link
+                  to={`/film/${fullMovie.imdbID}`}
+                  className="hover:bg-gray-200 transition-colors flex text-sm font-medium text-black bg-white rounded-lg px-5 py-2.5 items-center gap-2"
+                >
+                  Détails
+                </Link>
+                <button
+                  onClick={handleHeroListClick}
+                  className="bg-white/10 text-white border border-white/10 px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-white/20 transition-colors flex items-center gap-2"
+                >
+                  {isInList(fullMovie.imdbID) ? (
+                    <>
+                      <Check size={16} />
+                      Dans ma liste
+                    </>
+                  ) : (
+                    <>
+                      <Plus size={16} />
+                      Ajouter à ma liste
+                    </>
+                  )}
+                </button>
               </div>
             </div>
-
-            <h1 className="text-4xl sm:text-5xl font-semibold text-white tracking-tight mb-3">
-              {fullMovie.Title}
-            </h1>
-            <p className="text-gray-300 text-sm max-w-lg mb-6 leading-relaxed line-clamp-2">
-              {fullMovie.Plot}
-            </p>
-
-            <div className="flex gap-3">
-              <Link
-                to={`/film/${fullMovie.imdbID}`}
-                className="hover:bg-gray-200 transition-colors flex text-sm font-medium text-black bg-white rounded-lg px-5 py-2.5 items-center gap-2"
-              >
-                Détails
-              </Link>
-              <button
-                onClick={handleHeroListClick}
-                className="bg-white/10 text-white border border-white/10 px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-white/20 transition-colors flex items-center gap-2"
-              >
-                {isInList(fullMovie.imdbID) ? (
-                  <>
-                    <Check size={16} />
-                    Dans ma liste
-                  </>
-                ) : (
-                  <>
-                    <Plus size={16} />
-                    Ajouter à ma liste
-                  </>
-                )}
-              </button>
-            </div>
           </div>
-        </div>
+        ) : null
       )}
 
       {/* CATEGORIES */}
