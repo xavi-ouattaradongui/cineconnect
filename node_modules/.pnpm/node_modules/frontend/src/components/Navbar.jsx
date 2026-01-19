@@ -48,10 +48,12 @@ export default function Navbar({ onSearch }) {
   const { location } = useRouterState();
   const { user } = useAuth();
 
-  // Synchronise l’input avec ?q
+  // Synchronise l'input avec ?q UNIQUEMENT sur la page d'accueil
   useEffect(() => {
-    setSearchValue(location.search?.q || "");
-  }, [location.search?.q]);
+    if (location.pathname === "/") {
+      setSearchValue(location.search?.q || "");
+    }
+  }, [location.search?.q, location.pathname]);
 
   // Recherche dès la 1ère lettre
   const { data, isLoading } = useSearchMovies(searchValue);
@@ -61,10 +63,15 @@ export default function Navbar({ onSearch }) {
   const handleSearch = (e) => {
     const value = e.target.value;
     setSearchValue(value);
-    router.navigate({
-      to: "/",
-      search: (prev) => ({ ...prev, q: value || undefined }),
-    });
+
+    // Naviguer seulement si on est sur la page d'accueil
+    if (location.pathname === "/") {
+      router.navigate({
+        to: "/",
+        search: (prev) => ({ ...prev, q: value || undefined }),
+      });
+    }
+
     if (onSearch) onSearch(value);
   };
 
@@ -98,7 +105,7 @@ export default function Navbar({ onSearch }) {
         <div className="flex items-center gap-8">
           <Link
             to="/"
-            className="text-lg font-semibold tracking-tighter text-black dark:text-white flex items-center gap-2 hover:text-red-600 transition-colors"
+            className="text-lg font-semibold tracking-tighter text-black dark:text-white flex items-center gap-2 hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -123,13 +130,13 @@ export default function Navbar({ onSearch }) {
           <div className="hidden md:flex items-center gap-6 text-sm">
             <Link
               to="/"
-              className="text-gray-600 dark:text-gray-400 hover:text-red-600 transition-colors"
+              className="text-gray-600 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
             >
               Découvrir
             </Link>
             <Link
               to="/ma-liste"
-              className="text-gray-600 dark:text-gray-400 hover:text-red-600 transition-colors"
+              className="text-gray-600 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
             >
               Ma Liste
             </Link>

@@ -80,7 +80,7 @@ export default function MovieCard({ movie }) {
       {/* INFOS */}
       <div>
         <div className="flex justify-between items-start mb-1 gap-2">
-          <h3 className="text-sm font-medium text-black dark:text-white truncate group-hover:text-red-400 transition-colors">
+          <h3 className="text-sm font-medium text-black dark:text-white truncate group-hover:text-blue-500 transition-colors">
             {movie.Title}
           </h3>
           {fullMovie?.imdbRating && (

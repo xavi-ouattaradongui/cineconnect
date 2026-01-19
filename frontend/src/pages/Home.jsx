@@ -138,7 +138,7 @@ export default function Home() {
                 </Link>
                 <button
                   onClick={handleHeroListClick}
-                  className="bg-white/10 text-white border border-white/10 px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-white/20 transition-colors flex items-center gap-2"
+                  className="bg-white/10 text-white border border-white/10 px-5 py-2.5 rounded-lg text-sm font-medium hover:text-blue-500 hover:bg-white/20 transition-colors flex items-center gap-2"
                 >
                   {isInList(fullMovie.imdbID) ? (
                     <>
@@ -174,7 +174,7 @@ export default function Home() {
               className={`whitespace-nowrap flex items-center gap-2 px-4 py-2 rounded-full font-semibold transition-all text-sm ${
                 selectedCategory === null
                   ? "bg-black dark:bg-white text-white dark:text-black border border-black dark:border-white"
-                  : "bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white hover:bg-gray-200 dark:hover:bg-white/10"
+                  : "bg-gray-100 dark:bg-white/5 border border-gray-300 dark:border-white/10 text-gray-600 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 hover:bg-gray-200 dark:hover:bg-white/10"
               }`}
             >
               Tous
@@ -188,8 +188,8 @@ export default function Home() {
                 onClick={() => setSelectedCategory(category)}
                 className={`whitespace-nowrap flex items-center gap-2 px-4 py-2 rounded-full font-semibold transition-all text-sm ${
                   selectedCategory === category
-                    ? "bg-white text-black border border-white"
-                    : "bg-white/5 border border-white/10 text-gray-400 hover:text-white hover:bg-white/10 hover:border-white/20"
+                    ? "bg-black dark:bg-white text-white dark:text-black border border-black dark:border-white"
+                    : "bg-gray-100 dark:bg-white/5 border border-gray-300 dark:border-white/10 text-gray-600 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 hover:bg-gray-200 dark:hover:bg-white/10"
                 }`}
               >
                 {categoryIcons[category]}
@@ -259,8 +259,6 @@ function AllCategoriesView({ categories, displayCount }) {
 
 function CategorySection({ category, displayCount }) {
   const { data, isLoading } = useSearchMovies(category);
-
-  // ✔️ On affiche uniquement 6 films à l'accueil
   const movies = (data?.Search || []).slice(0, displayCount);
 
   if (isLoading) return <Loader />;
@@ -280,9 +278,17 @@ function CategorySection({ category, displayCount }) {
         </h3>
         <button
           onClick={handleSeeMore}
-          className="text-black dark:text-white hover:text-gray-600 dark:hover:text-gray-200 font-semibold flex items-center gap-2 transition border border-gray-300 dark:border-white/20 px-3 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10"
+          className="group flex items-center gap-1.5 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 transition-all"
         >
-          Voir plus →
+          <span>Voir plus</span>
+          <svg
+            className="w-4 h-4 transition-transform group-hover:translate-x-1"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
         </button>
       </div>
 
