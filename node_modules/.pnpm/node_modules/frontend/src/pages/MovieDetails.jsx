@@ -74,7 +74,7 @@ export default function MovieDetails() {
   if (!movie) return <div className="px-10 py-10">Film non trouvé</div>;
 
   return (
-    <div className="w-full bg-black text-white min-h-screen">
+    <div className="w-full bg-white dark:bg-black text-gray-900 dark:text-white min-h-screen">
       <div className="h-16"></div>
 
       {/* HERO SECTION */}
@@ -192,7 +192,7 @@ export default function MovieDetails() {
                 </svg>
                 <span className="absolute text-2xl font-bold text-white">{movie.imdbRating}</span>
               </div>
-              <span className="text-xs text-gray-400 font-medium">IMDb</span>
+              <span className="text-xs text-gray-400 font-medium"></span>
             </div>
           </div>
         </div>
@@ -206,46 +206,46 @@ export default function MovieDetails() {
           
           {/* SYNOPSIS */}
           <section>
-            <h3 className="text-sm font-semibold text-white uppercase tracking-widest mb-4 flex items-center gap-2">
+            <h3 className="text-sm font-semibold text-black dark:text-white uppercase tracking-widest mb-4 flex items-center gap-2">
               <Star size={16} className="text-blue-500" />
               Synopsis
             </h3>
-            <p className="text-gray-400 leading-relaxed">
+            <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
               {movie.Plot}
             </p>
           </section>
 
           {/* INFOS TECHNIQUES */}
           <section>
-            <h3 className="text-sm font-semibold text-white uppercase tracking-widest mb-4">
+            <h3 className="text-sm font-semibold text-black dark:text-white uppercase tracking-widest mb-4">
               Informations
             </h3>
             <div className="grid grid-cols-2 gap-4 text-sm">
-              <div className="bg-white/5 border border-white/10 p-4 rounded-lg">
+              <div className="bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 p-4 rounded-lg">
                 <p className="text-gray-500 text-xs mb-1">Réalisateur</p>
-                <p className="text-white font-medium">{movie.Director}</p>
+                <p className="text-black dark:text-white font-medium">{movie.Director}</p>
               </div>
-              <div className="bg-white/5 border border-white/10 p-4 rounded-lg">
+              <div className="bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 p-4 rounded-lg">
                 <p className="text-gray-500 text-xs mb-1">Date de sortie</p>
-                <p className="text-white font-medium">{movie.Released}</p>
+                <p className="text-black dark:text-white font-medium">{movie.Released}</p>
               </div>
-              <div className="bg-white/5 border border-white/10 p-4 rounded-lg">
+              <div className="bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 p-4 rounded-lg">
                 <p className="text-gray-500 text-xs mb-1">Genre</p>
-                <p className="text-white font-medium">{movie.Genre}</p>
+                <p className="text-black dark:text-white font-medium">{movie.Genre}</p>
               </div>
-              <div className="bg-white/5 border border-white/10 p-4 rounded-lg">
+              <div className="bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 p-4 rounded-lg">
                 <p className="text-gray-500 text-xs mb-1">Durée</p>
-                <p className="text-white font-medium">{movie.Runtime}</p>
+                <p className="text-black dark:text-white font-medium">{movie.Runtime}</p>
               </div>
             </div>
           </section>
 
           {/* CAST */}
           <section>
-            <h3 className="text-sm font-semibold text-white uppercase tracking-widest mb-4">
+            <h3 className="text-sm font-semibold text-black dark:text-white uppercase tracking-widest mb-4">
               Acteurs principaux
             </h3>
-            <p className="text-gray-400 text-sm">
+            <p className="text-gray-600 dark:text-gray-400 text-sm">
               {movie.Actors}
             </p>
           </section>
@@ -253,50 +253,48 @@ export default function MovieDetails() {
           {/* DISCUSSION/CHAT */}
           <section>
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-sm font-semibold text-white uppercase tracking-widest flex items-center gap-2">
+              <h3 className="text-sm font-semibold text-black dark:text-white uppercase tracking-widest flex items-center gap-2">
                 <Send size={16} className="text-indigo-400" />
                 Discussion en direct
-            </h3>
-              <span className="text-xs font-medium text-gray-500 bg-white/5 px-2.5 py-1 rounded-full">
+              </h3>
+              <span className="text-xs font-medium text-gray-600 dark:text-gray-500 bg-gray-100 dark:bg-white/5 px-2.5 py-1 rounded-full">
                 {messages.length} message{messages.length > 1 ? "s" : ""}
               </span>
             </div>
 
-            {/* CHAT CONTAINER - REDESIGNED */}
-            <div className="bg-gradient-to-b from-white/5 to-white/[0.02] border border-white/10 rounded-2xl overflow-hidden flex flex-col h-[500px] shadow-2xl shadow-black/50">
+            {/* CHAT CONTAINER */}
+            <div className="bg-gradient-to-b from-gray-100 to-gray-50 dark:from-white/5 dark:to-white/[0.02] border border-gray-200 dark:border-white/10 rounded-2xl overflow-hidden flex flex-col h-[500px] shadow-2xl">
               
               {/* MESSAGES LIST */}
               <div className="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar">
                 {messages.length === 0 ? (
                   <div className="flex flex-col items-center justify-center h-full text-center">
-                    <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center mb-3">
-                      <Send size={20} className="text-gray-600" />
+                    <div className="w-12 h-12 rounded-full bg-gray-200 dark:bg-white/10 flex items-center justify-center mb-3">
+                      <Send size={20} className="text-gray-400 dark:text-gray-600" />
                     </div>
                     <p className="text-sm text-gray-500">Aucun message pour le moment</p>
-                    <p className="text-xs text-gray-600 mt-1">Soyez le premier à partager votre avis!</p>
+                    <p className="text-xs text-gray-400 dark:text-gray-600 mt-1">Soyez le premier à partager votre avis!</p>
                   </div>
                 ) : (
-                  messages.map((msg, idx) => (
+                  messages.map((msg) => (
                     <div key={msg.id} className={`flex ${msg.isOwn ? "justify-end" : "justify-start"}`}>
                       <div className={`flex gap-3 max-w-xs ${msg.isOwn ? "flex-row-reverse" : ""}`}>
                         <div className={`h-8 w-8 rounded-full bg-gradient-to-br flex items-center justify-center text-xs font-semibold flex-shrink-0 text-white ${
-                          msg.isOwn
-                            ? "from-blue-500 to-cyan-600"
-                            : "from-indigo-500 to-purple-600"
+                          msg.isOwn ? "from-blue-500 to-cyan-600" : "from-indigo-500 to-purple-600"
                         }`}>
                           {msg.avatarInitials}
                         </div>
                         <div className={`${msg.isOwn ? "text-right" : "text-left"}`}>
                           <div className="flex items-center gap-2 mb-1">
-                            <span className="text-sm font-medium text-white">
+                            <span className="text-sm font-medium text-black dark:text-white">
                               {msg.isOwn ? "Vous" : msg.username}
                             </span>
-                            <span className="text-xs text-gray-600">{msg.timestamp}</span>
+                            <span className="text-xs text-gray-500 dark:text-gray-600">{msg.timestamp}</span>
                           </div>
                           <div className={`px-4 py-2.5 rounded-2xl ${
                             msg.isOwn
-                              ? "bg-indigo-600/30 text-gray-100 rounded-br-none"
-                              : "bg-white/10 text-gray-200 rounded-bl-none"
+                              ? "bg-indigo-600/30 text-gray-900 dark:text-gray-100 rounded-br-none"
+                              : "bg-gray-200 dark:bg-white/10 text-gray-900 dark:text-gray-200 rounded-bl-none"
                           }`}>
                             <p className="text-sm break-words">{msg.text}</p>
                           </div>
@@ -309,27 +307,27 @@ export default function MovieDetails() {
               </div>
 
               {/* DIVIDER */}
-              <div className="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+              <div className="h-px bg-gradient-to-r from-transparent via-gray-300 dark:via-white/10 to-transparent" />
 
               {/* INPUT FORM */}
-              <form onSubmit={handleSendMessage} className="p-4 bg-white/[0.02] backdrop-blur-sm">
+              <form onSubmit={handleSendMessage} className="p-4 bg-gray-50 dark:bg-white/[0.02] backdrop-blur-sm">
                 <div className="flex gap-3 items-end">
                   <input
                     type="text"
                     value={messageText}
                     onChange={(e) => setMessageText(e.target.value)}
                     placeholder="Partagez votre avis..."
-                    className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder:text-gray-600 focus:outline-none focus:ring-1 focus:ring-indigo-500/50 focus:border-indigo-500/30 transition-all"
+                    className="flex-1 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-black dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-600 focus:outline-none focus:ring-1 focus:ring-indigo-500/50 focus:border-indigo-500/30 transition-all"
                   />
                   <button
                     type="submit"
                     disabled={!messageText.trim()}
-                    className="p-2.5 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-700 hover:to-indigo-600 text-white rounded-xl transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:from-indigo-600 disabled:hover:to-indigo-500 shadow-lg shadow-indigo-500/20"
+                    className="p-2.5 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-700 hover:to-indigo-600 text-white rounded-xl transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-lg shadow-indigo-500/20"
                   >
                     <Send size={18} />
                   </button>
                 </div>
-                <p className="text-xs text-gray-600 mt-2">Appuyez sur Entrée ou cliquez pour envoyer</p>
+                <p className="text-xs text-gray-500 dark:text-gray-600 mt-2">Appuyez sur Entrée ou cliquez pour envoyer</p>
               </form>
             </div>
           </section>
@@ -337,14 +335,14 @@ export default function MovieDetails() {
 
         {/* RIGHT COLUMN - SIDEBAR */}
         <div className="lg:col-span-1">
-          <div className="bg-white/5 border border-white/10 rounded-lg p-6 sticky top-24">
-            <h3 className="text-sm font-semibold text-white uppercase tracking-widest mb-4">
+          <div className="bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg p-6 sticky top-24">
+            <h3 className="text-sm font-semibold text-black dark:text-white uppercase tracking-widest mb-4">
               À propos
             </h3>
-            <div className="space-y-3 text-sm text-gray-400">
-              <p><span className="text-white font-medium">Note IMDB:</span> {movie.imdbRating}/10</p>
-              <p><span className="text-white font-medium">Année:</span> {movie.Year}</p>
-              <p><span className="text-white font-medium">Pays:</span> {movie.Country || "N/A"}</p>
+            <div className="space-y-3 text-sm text-gray-600 dark:text-gray-400">
+              <p><span className="text-black dark:text-white font-medium">Note:</span> {movie.imdbRating}/10</p>
+              <p><span className="text-black dark:text-white font-medium">Année:</span> {movie.Year}</p>
+              <p><span className="text-black dark:text-white font-medium">Pays:</span> {movie.Country || "N/A"}</p>
             </div>
           </div>
         </div>

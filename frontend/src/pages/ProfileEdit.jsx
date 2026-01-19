@@ -91,7 +91,7 @@ export default function ProfileEdit() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-gray-400">
+    <div className="min-h-screen bg-white dark:bg-black text-gray-600 dark:text-gray-400">
       <div className="h-16" />
       <main className="max-w-6xl mx-auto pt-12 px-6 pb-16">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-10">
@@ -99,14 +99,14 @@ export default function ProfileEdit() {
           <aside className="md:col-span-3 space-y-1">
             <Link
               to="/profil/edition"
-              className="flex items-center gap-3 px-3 py-2 text-sm font-medium text-white bg-white/5 rounded-lg border border-white/5 transition"
+              className="flex items-center gap-3 px-3 py-2 text-sm font-medium text-black dark:text-white bg-gray-100 dark:bg-white/5 rounded-lg border border-gray-200 dark:border-white/5 transition"
             >
               <User size={16} className="text-indigo-400" />
               Général
             </Link>
             <Link
               to="/profil/securite"
-              className="flex items-center gap-3 px-3 py-2 text-sm font-medium text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition"
+              className="flex items-center gap-3 px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5 rounded-lg transition"
             >
               <Shield size={16} />
               Sécurité
@@ -115,8 +115,8 @@ export default function ProfileEdit() {
 
           {/* Form */}
           <div className="md:col-span-9 space-y-10">
-            <div className="border-b border-white/5 pb-8">
-              <h1 className="text-2xl font-medium text-white">Paramètres généraux</h1>
+            <div className="border-b border-gray-200 dark:border-white/5 pb-8">
+              <h1 className="text-2xl font-medium text-black dark:text-white">Paramètres généraux</h1>
               <p className="mt-1 text-sm text-gray-500">
                 Gérez vos informations personnelles et préférences de profil.
               </p>
@@ -124,20 +124,18 @@ export default function ProfileEdit() {
 
             {/* Avatar Preview */}
             <div className="flex items-center gap-6">
-              <div className="h-20 w-20 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 p-[1px]">
-                <div className={`h-full w-full rounded-full bg-gradient-to-br ${getAvatarColor()} border-2 border-black flex items-center justify-center`}>
-                  {getAvatarIcon()}
-                </div>
+              <div className={`h-20 w-20 rounded-full bg-gradient-to-br ${getAvatarColor()} flex items-center justify-center`}>
+                {getAvatarIcon()}
               </div>
               <div>
-                <p className="text-sm font-medium text-white">Avatar actuel</p>
+                <p className="text-sm font-medium text-black dark:text-white">Avatar actuel</p>
                 <p className="text-xs text-gray-500">Choisissez un avatar ci-dessous</p>
               </div>
             </div>
 
             {/* Avatar Gallery */}
             <div>
-              <h3 className="text-sm font-medium text-white uppercase tracking-wider mb-4">
+              <h3 className="text-sm font-medium text-black dark:text-white uppercase tracking-wider mb-4">
                 Choisir un avatar
               </h3>
               <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-3">
@@ -151,7 +149,7 @@ export default function ProfileEdit() {
                       className={`relative aspect-square rounded-lg border-2 transition-all hover:scale-105 flex items-center justify-center ${
                         selectedPreset === preset.id
                           ? "border-indigo-500 bg-indigo-500/20"
-                          : "border-white/10 bg-white/5 hover:border-white/20"
+                          : "border-gray-200 dark:border-white/10 bg-gray-100 dark:bg-white/5 hover:border-gray-300 dark:hover:border-white/20"
                       }`}
                       title={preset.label}
                     >
@@ -180,7 +178,7 @@ export default function ProfileEdit() {
                     type="text"
                     value={form.displayName}
                     onChange={handleChange("displayName")}
-                    className="w-full bg-transparent border border-white/10 rounded-lg px-3 py-2.5 text-sm text-white placeholder:text-gray-500/50 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 transition-all shadow-sm"
+                    className="w-full bg-white dark:bg-transparent border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2.5 text-sm text-black dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500/50 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 transition-all shadow-sm"
                   />
                 </div>
                 <div className="space-y-2">
@@ -195,7 +193,7 @@ export default function ProfileEdit() {
                       type="text"
                       value={form.username}
                       onChange={handleChange("username")}
-                      className="w-full bg-transparent border border-white/10 rounded-lg pl-7 pr-3 py-2.5 text-sm text-white placeholder:text-gray-500/50 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 transition-all shadow-sm"
+                      className="w-full bg-white dark:bg-transparent border border-gray-200 dark:border-white/10 rounded-lg pl-7 pr-3 py-2.5 text-sm text-black dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500/50 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 transition-all shadow-sm"
                     />
                   </div>
                 </div>
@@ -211,19 +209,19 @@ export default function ProfileEdit() {
                     type="email"
                     value={form.email}
                     onChange={handleChange("email")}
-                    className="w-full bg-transparent border border-white/10 rounded-lg pl-9 pr-3 py-2.5 text-sm text-white placeholder:text-gray-500/50 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 transition-all shadow-sm"
+                    className="w-full bg-white dark:bg-transparent border border-gray-200 dark:border-white/10 rounded-lg pl-9 pr-3 py-2.5 text-sm text-black dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500/50 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 transition-all shadow-sm"
                   />
                 </div>
               </div>
 
               {/* Footer actions */}
               <div className="pt-6 flex items-center justify-end gap-4">
-                <Link to="/profil" className="text-sm font-medium text-gray-500 hover:text-white transition-colors">
+                <Link to="/profil" className="text-sm font-medium text-gray-500 hover:text-black dark:hover:text-white transition-colors">
                   Annuler
                 </Link>
                 <button
                   type="submit"
-                  className="bg-white text-black hover:bg-gray-100 px-5 py-2.5 rounded-lg text-sm font-medium transition-all shadow-[0_0_20px_rgba(255,255,255,0.1)]"
+                  className="bg-black dark:bg-white text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-100 px-5 py-2.5 rounded-lg text-sm font-medium transition-all shadow-[0_0_20px_rgba(255,255,255,0.1)]"
                 >
                   Enregistrer les modifications
                 </button>

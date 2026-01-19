@@ -228,8 +228,6 @@ export default function Home() {
 
 function SingleCategoryView({ category }) {
   const { data, isLoading } = useSearchMovies(category);
-
-  // ✔️ Affiche TOUS les films — aucun slice ici
   const movies = data?.Search || [];
 
   if (isLoading) return <Loader />;
@@ -239,7 +237,7 @@ function SingleCategoryView({ category }) {
       {movies.length > 0 ? (
         movies.map((m) => <MovieCard key={m.imdbID} movie={m} />)
       ) : (
-        <p>Aucun film trouvé.</p>
+        <p className="text-gray-600 dark:text-gray-400">Aucun film trouvé.</p>
       )}
     </div>
   );
@@ -308,7 +306,7 @@ function SearchResultsView({ query }) {
       {movies.length > 0 ? (
         movies.map((m) => <MovieCard key={m.imdbID} movie={m} />)
       ) : (
-        <p className="text-gray-600 dark:text-gray-600 text-sm">Aucun film trouvé pour "{query}".</p>
+        <p className="text-gray-600 dark:text-gray-400 text-sm">Aucun film trouvé pour "{query}".</p>
       )}
     </div>
   );
