@@ -15,6 +15,11 @@ export default function MovieDetails() {
   const { user } = useAuth();
   const [messages, setMessages] = useState([]);
   const [messageText, setMessageText] = useState("");
+  const [userRating, setUserRating] = useState(() => {
+    const saved = localStorage.getItem(`rating-${id}`);
+    return saved ? Number(saved) : null;
+  });
+  const [hoverRating, setHoverRating] = useState(0);
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
@@ -200,10 +205,7 @@ export default function MovieDetails() {
 
       {/* CONTENT */}
       <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-3 gap-12 py-12">
-        
-        {/* LEFT COLUMN */}
         <div className="lg:col-span-2 space-y-12">
-          
           {/* SYNOPSIS */}
           <section>
             <h3 className="text-sm font-semibold text-black dark:text-white uppercase tracking-widest mb-4 flex items-center gap-2">
@@ -247,6 +249,45 @@ export default function MovieDetails() {
             </h3>
             <p className="text-gray-600 dark:text-gray-400 text-sm">
               {movie.Actors}
+            </p>
+          </section>
+
+          {/* NOTE UTILISATEUR */}
+          <section>
+            <h3 className="text-sm font-semibold text-black dark:text-white uppercase tracking-widest mb-4 flex items-center gap-2">
+              <Star size={16} className="text-yellow-400" />
+              Votre note
+            </h3>
+            <div className="flex items-center gap-2">
+              {[1, 2, 3, 4, 5].map((value) => (
+                <button
+                  key={value}
+                  type="button"
+                  onMouseEnter={() => setHoverRating(value)}
+                  onMouseLeave={() => setHoverRating(0)}
+                  onClick={() => {
+                    setUserRating(value);
+                    localStorage.setItem(`rating-${id}`, String(value));
+                  }}
+                  className="p-1"
+                  title={`${value}/5`}
+                >
+                  <Star
+                    size={28}
+                    className={`transition-colors ${
+                      (hoverRating || userRating) >= value
+                        ? "text-yellow-400 fill-yellow-400"
+                        : "text-gray-300 dark:text-gray-600"
+                    }`}
+                  />
+                </button>
+              ))}
+              <span className="text-sm text-gray-600 dark:text-gray-400 ml-2">
+                {userRating ? `${userRating}/5` : "Pas encore noté"}
+              </span>
+            </div>
+            <p className="text-xs text-gray-500 dark:text-gray-600 mt-1">
+              Note sauvegardée localement sur cet appareil.
             </p>
           </section>
 
