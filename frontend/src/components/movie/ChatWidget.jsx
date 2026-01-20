@@ -9,7 +9,8 @@ export default function ChatWidget({
   onSendMessage,
   onMessageChange,
   onToggleCollapse,
-  movieTitle, // nouveau
+  movieTitle,
+  currentUserId, // ✅ Nouveau prop
 }) {
   const chatEndRef = useRef(null);
 
@@ -48,8 +49,10 @@ export default function ChatWidget({
                 </p>
               </div>
             ) : (
-              chatMessages.map((msg) =>
-                msg.isOwn ? (
+              chatMessages.map((msg) => {
+                const isOwn = msg.userId === currentUserId; // ✅ Calculer isOwn dynamiquement
+
+                return isOwn ? (
                   <div
                     key={msg.id}
                     className="flex gap-2 flex-row-reverse items-start"
@@ -78,8 +81,8 @@ export default function ChatWidget({
                       </p>
                     </div>
                   </div>
-                )
-              )
+                );
+              })
             )}
             <div ref={chatEndRef} />
           </div>

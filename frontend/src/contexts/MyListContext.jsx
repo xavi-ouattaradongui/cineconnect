@@ -1,27 +1,42 @@
 import { createContext, useContext, useState, useEffect } from "react";
+import { useAuth } from "./AuthContext";
 
 const MyListContext = createContext();
 
 export function MyListProvider({ children }) {
-  const [myList, setMyList] = useState(() => {
-    const saved = localStorage.getItem("myList");
-    return saved ? JSON.parse(saved) : [];
-  });
+  const { user } = useAuth();
+  const [myList, setMyList] = useState([]);
 
+  // Charger la liste au montage ou changement d'utilisateur
   useEffect(() => {
-    localStorage.setItem("myList", JSON.stringify(myList));
-  }, [myList]);
+    if (user?.id) {
+      const saved = localStorage.getItem(`mylist_${user.id}`);
+      setMyList(saved ? JSON.parse(saved) : []);
+    } else {
+      // Si pas d'utilisateur, vider la liste
+      setMyList([]);
+    }
+  }, [user?.id]);
+
+  // Sauvegarder la liste quand elle change
+  useEffect(() => {
+    if (user?.id) {
+      localStorage.setItem(`mylist_${user.id}`, JSON.stringify(myList));
+    }
+  }, [myList, user?.id]);
 
   const addToList = (movie) => {
-    setMyList((prev) => [...prev, movie]);
+    if (!myList.some((m) => m.imdbID === movie.imdbID)) {
+      setMyList([...myList, movie]);
+    }
   };
 
-  const removeFromList = (imdbID) => {
-    setMyList((prev) => prev.filter((m) => m.imdbID !== imdbID));
+  const removeFromList = (id) => {
+    setMyList(myList.filter((m) => m.imdbID !== id));
   };
 
-  const isInList = (imdbID) => {
-    return myList.some((m) => m.imdbID === imdbID);
+  const isInList = (id) => {
+    return myList.some((m) => m.imdbID === id);
   };
 
   return (
@@ -31,10 +46,10 @@ export function MyListProvider({ children }) {
   );
 }
 
-export function useMyList() {
+export const useMyList = () => {
   const context = useContext(MyListContext);
   if (!context) {
-    throw new Error("useMyList must be used within MyListProvider");
+    throw new Error("useMyList doit être utilisé dans MyListProvider");
   }
   return context;
-}
+};

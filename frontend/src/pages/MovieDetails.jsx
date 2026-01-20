@@ -1,5 +1,5 @@
 import { useParams } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useMovie } from "../hooks/useMovies";
 import { useFavorites } from "../contexts/FavoritesContext";
 import { useMyList } from "../contexts/MyListContext";
@@ -20,14 +20,34 @@ export default function MovieDetails() {
   // États
   const [chatMessages, setChatMessages] = useState([]);
   const [messageText, setMessageText] = useState("");
-  const [reviews, setReviews] = useState([]);
-  const [userRating, setUserRating] = useState(() => {
-    const saved = localStorage.getItem(`rating-${id}`);
-    return saved ? Number(saved) : null;
+  
+  // Avis & Notes - Persistants par utilisateur/film
+  const [reviews, setReviews] = useState(() => {
+    if (user?.id) {
+      const saved = localStorage.getItem(`reviews_${user.id}_${id}`);
+      return saved ? JSON.parse(saved) : [];
+    }
+    return [];
   });
+
+  const [userRating, setUserRating] = useState(() => {
+    if (user?.id) {
+      const saved = localStorage.getItem(`rating_${user.id}_${id}`);
+      return saved ? Number(saved) : null;
+    }
+    return null;
+  });
+
   const [hoverRating, setHoverRating] = useState(0);
   const [reviewText, setReviewText] = useState("");
   const [chatCollapsed, setChatCollapsed] = useState(false);
+
+  // Sauvegarder les avis quand ils changent
+  useEffect(() => {
+    if (user?.id) {
+      localStorage.setItem(`reviews_${user.id}_${id}`, JSON.stringify(reviews));
+    }
+  }, [reviews, user?.id, id]);
 
   // Handlers
   const handleFavorite = () => {
@@ -43,45 +63,72 @@ export default function MovieDetails() {
   const handleSendMessage = (e) => {
     e.preventDefault();
     if (!messageText.trim()) return;
-    setChatMessages([
-      ...chatMessages,
-      {
-        id: Date.now(),
-        text: messageText,
-        author: "Vous",
-        username: user?.username || "anonyme",
-        timestamp: new Date().toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" }),
-        avatar: user?.avatar || null,
-        avatarInitials:
-          user?.displayName?.split(" ").map((w) => w[0]).join("").toUpperCase().slice(0, 2) || "?",
-        isOwn: true,
-      },
-    ]);
+    
+    const newMessage = {
+      id: Date.now(),
+      userId: user?.id || "anonymous", // ✅ Ajouter userId
+      text: messageText,
+      username: user?.username || "anonyme",
+      timestamp: new Date().toISOString(), // ✅ Format ISO pour API
+      avatar: user?.avatar || null,
+      avatarInitials:
+        user?.displayName?.split(" ").map((w) => w[0]).join("").toUpperCase().slice(0, 2) || "?",
+    };
+
+    setChatMessages([...chatMessages, newMessage]);
     setMessageText("");
+
+    // TODO: Remplacer par appel API
+    // await fetch(`/api/movies/${id}/chat`, {
+    //   method: 'POST',
+    //   body: JSON.stringify({ text: messageText })
+    // });
   };
 
   const handleSubmitReview = (e) => {
     e.preventDefault();
     if (!reviewText.trim()) return;
-    setReviews([
-      ...reviews,
-      {
-        id: Date.now(),
+
+    // Vérifier si l'utilisateur a déjà un avis pour ce film
+    const existingReviewIndex = reviews.findIndex((r) => r.userId === user?.id);
+
+    if (existingReviewIndex !== -1) {
+      // Modifier l'avis existant
+      const updatedReviews = [...reviews];
+      updatedReviews[existingReviewIndex] = {
+        ...updatedReviews[existingReviewIndex],
         text: reviewText,
         rating: userRating || null,
-        username: user?.username || "anonyme",
-        avatar: user?.avatar || null,
-        avatarInitials:
-          user?.displayName?.split(" ").map((w) => w[0]).join("").toUpperCase().slice(0, 2) || "?",
         timestamp: new Date().toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" }),
-        reactions: { like: [] },
-      },
-    ]);
+      };
+      setReviews(updatedReviews);
+    } else {
+      // Créer un nouvel avis
+      setReviews([
+        ...reviews,
+        {
+          id: Date.now(),
+          userId: user?.id || "anonymous",
+          text: reviewText,
+          rating: userRating || null,
+          username: user?.username || "anonyme",
+          avatar: user?.avatar || null,
+          avatarInitials:
+            user?.displayName?.split(" ").map((w) => w[0]).join("").toUpperCase().slice(0, 2) || "?",
+          timestamp: new Date().toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" }),
+          reactions: { like: [] },
+        },
+      ]);
+    }
     setReviewText("");
   };
 
   const handleDeleteReview = (reviewId) => {
-    setReviews(reviews.filter((r) => r.id !== reviewId));
+    // Un utilisateur ne peut supprimer que son propre avis
+    const review = reviews.find((r) => r.id === reviewId);
+    if (review && review.userId === user?.id) {
+      setReviews(reviews.filter((r) => r.id !== reviewId));
+    }
   };
 
   const handleReaction = (reviewId, reactionKey) => {
@@ -116,7 +163,9 @@ export default function MovieDetails() {
 
   const handleRatingChange = (value) => {
     setUserRating(value);
-    localStorage.setItem(`rating-${id}`, String(value));
+    if (user?.id) {
+      localStorage.setItem(`rating_${user.id}_${id}`, String(value));
+    }
   };
 
   if (isLoading) return <Loader />;
@@ -180,6 +229,7 @@ export default function MovieDetails() {
         onMessageChange={(e) => setMessageText(e.target.value)}
         onToggleCollapse={() => setChatCollapsed((v) => !v)}
         movieTitle={movie.Title}
+        currentUserId={user?.id} // ✅ Passer userId au widget
       />
     </div>
   );
