@@ -1,5 +1,5 @@
 import { useParams } from "@tanstack/react-router";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useMovie } from "../hooks/useMovies";
 import { useFavorites } from "../contexts/FavoritesContext";
 import { useMyList } from "../contexts/MyListContext";
@@ -48,6 +48,14 @@ export default function MovieDetails() {
       localStorage.setItem(`reviews_${user.id}_${id}`, JSON.stringify(reviews));
     }
   }, [reviews, user?.id, id]);
+
+  // Calculer la moyenne des notes
+  const averageRating = useMemo(() => {
+    const reviewsWithRating = reviews.filter((r) => r.rating !== null);
+    if (reviewsWithRating.length === 0) return null;
+    const sum = reviewsWithRating.reduce((acc, r) => acc + r.rating, 0);
+    return (sum / reviewsWithRating.length).toFixed(1);
+  }, [reviews]);
 
   // Handlers
   const handleFavorite = () => {
@@ -195,6 +203,7 @@ export default function MovieDetails() {
             hoverRating={hoverRating}
             reviewText={reviewText}
             reviews={reviews}
+            averageRating={averageRating}
             onRatingChange={handleRatingChange}
             onRatingHover={setHoverRating}
             onReviewChange={(e) => setReviewText(e.target.value)}

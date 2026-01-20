@@ -5,6 +5,7 @@ export default function MovieReviews({
   hoverRating,
   reviewText,
   reviews,
+  averageRating,
   onRatingChange,
   onRatingHover,
   onReviewChange,
@@ -15,10 +16,24 @@ export default function MovieReviews({
 }) {
   return (
     <section>
-      <h3 className="text-sm font-semibold text-black dark:text-white uppercase tracking-widest mb-4 flex items-center gap-2">
-        <Star size={16} className="text-yellow-400" />
-        Noter et commenter
-      </h3>
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-sm font-semibold text-black dark:text-white uppercase tracking-widest flex items-center gap-2">
+          <Star size={16} className="text-yellow-400" />
+          Noter et commenter
+        </h3>
+
+        {averageRating && (
+          <div className="flex items-center gap-2 bg-yellow-50 dark:bg-yellow-500/10 border border-yellow-200 dark:border-yellow-500/20 px-3 py-1.5 rounded-full">
+            <Star size={14} className="text-yellow-400 fill-yellow-400" />
+            <span className="text-sm font-semibold text-yellow-600 dark:text-yellow-400">
+              {averageRating}/5
+            </span>
+            <span className="text-xs text-gray-500 dark:text-gray-400">
+              ({reviews.filter((r) => r.rating).length} avis)
+            </span>
+          </div>
+        )}
+      </div>
 
       {/* Stars */}
       <div className="flex items-center gap-2 mb-3">
