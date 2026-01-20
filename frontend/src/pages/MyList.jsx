@@ -1,40 +1,50 @@
+import { List } from "lucide-react";
 import { useMyList } from "../contexts/MyListContext";
 import MovieCard from "../components/MovieCard";
-import { Plus } from "lucide-react";
+import Loader from "../components/Loader";
 
 export default function MyList() {
   const { myList } = useMyList();
 
   return (
-    <div className="min-h-screen bg-white dark:bg-black text-gray-900 dark:text-white pt-24 px-8 pb-8">
-      <div className="max-w-7xl mx-auto">
-        {myList.length > 0 && (
-          <div className="mb-8">
-            <h1 className="text-4xl font-bold mb-2">Ma Liste</h1>
-            <p className="text-gray-600 dark:text-gray-400">
-              {myList.length} film{myList.length > 1 ? "s" : ""} dans votre liste
-            </p>
+    <div className="min-h-screen bg-white dark:bg-black text-gray-900 dark:text-white">
+      <div className="h-16" />
+      <main className="max-w-7xl mx-auto px-6 py-12 space-y-8">
+        {/* Header */}
+        <div className="flex items-center justify-between border-b border-gray-200 dark:border-white/10 pb-4">
+          <div className="flex items-center gap-3">
+            <List size={24} className="text-black dark:text-white" />
+            <h1 className="text-2xl font-bold text-black dark:text-white">
+              Ma Liste
+            </h1>
           </div>
-        )}
+          <span className="text-sm text-gray-600 dark:text-gray-400">
+            {myList.length} film{myList.length > 1 ? "s" : ""}
+          </span>
+        </div>
 
+        {/* Content */}
         {myList.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-center">
-            <p className="text-gray-500 dark:text-gray-600 text-sm flex items-center gap-2">
-              Votre liste est vide. Cliquez sur le
-              <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-white">
-                <Plus size={12} />
-              </span>
-              pour ajouter des films à votre liste.
+            <div className="mb-4 p-6 bg-gray-100 dark:bg-white/5 rounded-full">
+              <List size={40} className="text-gray-400 dark:text-gray-600" />
+            </div>
+            <h3 className="text-lg font-semibold text-black dark:text-white mb-2">
+              Votre liste est vide
+            </h3>
+            <p className="text-sm text-gray-600 dark:text-gray-400 max-w-md">
+              Ajoutez des films à votre liste pour les retrouver facilement plus
+              tard.
             </p>
           </div>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
-            {myList.map((movie) => (
-              <MovieCard key={movie.imdbID} movie={movie} />
+            {myList.map((m) => (
+              <MovieCard key={m.imdbID} movie={m} />
             ))}
           </div>
         )}
-      </div>
+      </main>
     </div>
   );
 }
