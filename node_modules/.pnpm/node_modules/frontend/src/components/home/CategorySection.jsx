@@ -12,16 +12,22 @@ const categoryIcons = {
   Romance: <Heart size={18} />,
 };
 
-export default function CategorySection({ category, displayCount, onSeeMore }) {
+export default function CategorySection({ category, displayCount, onSelectCategory, isSelected }) {
   const { data, isLoading } = useSearchMovies(category);
-  const movies = (data?.Search || []).slice(0, displayCount);
+  
+  // Si la catégorie est sélectionnée, afficher TOUS les films, sinon limiter à displayCount
+  const movies = isSelected 
+    ? (data?.Search || [])
+    : (data?.Search || []).slice(0, displayCount);
 
   if (isLoading) return <Loader />;
   if (movies.length === 0) return null;
 
+  // Le bouton "Voir plus" ne s'affiche que s'il y a plus de films que displayCount ET que la catégorie n'est pas sélectionnée
+  const hasMoreMovies = !isSelected && (data?.Search || []).length > displayCount;
+
   const handleSeeMore = () => {
-    const categoryButton = document.querySelector(`[data-category="${category}"]`);
-    if (categoryButton) categoryButton.click();
+    onSelectCategory(category);
   };
 
   return (
@@ -31,20 +37,24 @@ export default function CategorySection({ category, displayCount, onSeeMore }) {
           {categoryIcons[category]}
           {category}
         </h3>
-        <button
-          onClick={handleSeeMore}
-          className="group flex items-center gap-1.5 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 transition-all"
-        >
-          <span>Voir plus</span>
-          <svg
-            className="w-4 h-4 transition-transform group-hover:translate-x-1"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
+
+        {/* Le bouton "Voir plus" ne s'affiche que s'il y a plus de films ET que la catégorie n'est pas sélectionnée */}
+        {hasMoreMovies && (
+          <button
+            onClick={handleSeeMore}
+            className="group flex items-center gap-1.5 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 transition-all"
           >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-          </svg>
-        </button>
+            <span>Voir plus</span>
+            <svg
+              className="w-4 h-4 transition-transform group-hover:translate-x-1"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        )}
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">

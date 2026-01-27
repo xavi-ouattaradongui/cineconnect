@@ -109,18 +109,21 @@ export default function Home() {
 
       {/* FILMS */}
       <div className="px-10 py-8">
-        <h2 className="text-lg font-medium text-black dark:text-white tracking-tight border-b border-gray-200 dark:border-white/10 pb-4 mb-6">
-          {query
-            ? `Résultats pour "${query}"`
-            : selectedCategory
-            ? selectedCategory
-            : "Tous les films"}
-        </h2>
+        {!selectedCategory && (
+          <h2 className="text-lg font-medium text-black dark:text-white tracking-tight border-b border-gray-200 dark:border-white/10 pb-4 mb-6">
+            {query ? `Résultats pour "${query}"` : "Tous les films"}
+          </h2>
+        )}
 
         {query ? (
           <SearchResults query={query} />
         ) : selectedCategory ? (
-          <CategorySection category={selectedCategory} />
+          <CategorySection
+            category={selectedCategory}
+            displayCount={displayCount}
+            onSelectCategory={setSelectedCategory}
+            isSelected={true}
+          />
         ) : (
           <div className="space-y-8">
             {categories.map((category) => (
@@ -129,6 +132,7 @@ export default function Home() {
                 category={category}
                 displayCount={displayCount}
                 onSelectCategory={setSelectedCategory}
+                isSelected={false}
               />
             ))}
           </div>

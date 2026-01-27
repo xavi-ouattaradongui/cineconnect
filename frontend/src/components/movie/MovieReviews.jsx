@@ -1,4 +1,5 @@
-import { Star, Send, Trash2, ThumbsUp } from "lucide-react";
+import { Star, Send, Trash2, ThumbsUp, MoreVertical } from "lucide-react";
+import { useState } from "react";
 
 export default function MovieReviews({
   userRating,
@@ -14,6 +15,8 @@ export default function MovieReviews({
   onReaction,
   currentUserId,
 }) {
+  const [openMenuId, setOpenMenuId] = useState(null);
+
   return (
     <section>
       <div className="flex items-center justify-between mb-4">
@@ -88,14 +91,14 @@ export default function MovieReviews({
 
       {/* Liste des avis */}
       {reviews.length > 0 && (
-        <div className="mt-4 space-y-3">
+        <div className="mt-4 space-y-2">
           {reviews.map((r) => (
-            <div key={r.id} className="flex items-start gap-2 text-sm group">
-              <div className="h-7 w-7 rounded-full bg-gray-200 dark:bg-white/10 flex items-center justify-center shrink-0">
+            <div key={r.id} className="flex items-start gap-2 text-sm relative">
+              <div className="h-7 w-7 rounded-full bg-white/10 flex items-center justify-center">
                 <span className="text-[11px]">{r.avatarInitials}</span>
               </div>
               <div className="flex-1">
-                <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 mb-1">
+                <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
                   <span>{r.username}</span>
                   <span>•</span>
                   <span>{r.timestamp}</span>
@@ -105,43 +108,52 @@ export default function MovieReviews({
                       <span className="text-yellow-400">{r.rating}/5</span>
                     </>
                   ) : null}
-
-                  {/* Réaction J'aime (déplacée ici) */}
-                  <span>•</span>
-                  {(() => {
-                    const likes = r.reactions?.like || [];
-                    const hasLiked = likes.includes(currentUserId);
-                    const count = likes.length;
-
-                    return (
-                      <button
-                        onClick={() => onReaction(r.id, "like")}
-                        className={`flex items-center gap-1 px-1.5 py-0.5 rounded-full text-xs transition-all ${
-                          hasLiked
-                            ? "bg-blue-50 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400"
-                            : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5"
-                        }`}
-                        title={`${count} J'aime`}
-                      >
-                        <ThumbsUp
-                          size={11}
-                          fill={hasLiked ? "currentColor" : "none"}
-                        />
-                        {count > 0 && <span className="font-medium">{count}</span>}
-                      </button>
-                    );
-                  })()}
                 </div>
                 <p className="text-gray-700 dark:text-gray-200">{r.text}</p>
               </div>
-
-              <button
-                onClick={() => onDeleteReview(r.id)}
-                className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-red-50 dark:hover:bg-red-600/10 rounded text-red-500 dark:text-red-400"
-                title="Supprimer"
-              >
-                <Trash2 size={14} />
-              </button>
+              {/* Remplacer le bouton supprimer par un menu */}
+              {r.userId === currentUserId && (
+                <div className="relative">
+                  <button
+                    className="p-1 rounded hover:bg-gray-200 dark:hover:bg-white/10 transition"
+                    onClick={() =>
+                      setOpenMenuId(openMenuId === r.id ? null : r.id)
+                    }
+                    title="Options"
+                  >
+                    <MoreVertical size={16} />
+                  </button>
+                  {openMenuId === r.id && (
+                    <div className="absolute right-0 mt-2 w-32 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-white/10 rounded shadow-lg z-10">
+                      <button
+                        className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-white/10"
+                        onClick={() => {
+                          setOpenMenuId(null);
+                          if (
+                            window.confirm(
+                              "Voulez-vous vraiment supprimer ce commentaire ?"
+                            )
+                          ) {
+                            onDeleteReview(r.id);
+                          }
+                        }}
+                      >
+                        Supprimer
+                      </button>
+                      <button
+                        className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-white/10"
+                        onClick={() => {
+                          setOpenMenuId(null);
+                          onReviewChange({ target: { value: r.text } });
+                          // Optionnel : focus input, ou ajouter une logique pour modifier
+                        }}
+                      >
+                        Modifier
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           ))}
         </div>
