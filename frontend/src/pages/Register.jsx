@@ -12,32 +12,31 @@ export default function Register() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
   const router = useRouter();
-  const { login } = useAuth();
+  const { register } = useAuth();
 
   const handleRegister = async (e) => {
     e.preventDefault();
+    setError("");
+
     if (password !== confirmPassword) {
-      alert("Les mots de passe ne correspondent pas");
+      setError("Les mots de passe ne correspondent pas");
       return;
     }
+
     setIsLoading(true);
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      const userData = {
-        id: Date.now().toString(),
+      await register({
         username: username,
         email: email,
-        displayName: displayName,
-        avatar:
-          "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=400&auto=format&fit=crop",
-      };
+        password: password,
+        displayName: displayName || username, // Envoyer displayName au backend
+      });
 
-      login(userData);
       router.navigate({ to: "/" });
-    } catch (error) {
-      console.error("Erreur d'inscription:", error);
+    } catch (err) {
+      setError(err.message || "Erreur lors de l'inscription");
     } finally {
       setIsLoading(false);
     }
@@ -71,7 +70,14 @@ export default function Register() {
 
         {/* Form */}
         <form onSubmit={handleRegister} className="space-y-4">
-          {/* Display Name */}
+          {/* Error Message */}
+          {error && (
+            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 px-4 py-3 rounded-lg text-sm">
+              {error}
+            </div>
+          )}
+
+          {/* Display Name - OPTIONNEL pour le backend */}
           <div className="space-y-2">
             <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
               Nom d'affichage

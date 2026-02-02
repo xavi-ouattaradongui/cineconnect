@@ -76,21 +76,24 @@ export default function Navbar({ onSearch }) {
   };
 
   const getAvatarIcon = () => {
-    if (!user) return null;
-    const Icon = AVATAR_ICONS[user.avatar];
-    if (Icon) {
-      return <Icon size={16} className="text-white" />;
+    if (user?.avatar) {
+      return (
+        <img
+          src={user.avatar}
+          alt={user.displayName || user.username || "User"}
+          className="w-full h-full object-cover"
+        />
+      );
     }
-    return (
-      <span className="text-xs font-bold text-white">
-        {user.displayName
-          .split(" ")
-          .map((word) => word[0])
-          .join("")
-          .toUpperCase()
-          .slice(0, 2)}
-      </span>
-    );
+
+    const name = user?.displayName || user?.username || "User";
+
+    // Gérer le cas où le nom contient des espaces
+    const initials = name.includes(" ")
+      ? name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2)
+      : name.slice(0, 2).toUpperCase();
+
+    return <span className="text-sm font-medium">{initials}</span>;
   };
 
   const getAvatarColor = () => {

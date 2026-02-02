@@ -46,25 +46,38 @@ const AVATAR_COLORS = {
 };
 
 export default function ProfileHeader({ user, onLogout }) {
-  const getInitials = (displayName) => {
-    return displayName
-      .split(" ")
-      .map((word) => word[0])
-      .join("")
-      .toUpperCase()
-      .slice(0, 2);
+  const getInitials = (name) => {
+    if (!name) return "U";
+
+    // Si le nom contient un espace, prendre les initiales
+    if (name.includes(" ")) {
+      return name
+        .split(" ")
+        .map((n) => n[0])
+        .join("")
+        .toUpperCase()
+        .slice(0, 2);
+    }
+
+    // Sinon, prendre les 2 premières lettres
+    return name.slice(0, 2).toUpperCase();
   };
 
   const getAvatarIcon = () => {
-    const Icon = AVATAR_ICONS[user.avatar];
-    if (Icon) {
-      return <Icon size={40} className="text-white" />;
+    if (user?.avatar) {
+      return (
+        <img
+          src={user.avatar}
+          alt={user.displayName || user.username || "User"}
+          className="w-full h-full object-cover"
+        />
+      );
     }
-    return (
-      <span className="text-2xl font-bold text-white">
-        {getInitials(user.displayName)}
-      </span>
-    );
+
+    const name = user?.displayName || user?.username || "User";
+    const initials = getInitials(name);
+
+    return <span className="text-2xl font-semibold">{initials}</span>;
   };
 
   const getAvatarColor = () => {

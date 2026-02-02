@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect } from "react";
+import { api } from "../services/api";
 
 const AuthContext = createContext();
 
@@ -11,6 +12,8 @@ export function AuthProvider({ children }) {
   const [token, setToken] = useState(() => {
     return localStorage.getItem("token") || null;
   });
+
+  const [loading, setLoading] = useState(false);
 
   // Sauvegarder user quand il change
   useEffect(() => {
@@ -41,10 +44,35 @@ export function AuthProvider({ children }) {
     }
   }, [token]);
 
-  const login = (userData, authToken = null) => {
-    setUser(userData);
-    if (authToken) {
-      setToken(authToken);
+  const login = async (credentials) => {
+    setLoading(true);
+    try {
+      const data = await api.login(credentials);
+
+      setToken(data.token);
+      setUser(data.user);
+
+      return data;
+    } catch (error) {
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const register = async (userData) => {
+    setLoading(true);
+    try {
+      const data = await api.register(userData);
+
+      setToken(data.token);
+      setUser(data.user);
+
+      return data;
+    } catch (error) {
+      throw error;
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -56,7 +84,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, login, logout }}>
+    <AuthContext.Provider value={{ user, token, login, register, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );

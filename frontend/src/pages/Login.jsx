@@ -8,30 +8,24 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
   const router = useRouter();
   const { login } = useAuth();
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+    setError("");
+
     try {
-      // Simule une connexion
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await login({
+        email: emailOrUsername,
+        password: password,
+      });
 
-      // Simule les données reçues du serveur
-      const userData = {
-        id: "123",
-        username: emailOrUsername.includes("@") ? "jean_dupont" : emailOrUsername,
-        email: emailOrUsername.includes("@") ? emailOrUsername : "jean@example.com",
-        displayName: "Jean Dupont",
-        avatar:
-          "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=400&auto=format&fit=crop",
-      };
-
-      login(userData);
       router.navigate({ to: "/" });
-    } catch (error) {
-      console.error("Erreur de connexion:", error);
+    } catch (err) {
+      setError(err.message || "Email ou mot de passe incorrect");
     } finally {
       setIsLoading(false);
     }
@@ -65,16 +59,21 @@ export default function Login() {
 
         {/* Form */}
         <form onSubmit={handleLogin} className="space-y-6">
+          {/* Error Message */}
+          {error && (
+            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 px-4 py-3 rounded-lg text-sm">
+              {error}
+            </div>
+          )}
+
           {/* Email or Username */}
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Email ou nom d'utilisateur</label>
+            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              Email ou nom d'utilisateur
+            </label>
             <div className="relative">
               <div className="absolute left-3 top-3.5 text-gray-400 dark:text-gray-500">
-                {emailOrUsername.includes("@") ? (
-                  <Mail size={16} />
-                ) : (
-                  <User size={16} />
-                )}
+                {emailOrUsername.includes("@") ? <Mail size={16} /> : <User size={16} />}
               </div>
               <input
                 type="text"
@@ -116,7 +115,10 @@ export default function Login() {
               <input type="checkbox" className="rounded w-4 h-4" />
               <span className="text-gray-600 dark:text-gray-400">Se souvenir de moi</span>
             </label>
-            <Link to="#" className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 transition">
+            <Link
+              to="#"
+              className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 transition"
+            >
               Mot de passe oublié?
             </Link>
           </div>
