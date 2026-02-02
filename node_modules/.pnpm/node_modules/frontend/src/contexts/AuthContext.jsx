@@ -83,8 +83,54 @@ export function AuthProvider({ children }) {
     localStorage.removeItem("token");
   };
 
+  const updateProfile = async (profileData) => {
+    setLoading(true);
+    try {
+      const data = await api.updateProfile(profileData, token);
+
+      // Mettre à jour immédiatement l'état
+      setUser(data.user);
+      localStorage.setItem("user", JSON.stringify(data.user));
+
+      // Forcer un re-render de tous les composants
+      window.dispatchEvent(new Event('storage'));
+
+      return data;
+    } catch (error) {
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const refreshProfile = async () => {
+    if (!token) return;
+
+    try {
+      const data = await api.getProfile(token);
+      setUser(data.user);
+      localStorage.setItem("user", JSON.stringify(data.user));
+      
+      // Forcer un re-render
+      window.dispatchEvent(new Event('storage'));
+    } catch (error) {
+      console.error("Error refreshing profile:", error);
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, token, login, register, logout, loading }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        token,
+        login,
+        register,
+        logout,
+        updateProfile,
+        refreshProfile,
+        loading,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

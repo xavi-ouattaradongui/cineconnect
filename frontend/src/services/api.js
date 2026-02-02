@@ -46,5 +46,39 @@ export const api = {
     const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
     const response = await fetch(`${API_URL}/reviews/${filmId}`, { headers });
     return response.json();
+  },
+
+  // Profile
+  getProfile: async (token) => {
+    const response = await fetch(`${API_URL}/auth/profile`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    
+    const data = await response.json();
+    
+    if (!response.ok) {
+      throw new Error(data.message || 'Erreur lors de la récupération du profil');
+    }
+    
+    return data;
+  },
+
+  updateProfile: async (profileData, token) => {
+    const response = await fetch(`${API_URL}/auth/profile`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(profileData)
+    });
+    
+    const data = await response.json();
+    
+    if (!response.ok) {
+      throw new Error(data.message || 'Erreur lors de la mise à jour du profil');
+    }
+    
+    return data;
   }
 };

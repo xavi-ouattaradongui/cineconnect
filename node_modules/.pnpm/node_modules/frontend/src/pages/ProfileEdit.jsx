@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useRouter } from "@tanstack/react-router";
 import { User, Shield } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
@@ -51,14 +51,29 @@ const AVATAR_COLORS = {
 };
 
 export default function ProfileEdit() {
-  const { user, login } = useAuth();
+  const { user, updateProfile, refreshProfile } = useAuth();
   const router = useRouter();
+  
   const [form, setForm] = useState({
-    displayName: user?.displayName || "Jean Dupont",
-    username: user?.username || "jeandupont",
-    email: user?.email || "jean.dupont@example.com",
+    displayName: "",
+    username: "",
+    email: "",
   });
-  const [avatar, setAvatar] = useState(user?.avatar || null);
+  const [avatar, setAvatar] = useState("skull");
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      setForm({
+        displayName: user.displayName || user.username || "",
+        username: user.username || "",
+        email: user.email || "",
+      });
+      setAvatar(user.avatar || "skull");
+    }
+  }, [user]);
 
   const handleFormChange = (field, value) => {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -68,26 +83,51 @@ export default function ProfileEdit() {
     setAvatar(avatarId);
   };
 
-  const handleSaveProfile = (e) => {
+  const handleSaveProfile = async (e) => {
     e.preventDefault();
-    const updatedUser = {
-      ...user,
-      displayName: form.displayName,
-      username: form.username,
-      email: form.email,
-      avatar: avatar,
-    };
-    login(updatedUser);
-    router.navigate({ to: "/profil" });
+    setError("");
+    setSuccess("");
+    setIsLoading(true);
+
+    try {
+      await updateProfile({
+        username: form.username,
+        email: form.email,
+        displayName: form.displayName,
+        avatar: avatar,
+      });
+
+      // Rafraîchir le profil pour mettre à jour tous les composants
+      await refreshProfile();
+
+      setSuccess("Profil mis à jour avec succès !");
+      
+      setTimeout(() => {
+        router.navigate({ to: "/profil" });
+      }, 1500);
+    } catch (err) {
+      setError(err.message || "Erreur lors de la mise à jour");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const getInitials = (displayName) => {
-    return displayName
-      .split(" ")
-      .map((word) => word[0])
-      .join("")
-      .toUpperCase()
-      .slice(0, 2);
+    if (!displayName) return "U";
+    
+    // Gérer les noms avec espaces, underscores ou tirets
+    const parts = displayName.split(/[\s_-]+/);
+    
+    if (parts.length > 1) {
+      return parts
+        .map((part) => part[0])
+        .join("")
+        .toUpperCase()
+        .slice(0, 2);
+    }
+    
+    // Sinon, prendre les 2 premières lettres
+    return displayName.slice(0, 2).toUpperCase();
   };
 
   const getAvatarIcon = () => {
@@ -135,6 +175,19 @@ export default function ProfileEdit() {
               onFormChange={handleFormChange}
               onSubmit={handleSaveProfile}
             />
+
+            {/* Messages d'erreur et succès */}
+            {error && (
+              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 px-4 py-3 rounded-lg text-sm">
+                {error}
+              </div>
+            )}
+
+            {success && (
+              <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-600 dark:text-green-400 px-4 py-3 rounded-lg text-sm">
+                {success}
+              </div>
+            )}
           </div>
         </div>
       </main>

@@ -76,22 +76,30 @@ export default function Navbar({ onSearch }) {
   };
 
   const getAvatarIcon = () => {
-    if (user?.avatar) {
+    // Vérifier si l'utilisateur a un avatar d'icône (skull, ghost, etc.)
+    const avatarKey = user?.avatar;
+
+    if (avatarKey && AVATAR_ICONS[avatarKey]) {
+      const Icon = AVATAR_ICONS[avatarKey];
+      const colorClass = AVATAR_COLORS[avatarKey];
+
       return (
-        <img
-          src={user.avatar}
-          alt={user.displayName || user.username || "User"}
-          className="w-full h-full object-cover"
-        />
+        <div
+          className={`w-full h-full rounded-full bg-gradient-to-br ${colorClass} flex items-center justify-center`}
+        >
+          <Icon size={16} className="text-white" />
+        </div>
       );
     }
 
+    // Sinon, afficher les initiales
     const name = user?.displayName || user?.username || "User";
+    const parts = name.split(/[\s_-]+/);
 
-    // Gérer le cas où le nom contient des espaces
-    const initials = name.includes(" ")
-      ? name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2)
-      : name.slice(0, 2).toUpperCase();
+    const initials =
+      parts.length > 1
+        ? parts.map((part) => part[0]).join("").toUpperCase().slice(0, 2)
+        : name.slice(0, 2).toUpperCase();
 
     return <span className="text-sm font-medium">{initials}</span>;
   };

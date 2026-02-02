@@ -49,14 +49,18 @@ export default function ProfileHeader({ user, onLogout }) {
   const getInitials = (name) => {
     if (!name) return "U";
 
-    // Si le nom contient un espace, prendre les initiales
-    if (name.includes(" ")) {
-      return name
-        .split(" ")
-        .map((n) => n[0])
-        .join("")
-        .toUpperCase()
-        .slice(0, 2);
+    // Gérer les noms avec espaces, underscores ou tirets
+    const parts = name.split(/[\s_-]+/);
+
+    if (parts.length > 1) {
+      // Prendre la première lettre de chaque partie
+      return (
+        parts
+          .map((part) => part[0])
+          .join("")
+          .toUpperCase()
+          .slice(0, 2)
+      );
     }
 
     // Sinon, prendre les 2 premières lettres
@@ -64,20 +68,17 @@ export default function ProfileHeader({ user, onLogout }) {
   };
 
   const getAvatarIcon = () => {
-    if (user?.avatar) {
-      return (
-        <img
-          src={user.avatar}
-          alt={user.displayName || user.username || "User"}
-          className="w-full h-full object-cover"
-        />
-      );
-    }
+    const avatarKey = user?.avatar || "skull";
+    const Icon = AVATAR_ICONS[avatarKey] || Skull;
+    const colorClass = AVATAR_COLORS[avatarKey] || AVATAR_COLORS.skull;
 
-    const name = user?.displayName || user?.username || "User";
-    const initials = getInitials(name);
-
-    return <span className="text-2xl font-semibold">{initials}</span>;
+    return (
+      <div
+        className={`w-full h-full rounded-full bg-gradient-to-br ${colorClass} flex items-center justify-center`}
+      >
+        <Icon size={40} className="text-white" />
+      </div>
+    );
   };
 
   const getAvatarColor = () => {
