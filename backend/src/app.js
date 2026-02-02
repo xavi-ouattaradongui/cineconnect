@@ -2,12 +2,16 @@ import express from "express";
 import cors from "cors";
 import { db } from "./db/index.js";
 import authRoutes from "./routes/auth.routes.js";
+import filmRoutes from "./routes/films.routes.js";
+import reviewRoutes from "./routes/reviews.routes.js";
 
 const app = express(); 
 
 app.use(cors());
 app.use(express.json());
 app.use("/auth", authRoutes);
+app.use("/films", filmRoutes);
+app.use("/reviews", reviewRoutes);
 
 app.get("/", (req, res) => {
   res.send("CineConnect API running 🎬");
