@@ -153,5 +153,25 @@ export const api = {
     }
     
     return data;
+  },
+
+  // Réactions
+  toggleReaction: async (reviewId, type, token) => {
+    const response = await fetch(`${API_URL}/reviews/${reviewId}/reaction`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ type })
+    });
+    
+    const data = await response.json();
+    
+    if (!response.ok) {
+      throw new Error(data.message || 'Erreur lors de la réaction');
+    }
+    
+    return data;
   }
 };

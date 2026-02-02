@@ -39,6 +39,13 @@ export const useReviews = (filmId) => {
     }
   });
 
+  const toggleReaction = useMutation({
+    mutationFn: ({ reviewId, type }) => api.toggleReaction(reviewId, type, token),
+    onSuccess: () => {
+      queryClient.invalidateQueries(["reviews", filmId]);
+    },
+  });
+
   return {
     reviews,
     isLoading,
@@ -46,5 +53,6 @@ export const useReviews = (filmId) => {
     createReview,
     updateReview,
     deleteReview,
+    toggleReaction,
   };
 };

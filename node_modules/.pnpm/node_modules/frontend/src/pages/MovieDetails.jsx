@@ -14,7 +14,7 @@ import ChatWidget from "../components/movie/ChatWidget";
 export default function MovieDetails() {
   const { id } = useParams({ from: "/film/$id" });
   const { data: movie, isLoading, error } = useMovie(id);
-  const { reviews, isLoading: reviewsLoading, createReview, updateReview, deleteReview } = useReviews(id);
+  const { reviews, isLoading: reviewsLoading, createReview, updateReview, deleteReview, toggleReaction } = useReviews(id);
   const { addFavorite, removeFavorite, isFavorite } = useFavorites();
   const { addToList, removeFromList, isInList } = useMyList();
   const { user } = useAuth();
@@ -120,6 +120,14 @@ export default function MovieDetails() {
     }
   };
 
+  const handleReaction = async (reviewId, type) => {
+    try {
+      await toggleReaction.mutateAsync({ reviewId, type });
+    } catch (err) {
+      console.error("Erreur lors de la réaction:", err);
+    }
+  };
+
   const handleRatingChange = (value) => {
     setUserRating(value);
   };
@@ -158,7 +166,8 @@ export default function MovieDetails() {
             onReviewChange={(e) => setReviewText(e.target.value)}
             onReviewSubmit={handleSubmitReview}
             onDeleteReview={handleDeleteReview}
-            currentUserId={user?.id} // Assurez-vous que c'est bien un nombre
+            onReaction={handleReaction}
+            currentUserId={user?.id}
             isSubmitting={createReview.isPending || updateReview.isPending}
           />
         </div>

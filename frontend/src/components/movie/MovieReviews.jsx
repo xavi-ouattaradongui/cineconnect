@@ -1,4 +1,4 @@
-import { Star, Send, Trash2, ThumbsUp, MoreVertical } from "lucide-react";
+import { Star, Send, Trash2, Heart, ThumbsDown, MoreVertical } from "lucide-react";
 import { useState } from "react";
 
 export default function MovieReviews({
@@ -14,6 +14,7 @@ export default function MovieReviews({
   onReviewChange,
   onReviewSubmit,
   onDeleteReview,
+  onReaction,
   currentUserId,
 }) {
   const [openMenuId, setOpenMenuId] = useState(null);
@@ -100,6 +101,8 @@ export default function MovieReviews({
         <div className="mt-4 space-y-3">
           {reviews.map((r) => {
             const canDelete = r.userId === currentUserId;
+            const hasLiked = r.reactions?.likedBy?.includes(currentUserId);
+            const hasDisliked = r.reactions?.dislikedBy?.includes(currentUserId);
             
             return (
               <div key={r.id} className="flex items-start gap-3 p-3 rounded-lg bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 relative">
@@ -124,10 +127,38 @@ export default function MovieReviews({
                     )}
                   </div>
                   {r.comment && (
-                    <p className="text-sm text-gray-700 dark:text-gray-200">
+                    <p className="text-sm text-gray-700 dark:text-gray-200 mb-2">
                       {r.comment}
                     </p>
                   )}
+                  
+                  {/* Boutons de réaction */}
+                  <div className="flex items-center gap-3 mt-2">
+                    <button
+                      onClick={() => onReaction(r.id, "like")}
+                      className={`flex items-center gap-1 px-2 py-1 rounded-md text-xs transition ${
+                        hasLiked
+                          ? "bg-pink-100 dark:bg-pink-500/20 text-pink-600 dark:text-pink-400"
+                          : "hover:bg-gray-200 dark:hover:bg-white/10 text-gray-600 dark:text-gray-400"
+                      }`}
+                      title="J'aime"
+                    >
+                      <Heart size={14} className={hasLiked ? "fill-current" : ""} />
+                      <span>{r.reactions?.likes || 0}</span>
+                    </button>
+                    <button
+                      onClick={() => onReaction(r.id, "dislike")}
+                      className={`flex items-center gap-1 px-2 py-1 rounded-md text-xs transition ${
+                        hasDisliked
+                          ? "bg-gray-200 dark:bg-white/20 text-gray-700 dark:text-gray-300"
+                          : "hover:bg-gray-200 dark:hover:bg-white/10 text-gray-600 dark:text-gray-400"
+                      }`}
+                      title="Pas utile"
+                    >
+                      <ThumbsDown size={14} className={hasDisliked ? "fill-current" : ""} />
+                      <span>{r.reactions?.dislikes || 0}</span>
+                    </button>
+                  </div>
                 </div>
                 {canDelete && (
                   <div className="relative flex-shrink-0">
