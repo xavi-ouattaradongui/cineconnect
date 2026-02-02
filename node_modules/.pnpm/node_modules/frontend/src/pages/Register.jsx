@@ -13,8 +13,23 @@ export default function Register() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [passwordStrength, setPasswordStrength] = useState({
+    minLength: false,
+    hasUpperCase: false,
+    hasNumber: false,
+    hasSpecialChar: false
+  });
   const router = useRouter();
   const { register } = useAuth();
+
+  const checkPasswordStrength = (password) => {
+    setPasswordStrength({
+      minLength: password.length >= 8,
+      hasUpperCase: /[A-Z]/.test(password),
+      hasNumber: /\d/.test(password),
+      hasSpecialChar: /[@$!%*?&]/.test(password)
+    });
+  };
 
   const handleRegister = async (e) => {
     e.preventDefault();
@@ -25,13 +40,20 @@ export default function Register() {
       return;
     }
 
+    // Vérifier la force du mot de passe
+    if (!passwordStrength.minLength || !passwordStrength.hasUpperCase || 
+        !passwordStrength.hasNumber || !passwordStrength.hasSpecialChar) {
+      setError("Le mot de passe ne respecte pas tous les critères de sécurité");
+      return;
+    }
+
     setIsLoading(true);
     try {
       await register({
         username: username,
         email: email,
         password: password,
-        displayName: displayName || username, // Envoyer displayName au backend
+        displayName: displayName || username,
       });
 
       router.navigate({ to: "/" });
@@ -139,7 +161,10 @@ export default function Register() {
               <input
                 type={showPassword ? "text" : "password"}
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  checkPasswordStrength(e.target.value);
+                }}
                 placeholder="••••••••"
                 className="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg pl-10 pr-10 py-3 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-600 focus:outline-none focus:ring-1 focus:ring-indigo-500/50 focus:border-indigo-500/30 transition-all"
                 required
@@ -152,6 +177,28 @@ export default function Register() {
                 {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
               </button>
             </div>
+
+            {/* Password Strength Indicators */}
+            {password && (
+              <div className="mt-2 space-y-1.5 text-xs">
+                <div className={`flex items-center gap-2 ${passwordStrength.minLength ? 'text-green-600 dark:text-green-400' : 'text-gray-400'}`}>
+                  <span>{passwordStrength.minLength ? '✓' : '○'}</span>
+                  <span>Au moins 8 caractères</span>
+                </div>
+                <div className={`flex items-center gap-2 ${passwordStrength.hasUpperCase ? 'text-green-600 dark:text-green-400' : 'text-gray-400'}`}>
+                  <span>{passwordStrength.hasUpperCase ? '✓' : '○'}</span>
+                  <span>Une lettre majuscule</span>
+                </div>
+                <div className={`flex items-center gap-2 ${passwordStrength.hasNumber ? 'text-green-600 dark:text-green-400' : 'text-gray-400'}`}>
+                  <span>{passwordStrength.hasNumber ? '✓' : '○'}</span>
+                  <span>Un chiffre</span>
+                </div>
+                <div className={`flex items-center gap-2 ${passwordStrength.hasSpecialChar ? 'text-green-600 dark:text-green-400' : 'text-gray-400'}`}>
+                  <span>{passwordStrength.hasSpecialChar ? '✓' : '○'}</span>
+                  <span>Un caractère spécial (@$!%*?&)</span>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Confirm Password */}

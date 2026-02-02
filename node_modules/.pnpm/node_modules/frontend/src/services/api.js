@@ -80,5 +80,24 @@ export const api = {
     }
     
     return data;
+  },
+
+  changePassword: async (passwordData, token) => {
+    const response = await fetch(`${API_URL}/auth/change-password`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(passwordData)
+    });
+    
+    const data = await response.json();
+    
+    if (!response.ok) {
+      throw new Error(data.message || 'Erreur lors du changement de mot de passe');
+    }
+    
+    return data;
   }
 };

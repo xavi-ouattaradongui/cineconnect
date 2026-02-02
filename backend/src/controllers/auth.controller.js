@@ -4,11 +4,39 @@ import { db } from "../db/index.js";
 import { users } from "../db/schema/users.js";
 import { eq, or } from "drizzle-orm";
 
+// Fonction de validation du mot de passe
+const validatePassword = (password) => {
+  const minLength = password.length >= 8;
+  const hasUpperCase = /[A-Z]/.test(password);
+  const hasLowerCase = /[a-z]/.test(password);
+  const hasNumber = /\d/.test(password);
+  const hasSpecialChar = /[@$!%*?&]/.test(password);
+
+  return {
+    isValid: minLength && hasUpperCase && hasLowerCase && hasNumber && hasSpecialChar,
+    errors: {
+      minLength,
+      hasUpperCase,
+      hasLowerCase,
+      hasNumber,
+      hasSpecialChar
+    }
+  };
+};
+
 export const register = async (req, res) => {
   const { username, email, password, displayName } = req.body;
 
   if (!username || !email || !password) {
     return res.status(400).json({ message: "Champs manquants" });
+  }
+
+  // Valider le mot de passe
+  const passwordValidation = validatePassword(password);
+  if (!passwordValidation.isValid) {
+    return res.status(400).json({ 
+      message: "Le mot de passe doit contenir au moins 8 caractères, 1 majuscule, 1 minuscule, 1 chiffre et 1 caractère spécial (@$!%*?&)"
+    });
   }
 
   const hashedPassword = await bcrypt.hash(password, 10);
@@ -177,5 +205,50 @@ export const updateProfile = async (req, res) => {
   } catch (error) {
     console.error("Update profile error:", error);
     res.status(500).json({ message: "Erreur lors de la mise à jour" });
+  }
+};
+
+export const changePassword = async (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+
+  if (!currentPassword || !newPassword) {
+    return res.status(400).json({ message: "Tous les champs sont requis" });
+  }
+
+  // Valider le nouveau mot de passe
+  const passwordValidation = validatePassword(newPassword);
+  if (!passwordValidation.isValid) {
+    return res.status(400).json({ 
+      message: "Le mot de passe doit contenir au moins 8 caractères, 1 majuscule, 1 minuscule, 1 chiffre et 1 caractère spécial (@$!%*?&)"
+    });
+  }
+
+  try {
+    const [user] = await db
+      .select()
+      .from(users)
+      .where(eq(users.id, req.user.id));
+
+    if (!user) {
+      return res.status(404).json({ message: "Utilisateur non trouvé" });
+    }
+
+    const isValid = await bcrypt.compare(currentPassword, user.password);
+
+    if (!isValid) {
+      return res.status(401).json({ message: "Mot de passe actuel incorrect" });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    await db
+      .update(users)
+      .set({ password: hashedPassword })
+      .where(eq(users.id, req.user.id));
+
+    res.json({ message: "Mot de passe modifié avec succès" });
+  } catch (error) {
+    console.error("Change password error:", error);
+    res.status(500).json({ message: "Erreur lors du changement de mot de passe" });
   }
 };

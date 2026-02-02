@@ -118,6 +118,18 @@ export function AuthProvider({ children }) {
     }
   };
 
+  const changePassword = async (passwordData) => {
+    setLoading(true);
+    try {
+      const data = await api.changePassword(passwordData, token);
+      return data;
+    } catch (error) {
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -128,6 +140,7 @@ export function AuthProvider({ children }) {
         logout,
         updateProfile,
         refreshProfile,
+        changePassword,
         loading,
       }}
     >

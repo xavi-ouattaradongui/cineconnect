@@ -4,6 +4,8 @@ import {
   Skull,
   Ghost,
   Zap,
+  Heart,
+  Star,
   Flame,
   Crown,
   Swords,
@@ -11,8 +13,19 @@ import {
   Moon,
   Sun,
   Camera,
-  Heart,
-  Star,
+  Rocket,
+  Coffee,
+  Music,
+  Gamepad,
+  Pizza,
+  Trophy,
+  Diamond,
+  Eye,
+  Smile,
+  Angry,
+  Target,
+  Compass,
+  Feather,
 } from "lucide-react";
 
 const AVATAR_ICONS = {
@@ -28,6 +41,19 @@ const AVATAR_ICONS = {
   moon: Moon,
   sun: Sun,
   camera: Camera,
+  rocket: Rocket,
+  coffee: Coffee,
+  music: Music,
+  gamepad: Gamepad,
+  pizza: Pizza,
+  trophy: Trophy,
+  diamond: Diamond,
+  eye: Eye,
+  smile: Smile,
+  angry: Angry,
+  target: Target,
+  compass: Compass,
+  feather: Feather,
 };
 
 const AVATAR_COLORS = {
@@ -43,6 +69,19 @@ const AVATAR_COLORS = {
   moon: "from-indigo-400 to-purple-600",
   sun: "from-yellow-400 to-orange-500",
   camera: "from-gray-500 to-slate-700",
+  rocket: "from-blue-500 to-cyan-600",
+  coffee: "from-amber-700 to-brown-800",
+  music: "from-purple-400 to-pink-500",
+  gamepad: "from-green-500 to-teal-600",
+  pizza: "from-red-500 to-orange-600",
+  trophy: "from-yellow-600 to-amber-700",
+  diamond: "from-cyan-300 to-blue-500",
+  eye: "from-indigo-500 to-purple-600",
+  smile: "from-yellow-300 to-orange-400",
+  angry: "from-red-600 to-orange-700",
+  target: "from-red-500 to-pink-600",
+  compass: "from-blue-600 to-indigo-700",
+  feather: "from-teal-400 to-cyan-500",
 };
 
 export default function ProfileHeader({ user, onLogout }) {
@@ -68,15 +107,27 @@ export default function ProfileHeader({ user, onLogout }) {
   };
 
   const getAvatarIcon = () => {
-    const avatarKey = user?.avatar || "skull";
-    const Icon = AVATAR_ICONS[avatarKey] || Skull;
-    const colorClass = AVATAR_COLORS[avatarKey] || AVATAR_COLORS.skull;
-
+    const avatarKey = user?.avatar;
+    
+    // Si l'utilisateur a choisi une icône
+    if (avatarKey && AVATAR_ICONS[avatarKey]) {
+      const Icon = AVATAR_ICONS[avatarKey];
+      const colorClass = AVATAR_COLORS[avatarKey];
+      
+      return (
+        <div className={`w-full h-full rounded-full bg-gradient-to-br ${colorClass} flex items-center justify-center`}>
+          <Icon size={40} className="text-white" />
+        </div>
+      );
+    }
+    
+    // Sinon, afficher les initiales (par défaut)
+    const name = user?.displayName || user?.username || "User";
+    const initials = getInitials(name);
+    
     return (
-      <div
-        className={`w-full h-full rounded-full bg-gradient-to-br ${colorClass} flex items-center justify-center`}
-      >
-        <Icon size={40} className="text-white" />
+      <div className="w-full h-full rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+        <span className="text-2xl font-semibold text-white">{initials}</span>
       </div>
     );
   };

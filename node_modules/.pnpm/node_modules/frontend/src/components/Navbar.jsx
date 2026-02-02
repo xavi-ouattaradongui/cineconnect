@@ -76,32 +76,32 @@ export default function Navbar({ onSearch }) {
   };
 
   const getAvatarIcon = () => {
-    // Vérifier si l'utilisateur a un avatar d'icône (skull, ghost, etc.)
     const avatarKey = user?.avatar;
-
+    
+    // Si l'utilisateur a choisi une icône
     if (avatarKey && AVATAR_ICONS[avatarKey]) {
       const Icon = AVATAR_ICONS[avatarKey];
       const colorClass = AVATAR_COLORS[avatarKey];
-
+      
       return (
-        <div
-          className={`w-full h-full rounded-full bg-gradient-to-br ${colorClass} flex items-center justify-center`}
-        >
+        <div className={`w-full h-full rounded-full bg-gradient-to-br ${colorClass} flex items-center justify-center`}>
           <Icon size={16} className="text-white" />
         </div>
       );
     }
-
-    // Sinon, afficher les initiales
+    
+    // Sinon, afficher les initiales (par défaut)
     const name = user?.displayName || user?.username || "User";
     const parts = name.split(/[\s_-]+/);
-
-    const initials =
-      parts.length > 1
-        ? parts.map((part) => part[0]).join("").toUpperCase().slice(0, 2)
-        : name.slice(0, 2).toUpperCase();
-
-    return <span className="text-sm font-medium">{initials}</span>;
+    const initials = parts.length > 1
+      ? parts.map(part => part[0]).join("").toUpperCase().slice(0, 2)
+      : name.slice(0, 2).toUpperCase();
+    
+    return (
+      <div className="w-full h-full rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+        <span className="text-sm font-medium text-white">{initials}</span>
+      </div>
+    );
   };
 
   const getAvatarColor = () => {
