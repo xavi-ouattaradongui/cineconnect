@@ -7,12 +7,13 @@ export default function MovieReviews({
   reviewText,
   reviews,
   averageRating,
+  isLoading,
+  isSubmitting,
   onRatingChange,
   onRatingHover,
   onReviewChange,
   onReviewSubmit,
   onDeleteReview,
-  onReaction,
   currentUserId,
 }) {
   const [openMenuId, setOpenMenuId] = useState(null);
@@ -73,11 +74,12 @@ export default function MovieReviews({
             value={reviewText}
             onChange={onReviewChange}
             placeholder="Écrivez votre avis..."
-            className="w-full bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2.5 text-sm text-black dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-600 focus:outline-none focus:ring-1 focus:ring-indigo-500/50 focus:border-indigo-500/30 transition"
+            disabled={isSubmitting}
+            className="w-full bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2.5 text-sm text-black dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-600 focus:outline-none focus:ring-1 focus:ring-indigo-500/50 focus:border-indigo-500/30 transition disabled:opacity-50"
           />
           <button
             type="submit"
-            disabled={!reviewText.trim()}
+            disabled={!userRating || isSubmitting}
             className="absolute right-1.5 top-1.5 p-2 bg-indigo-600/90 hover:bg-indigo-600 text-white rounded-md transition disabled:opacity-40 disabled:cursor-not-allowed"
             title="Envoyer"
           >
@@ -85,77 +87,90 @@ export default function MovieReviews({
           </button>
         </div>
         <p className="text-xs text-gray-500 dark:text-gray-600">
-          Votre note est enregistrée localement sur cet appareil.
+          {isSubmitting
+            ? "Envoi en cours..."
+            : "Une note est obligatoire. Le commentaire est optionnel."}
         </p>
       </form>
 
       {/* Liste des avis */}
-      {reviews.length > 0 && (
-        <div className="mt-4 space-y-2">
-          {reviews.map((r) => (
-            <div key={r.id} className="flex items-start gap-2 text-sm relative">
-              <div className="h-7 w-7 rounded-full bg-white/10 flex items-center justify-center">
-                <span className="text-[11px]">{r.avatarInitials}</span>
-              </div>
-              <div className="flex-1">
-                <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-                  <span>{r.username}</span>
-                  <span>•</span>
-                  <span>{r.timestamp}</span>
-                  {r.rating ? (
-                    <>
-                      <span>•</span>
-                      <span className="text-yellow-400">{r.rating}/5</span>
-                    </>
-                  ) : null}
+      {isLoading ? (
+        <div className="mt-4 text-center text-gray-500">Chargement des avis...</div>
+      ) : reviews.length > 0 ? (
+        <div className="mt-4 space-y-3">
+          {reviews.map((r) => {
+            const canDelete = r.userId === currentUserId;
+            
+            return (
+              <div key={r.id} className="flex items-start gap-3 p-3 rounded-lg bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 relative">
+                <div className="h-8 w-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center flex-shrink-0">
+                  <span className="text-xs font-semibold text-white">
+                    {r.user?.username?.slice(0, 2).toUpperCase() || "??"}
+                  </span>
                 </div>
-                <p className="text-gray-700 dark:text-gray-200">{r.text}</p>
-              </div>
-              {/* Remplacer le bouton supprimer par un menu */}
-              {r.userId === currentUserId && (
-                <div className="relative">
-                  <button
-                    className="p-1 rounded hover:bg-gray-200 dark:hover:bg-white/10 transition"
-                    onClick={() =>
-                      setOpenMenuId(openMenuId === r.id ? null : r.id)
-                    }
-                    title="Options"
-                  >
-                    <MoreVertical size={16} />
-                  </button>
-                  {openMenuId === r.id && (
-                    <div className="absolute right-0 mt-2 w-32 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-white/10 rounded shadow-lg z-10">
-                      <button
-                        className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-white/10"
-                        onClick={() => {
-                          setOpenMenuId(null);
-                          if (
-                            window.confirm(
-                              "Voulez-vous vraiment supprimer ce commentaire ?"
-                            )
-                          ) {
-                            onDeleteReview(r.id);
-                          }
-                        }}
-                      >
-                        Supprimer
-                      </button>
-                      <button
-                        className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-white/10"
-                        onClick={() => {
-                          setOpenMenuId(null);
-                          onReviewChange({ target: { value: r.text } });
-                          // Optionnel : focus input, ou ajouter une logique pour modifier
-                        }}
-                      >
-                        Modifier
-                      </button>
-                    </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 mb-1">
+                    <span className="font-medium text-gray-700 dark:text-gray-300">{r.user?.username || "Anonyme"}</span>
+                    <span>•</span>
+                    <span>{new Date(r.createdAt).toLocaleString("fr-FR")}</span>
+                    {r.rating && (
+                      <>
+                        <span>•</span>
+                        <span className="flex items-center gap-1 text-yellow-500">
+                          <Star size={12} className="fill-yellow-500" />
+                          {r.rating}/5
+                        </span>
+                      </>
+                    )}
+                  </div>
+                  {r.comment && (
+                    <p className="text-sm text-gray-700 dark:text-gray-200">
+                      {r.comment}
+                    </p>
                   )}
                 </div>
-              )}
-            </div>
-          ))}
+                {canDelete && (
+                  <div className="relative flex-shrink-0">
+                    <button
+                      className="p-1.5 rounded hover:bg-gray-200 dark:hover:bg-white/10 transition text-gray-600 dark:text-gray-400"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setOpenMenuId(openMenuId === r.id ? null : r.id);
+                      }}
+                      title="Options"
+                    >
+                      <MoreVertical size={18} />
+                    </button>
+                    {openMenuId === r.id && (
+                      <>
+                        {/* Overlay pour fermer le menu en cliquant ailleurs */}
+                        <div
+                          className="fixed inset-0 z-10"
+                          onClick={() => setOpenMenuId(null)}
+                        />
+                        <div className="absolute right-0 top-8 w-40 bg-white dark:bg-zinc-800 border border-gray-200 dark:border-white/10 rounded-lg shadow-xl z-20 overflow-hidden">
+                          <button
+                            className="w-full text-left px-4 py-2.5 text-sm hover:bg-gray-100 dark:hover:bg-white/10 text-red-600 dark:text-red-400 font-medium flex items-center gap-2"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onDeleteReview(r.id);
+                            }}
+                          >
+                            <Trash2 size={16} />
+                            Supprimer
+                          </button>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      ) : (
+        <div className="mt-4 text-center text-gray-500 dark:text-gray-400 text-sm py-8">
+          Aucun avis pour le moment. Soyez le premier ! 🎬
         </div>
       )}
     </section>

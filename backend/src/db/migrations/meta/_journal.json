@@ -15,6 +15,20 @@
       "when": 1770023216452,
       "tag": "0001_striped_thor_girl",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1770048623490,
+      "tag": "0002_melodic_gamora",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1770051526370,
+      "tag": "0003_good_caretaker",
+      "breakpoints": true
     }
   ]
 }

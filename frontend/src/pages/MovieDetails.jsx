@@ -1,6 +1,7 @@
 import { useParams } from "@tanstack/react-router";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { useMovie } from "../hooks/useMovies";
+import { useReviews } from "../hooks/useReviews";
 import { useFavorites } from "../contexts/FavoritesContext";
 import { useMyList } from "../contexts/MyListContext";
 import { useAuth } from "../contexts/AuthContext";
@@ -13,6 +14,7 @@ import ChatWidget from "../components/movie/ChatWidget";
 export default function MovieDetails() {
   const { id } = useParams({ from: "/film/$id" });
   const { data: movie, isLoading, error } = useMovie(id);
+  const { reviews, isLoading: reviewsLoading, createReview, updateReview, deleteReview } = useReviews(id);
   const { addFavorite, removeFavorite, isFavorite } = useFavorites();
   const { addToList, removeFromList, isInList } = useMyList();
   const { user } = useAuth();
@@ -21,33 +23,15 @@ export default function MovieDetails() {
   const [chatMessages, setChatMessages] = useState([]);
   const [messageText, setMessageText] = useState("");
   
-  // Avis & Notes - Persistants par utilisateur/film
-  const [reviews, setReviews] = useState(() => {
-    if (user?.id) {
-      const saved = localStorage.getItem(`reviews_${user.id}_${id}`);
-      return saved ? JSON.parse(saved) : [];
-    }
-    return [];
-  });
-
-  const [userRating, setUserRating] = useState(() => {
-    if (user?.id) {
-      const saved = localStorage.getItem(`rating_${user.id}_${id}`);
-      return saved ? Number(saved) : null;
-    }
-    return null;
-  });
-
+  const [userRating, setUserRating] = useState(null);
   const [hoverRating, setHoverRating] = useState(0);
   const [reviewText, setReviewText] = useState("");
   const [chatCollapsed, setChatCollapsed] = useState(false);
 
-  // Sauvegarder les avis quand ils changent
-  useEffect(() => {
-    if (user?.id) {
-      localStorage.setItem(`reviews_${user.id}_${id}`, JSON.stringify(reviews));
-    }
-  }, [reviews, user?.id, id]);
+  // Trouver la review de l'utilisateur connecté
+  const userReview = useMemo(() => {
+    return reviews.find((r) => r.userId === user?.id);
+  }, [reviews, user?.id]);
 
   // Calculer la moyenne des notes
   const averageRating = useMemo(() => {
@@ -93,87 +77,51 @@ export default function MovieDetails() {
     // });
   };
 
-  const handleSubmitReview = (e) => {
+  const handleSubmitReview = async (e) => {
     e.preventDefault();
-    if (!reviewText.trim()) return;
-
-    // Vérifier si l'utilisateur a déjà un avis pour ce film
-    const existingReviewIndex = reviews.findIndex((r) => r.userId === user?.id);
-
-    if (existingReviewIndex !== -1) {
-      // Modifier l'avis existant
-      const updatedReviews = [...reviews];
-      updatedReviews[existingReviewIndex] = {
-        ...updatedReviews[existingReviewIndex],
-        text: reviewText,
-        rating: userRating || null,
-        timestamp: new Date().toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" }),
-      };
-      setReviews(updatedReviews);
-    } else {
-      // Créer un nouvel avis
-      setReviews([
-        ...reviews,
-        {
-          id: Date.now(),
-          userId: user?.id || "anonymous",
-          text: reviewText,
-          rating: userRating || null,
-          username: user?.username || "anonyme",
-          avatar: user?.avatar || null,
-          avatarInitials:
-            user?.displayName?.split(" ").map((w) => w[0]).join("").toUpperCase().slice(0, 2) || "?",
-          timestamp: new Date().toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" }),
-          reactions: { like: [] },
-        },
-      ]);
+    
+    if (!userRating) {
+      alert("Veuillez d'abord donner une note");
+      return;
     }
-    setReviewText("");
-  };
 
-  const handleDeleteReview = (reviewId) => {
-    // Un utilisateur ne peut supprimer que son propre avis
-    const review = reviews.find((r) => r.id === reviewId);
-    if (review && review.userId === user?.id) {
-      setReviews(reviews.filter((r) => r.id !== reviewId));
+    try {
+      if (userReview) {
+        await updateReview.mutateAsync({
+          reviewId: userReview.id,
+          rating: userRating,
+          comment: reviewText.trim() || userReview.comment,
+        });
+      } else {
+        await createReview.mutateAsync({
+          rating: userRating,
+          comment: reviewText.trim() || "",
+          // Passer les données du film pour créer l'entrée dans la table films
+          title: movie.Title,
+          poster: movie.Poster,
+          year: parseInt(movie.Year),
+        });
+      }
+      setReviewText("");
+      setUserRating(null);
+    } catch (err) {
+      console.error("Erreur lors de la soumission:", err);
+      alert(err.message || "Erreur lors de l'envoi de l'avis");
     }
   };
 
-  const handleReaction = (reviewId, reactionKey) => {
-    setReviews((prevReviews) =>
-      prevReviews.map((r) => {
-        if (r.id !== reviewId) return r;
-
-        const reactions = r.reactions || { like: [] };
-        const userList = reactions[reactionKey] || [];
-        const userId = user?.id || "anonymous";
-
-        if (userList.includes(userId)) {
-          return {
-            ...r,
-            reactions: {
-              ...reactions,
-              [reactionKey]: userList.filter((id) => id !== userId),
-            },
-          };
-        } else {
-          return {
-            ...r,
-            reactions: {
-              ...reactions,
-              [reactionKey]: [...userList, userId],
-            },
-          };
-        }
-      })
-    );
+  const handleDeleteReview = async (reviewId) => {
+    if (window.confirm("Voulez-vous vraiment supprimer ce commentaire ?")) {
+      try {
+        await deleteReview.mutateAsync(reviewId);
+      } catch (err) {
+        console.error("Erreur lors de la suppression:", err);
+      }
+    }
   };
 
   const handleRatingChange = (value) => {
     setUserRating(value);
-    if (user?.id) {
-      localStorage.setItem(`rating_${user.id}_${id}`, String(value));
-    }
   };
 
   if (isLoading) return <Loader />;
@@ -199,18 +147,19 @@ export default function MovieDetails() {
         <div className="lg:col-span-2 space-y-12">
           <MovieInfo movie={movie} />
           <MovieReviews
-            userRating={userRating}
+            userRating={userRating || userReview?.rating}
             hoverRating={hoverRating}
             reviewText={reviewText}
             reviews={reviews}
             averageRating={averageRating}
+            isLoading={reviewsLoading}
             onRatingChange={handleRatingChange}
             onRatingHover={setHoverRating}
             onReviewChange={(e) => setReviewText(e.target.value)}
             onReviewSubmit={handleSubmitReview}
             onDeleteReview={handleDeleteReview}
-            onReaction={handleReaction}
-            currentUserId={user?.id || "anonymous"}
+            currentUserId={user?.id} // Assurez-vous que c'est bien un nombre
+            isSubmitting={createReview.isPending || updateReview.isPending}
           />
         </div>
 

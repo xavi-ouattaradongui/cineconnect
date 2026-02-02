@@ -1,23 +1,28 @@
-import http from "http";
-import { Server } from "socket.io";
+import express from "express";
+import cors from "cors";
 import dotenv from "dotenv";
-import app from "./app.js";
-import { initSocket } from "./sockets/chat.socket.js";
+import authRoutes from "./routes/auth.routes.js";
+import reviewsRoutes from "./routes/reviews.routes.js";
 
 dotenv.config();
 
-const server = http.createServer(app);
-
-const io = new Server(server, {
-  cors: {
-    origin: "*",
-  },
-});
-
-initSocket(io);
-
+const app = express();
 const PORT = process.env.PORT || 3001;
 
-server.listen(PORT, () => {
-  console.log(`🔥 Server + Socket running on http://localhost:${PORT}`);
+// CORS
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL || "http://localhost:5173",
+    credentials: true,
+  })
+);
+
+app.use(express.json());
+
+// Routes
+app.use("/auth", authRoutes);
+app.use("/reviews", reviewsRoutes);
+
+app.listen(PORT, () => {
+  console.log(`✅ Serveur démarré sur http://localhost:${PORT}`);
 });
