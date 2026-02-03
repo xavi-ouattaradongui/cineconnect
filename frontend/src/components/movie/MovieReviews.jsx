@@ -18,6 +18,10 @@ export default function MovieReviews({
   currentUserId,
 }) {
   const [openMenuId, setOpenMenuId] = useState(null);
+  const [visibleCount, setVisibleCount] = useState(5);
+
+  const visibleReviews = reviews.slice(0, visibleCount);
+  const hasMore = reviews.length > visibleCount;
 
   return (
     <section>
@@ -98,107 +102,133 @@ export default function MovieReviews({
       {isLoading ? (
         <div className="mt-4 text-center text-gray-500">Chargement des avis...</div>
       ) : reviews.length > 0 ? (
-        <div className="mt-4 space-y-3">
-          {reviews.map((r) => {
-            const canDelete = r.userId === currentUserId;
-            const hasLiked = r.reactions?.likedBy?.includes(currentUserId);
-            const hasDisliked = r.reactions?.dislikedBy?.includes(currentUserId);
-            
-            return (
-              <div key={r.id} className="flex items-start gap-3 p-3 rounded-lg bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 relative">
-                <div className="h-8 w-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center flex-shrink-0">
-                  <span className="text-xs font-semibold text-white">
-                    {r.user?.username?.slice(0, 2).toUpperCase() || "??"}
-                  </span>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 mb-1">
-                    <span className="font-medium text-gray-700 dark:text-gray-300">{r.user?.username || "Anonyme"}</span>
-                    <span>•</span>
-                    <span>{new Date(r.createdAt).toLocaleString("fr-FR")}</span>
-                    {r.rating && (
-                      <>
-                        <span>•</span>
-                        <span className="flex items-center gap-1 text-yellow-500">
-                          <Star size={12} className="fill-yellow-500" />
-                          {r.rating}/5
-                        </span>
-                      </>
-                    )}
+        <>
+          <div className="mt-4 space-y-3">
+            {visibleReviews.map((r) => {
+              const canDelete = r.userId === currentUserId;
+              const hasLiked = r.reactions?.likedBy?.includes(currentUserId);
+              const hasDisliked = r.reactions?.dislikedBy?.includes(currentUserId);
+              
+              return (
+                <div key={r.id} className="flex items-start gap-3 p-3 rounded-lg bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 relative">
+                  <div className="h-8 w-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center flex-shrink-0">
+                    <span className="text-xs font-semibold text-white">
+                      {r.user?.username?.slice(0, 2).toUpperCase() || "??"}
+                    </span>
                   </div>
-                  {r.comment && (
-                    <p className="text-sm text-gray-700 dark:text-gray-200 mb-2">
-                      {r.comment}
-                    </p>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 mb-1">
+                      <span className="font-medium text-gray-700 dark:text-gray-300">{r.user?.username || "Anonyme"}</span>
+                      <span>•</span>
+                      <span>{new Date(r.createdAt).toLocaleString("fr-FR")}</span>
+                      {r.rating && (
+                        <>
+                          <span>•</span>
+                          <span className="flex items-center gap-1 text-yellow-500">
+                            <Star size={12} className="fill-yellow-500" />
+                            {r.rating}/5
+                          </span>
+                        </>
+                      )}
+                    </div>
+                    {r.comment && (
+                      <p className="text-sm text-gray-700 dark:text-gray-200 mb-2">
+                        {r.comment}
+                      </p>
+                    )}
+                    
+                    {/* Boutons de réaction */}
+                    <div className="flex items-center gap-3 mt-2">
+                      <button
+                        onClick={() => onReaction(r.id, "like")}
+                        className={`flex items-center gap-1 px-2 py-1 rounded-md text-xs transition ${
+                          hasLiked
+                            ? "bg-pink-100 dark:bg-pink-500/20 text-pink-600 dark:text-pink-400"
+                            : "hover:bg-gray-200 dark:hover:bg-white/10 text-gray-600 dark:text-gray-400"
+                        }`}
+                        title="J'aime"
+                      >
+                        <Heart size={14} className={hasLiked ? "fill-current" : ""} />
+                        <span>{r.reactions?.likes || 0}</span>
+                      </button>
+                      <button
+                        onClick={() => onReaction(r.id, "dislike")}
+                        className={`flex items-center gap-1 px-2 py-1 rounded-md text-xs transition ${
+                          hasDisliked
+                            ? "bg-gray-200 dark:bg-white/20 text-gray-700 dark:text-gray-300"
+                            : "hover:bg-gray-200 dark:hover:bg-white/10 text-gray-600 dark:text-gray-400"
+                        }`}
+                        title="Pas utile"
+                      >
+                        <ThumbsDown size={14} className={hasDisliked ? "fill-current" : ""} />
+                        <span>{r.reactions?.dislikes || 0}</span>
+                      </button>
+                    </div>
+                  </div>
+                  {canDelete && (
+                    <div className="relative flex-shrink-0">
+                      <button
+                        className="p-1.5 rounded hover:bg-gray-200 dark:hover:bg-white/10 transition text-gray-600 dark:text-gray-400"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setOpenMenuId(openMenuId === r.id ? null : r.id);
+                        }}
+                        title="Options"
+                      >
+                        <MoreVertical size={18} />
+                      </button>
+                      {openMenuId === r.id && (
+                        <>
+                          {/* Overlay pour fermer le menu en cliquant ailleurs */}
+                          <div
+                            className="fixed inset-0 z-10"
+                            onClick={() => setOpenMenuId(null)}
+                          />
+                          <div className="absolute right-0 top-8 w-40 bg-white dark:bg-zinc-800 border border-gray-200 dark:border-white/10 rounded-lg shadow-xl z-20 overflow-hidden">
+                            <button
+                              className="w-full text-left px-4 py-2.5 text-sm hover:bg-gray-100 dark:hover:bg-white/10 text-red-600 dark:text-red-400 font-medium flex items-center gap-2"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onDeleteReview(r.id);
+                              }}
+                            >
+                              <Trash2 size={16} />
+                              Supprimer
+                            </button>
+                          </div>
+                        </>
+                      )}
+                    </div>
                   )}
-                  
-                  {/* Boutons de réaction */}
-                  <div className="flex items-center gap-3 mt-2">
-                    <button
-                      onClick={() => onReaction(r.id, "like")}
-                      className={`flex items-center gap-1 px-2 py-1 rounded-md text-xs transition ${
-                        hasLiked
-                          ? "bg-pink-100 dark:bg-pink-500/20 text-pink-600 dark:text-pink-400"
-                          : "hover:bg-gray-200 dark:hover:bg-white/10 text-gray-600 dark:text-gray-400"
-                      }`}
-                      title="J'aime"
-                    >
-                      <Heart size={14} className={hasLiked ? "fill-current" : ""} />
-                      <span>{r.reactions?.likes || 0}</span>
-                    </button>
-                    <button
-                      onClick={() => onReaction(r.id, "dislike")}
-                      className={`flex items-center gap-1 px-2 py-1 rounded-md text-xs transition ${
-                        hasDisliked
-                          ? "bg-gray-200 dark:bg-white/20 text-gray-700 dark:text-gray-300"
-                          : "hover:bg-gray-200 dark:hover:bg-white/10 text-gray-600 dark:text-gray-400"
-                      }`}
-                      title="Pas utile"
-                    >
-                      <ThumbsDown size={14} className={hasDisliked ? "fill-current" : ""} />
-                      <span>{r.reactions?.dislikes || 0}</span>
-                    </button>
-                  </div>
                 </div>
-                {canDelete && (
-                  <div className="relative flex-shrink-0">
-                    <button
-                      className="p-1.5 rounded hover:bg-gray-200 dark:hover:bg-white/10 transition text-gray-600 dark:text-gray-400"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setOpenMenuId(openMenuId === r.id ? null : r.id);
-                      }}
-                      title="Options"
-                    >
-                      <MoreVertical size={18} />
-                    </button>
-                    {openMenuId === r.id && (
-                      <>
-                        {/* Overlay pour fermer le menu en cliquant ailleurs */}
-                        <div
-                          className="fixed inset-0 z-10"
-                          onClick={() => setOpenMenuId(null)}
-                        />
-                        <div className="absolute right-0 top-8 w-40 bg-white dark:bg-zinc-800 border border-gray-200 dark:border-white/10 rounded-lg shadow-xl z-20 overflow-hidden">
-                          <button
-                            className="w-full text-left px-4 py-2.5 text-sm hover:bg-gray-100 dark:hover:bg-white/10 text-red-600 dark:text-red-400 font-medium flex items-center gap-2"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onDeleteReview(r.id);
-                            }}
-                          >
-                            <Trash2 size={16} />
-                            Supprimer
-                          </button>
-                        </div>
-                      </>
-                    )}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+
+          {/* Bouton "Voir plus" */}
+          {hasMore && (
+            <div className="mt-4 text-center">
+              <button
+                onClick={() => setVisibleCount(prev => prev + 2)}
+                className="px-6 py-2.5 bg-indigo-600/10 hover:bg-indigo-600/20 dark:bg-indigo-500/10 dark:hover:bg-indigo-500/20 text-indigo-700 dark:text-indigo-400 rounded-lg text-sm font-medium transition border border-indigo-200 dark:border-indigo-500/20"
+              >
+                Voir plus de commentaires ({reviews.length - visibleCount} restants)
+              </button>
+            </div>
+          )}
+
+          {/* Bouton "Voir moins" si on a étendu la liste */}
+          {visibleCount > 5 && (
+            <div className="mt-2 text-center">
+              <button
+                onClick={() => setVisibleCount(5)}
+                className="px-6 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 text-sm transition"
+              >
+                Voir moins
+              </button>
+            </div>
+          )}
+        </>
       ) : (
         <div className="mt-4 text-center text-gray-500 dark:text-gray-400 text-sm py-8">
           Aucun avis pour le moment. Soyez le premier ! 🎬
