@@ -99,7 +99,7 @@ export default function Register() {
             </div>
           )}
 
-          {/* Display Name - OPTIONNEL pour le backend */}
+          {/* Display Name */}
           <div className="space-y-2">
             <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
               Nom d'affichage
@@ -130,7 +130,7 @@ export default function Register() {
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                placeholder="jean_dupont"
+                placeholder="jean_dupont21"
                 className="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg pl-8 pr-4 py-3 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-600 focus:outline-none focus:ring-1 focus:ring-indigo-500/50 focus:border-indigo-500/30 transition-all"
                 required
               />

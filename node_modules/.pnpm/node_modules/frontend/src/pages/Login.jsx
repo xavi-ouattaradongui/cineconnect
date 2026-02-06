@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useRouter } from "@tanstack/react-router";
+import { Link, useRouter, useNavigate } from "@tanstack/react-router";
 import { Mail, Lock, Eye, EyeOff, User } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 
@@ -10,6 +10,7 @@ export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
+  const navigate = useNavigate();
   const { login } = useAuth();
 
   const handleLogin = async (e) => {
@@ -23,7 +24,7 @@ export default function Login() {
         password: password,
       });
 
-      router.navigate({ to: "/" });
+      navigate({ to: "/home" });
     } catch (err) {
       setError(err.message || "Email ou mot de passe incorrect");
     } finally {

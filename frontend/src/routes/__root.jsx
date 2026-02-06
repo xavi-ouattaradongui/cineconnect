@@ -15,7 +15,7 @@ import Register from "../pages/Register";
 export const rootRoute = new RootRoute({
   component: () => {
     const location = useLocation();
-    const hideNavbar = location.pathname === "/login" || location.pathname === "/register";
+    const hideNavbar = location.pathname === "/" || location.pathname === "/login" || location.pathname === "/register";
 
     return (
       <div>
@@ -27,9 +27,15 @@ export const rootRoute = new RootRoute({
 });
 
 // Routes enfants
-export const homeRoute = new Route({
+export const loginRoute = new Route({
   getParentRoute: () => rootRoute,
   path: "/",
+  component: Login,
+});
+
+export const homeRoute = new Route({
+  getParentRoute: () => rootRoute,
+  path: "/home",
   component: Home,
 });
 
@@ -69,7 +75,7 @@ export const profileSecurityRoute = new Route({
   component: ProfileSecurity,
 });
 
-export const loginRoute = new Route({
+export const loginAltRoute = new Route({
   getParentRoute: () => rootRoute,
   path: "login",
   component: Login,
@@ -89,6 +95,7 @@ export const errorRoute = new Route({
 
 // Créer routeTree
 const routeTree = rootRoute.addChildren([
+  loginRoute,
   homeRoute,
   filmRoute,
   favoritesRoute,
@@ -96,7 +103,7 @@ const routeTree = rootRoute.addChildren([
   profileRoute,
   profileEditRoute,
   profileSecurityRoute,
-  loginRoute,
+  loginAltRoute,
   registerRoute,
   errorRoute,
 ]);
