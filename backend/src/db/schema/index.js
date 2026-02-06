@@ -3,3 +3,5 @@ export * from "./films.js";
 export * from "./categories.js";
 export * from "./reviews.js";
 export * from "./messages.js";
+export * from "./favorites.js";
+export * from "./mylists.js";

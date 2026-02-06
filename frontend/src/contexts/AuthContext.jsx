@@ -81,6 +81,9 @@ export function AuthProvider({ children }) {
     setToken(null);
     localStorage.removeItem("user");
     localStorage.removeItem("token");
+    
+    // Forcer un re-render complet de l'application
+    window.dispatchEvent(new Event('storage'));
   };
 
   const updateProfile = async (profileData) => {

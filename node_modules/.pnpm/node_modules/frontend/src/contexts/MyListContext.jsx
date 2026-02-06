@@ -1,46 +1,106 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { useAuth } from "./AuthContext";
+import { api } from "../services/api";
 
 const MyListContext = createContext();
 
 export function MyListProvider({ children }) {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const [myList, setMyList] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  // Charger la liste au montage ou changement d'utilisateur
+  // Charger la liste depuis le backend
   useEffect(() => {
-    if (user?.id) {
-      const saved = localStorage.getItem(`mylist_${user.id}`);
-      setMyList(saved ? JSON.parse(saved) : []);
-    } else {
-      // Si pas d'utilisateur, vider la liste
+    // Vider immédiatement la liste
+    setMyList([]);
+
+    if (user?.id && token) {
+      loadMyList();
+    }
+  }, [user?.id, token]);
+
+  const loadMyList = async () => {
+    if (!token) {
       setMyList([]);
+      return;
     }
-  }, [user?.id]);
 
-  // Sauvegarder la liste quand elle change
-  useEffect(() => {
-    if (user?.id) {
-      localStorage.setItem(`mylist_${user.id}`, JSON.stringify(myList));
-    }
-  }, [myList, user?.id]);
-
-  const addToList = (movie) => {
-    if (!myList.some((m) => m.imdbID === movie.imdbID)) {
-      setMyList([...myList, movie]);
+    setLoading(true);
+    try {
+      const data = await api.getMyList(token);
+      const formattedList = data.map((item) => ({
+        imdbID: item.imdbId,
+        Title: item.title,
+        Poster: item.poster,
+        Year: item.year,
+      }));
+      setMyList(formattedList);
+    } catch (error) {
+      console.error("Erreur chargement liste:", error);
+      setMyList([]);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const removeFromList = (id) => {
-    setMyList(myList.filter((m) => m.imdbID !== id));
+  const addToList = async (movie) => {
+    if (!token) {
+      console.error("Vous devez être connecté");
+      return;
+    }
+
+    const alreadyExists = myList.some((m) => m.imdbID === movie.imdbID);
+    if (!alreadyExists) {
+      setMyList((prev) => [...prev, movie]);
+    }
+
+    try {
+      await api.addToMyList(movie, token);
+      await loadMyList();
+    } catch (error) {
+      console.error("Erreur ajout liste:", error);
+      if (!alreadyExists) {
+        setMyList((prev) => prev.filter((m) => m.imdbID !== movie.imdbID));
+      }
+    }
+  };
+
+  const removeFromList = async (id) => {
+    if (!token) {
+      console.error("Vous devez être connecté");
+      return;
+    }
+
+    const oldList = [...myList];
+    setMyList((prev) => prev.filter((m) => m.imdbID !== id));
+
+    try {
+      await api.removeFromMyList(id, token);
+      await loadMyList();
+    } catch (error) {
+      console.error("Erreur suppression liste:", error);
+      setMyList(oldList);
+    }
   };
 
   const isInList = (id) => {
     return myList.some((m) => m.imdbID === id);
   };
 
+  const providerKey = user?.id ? `mylist-${user.id}` : "mylist-guest";
+
   return (
-    <MyListContext.Provider value={{ myList, addToList, removeFromList, isInList }}>
+    <MyListContext.Provider
+      key={providerKey}
+      value={{
+        myList,
+        addToList,
+        removeFromList,
+        isInList,
+        loading,
+        refresh: loadMyList,
+      }}
+    >
       {children}
     </MyListContext.Provider>
   );

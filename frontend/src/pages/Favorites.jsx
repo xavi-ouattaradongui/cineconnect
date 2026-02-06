@@ -1,10 +1,16 @@
+import { useEffect } from "react";
 import { Heart } from "lucide-react";
 import { useFavorites } from "../contexts/FavoritesContext";
 import MovieCard from "../components/MovieCard";
 import Loader from "../components/Loader";
 
 export default function Favorites() {
-  const { favorites } = useFavorites();
+  const { favorites, loading, refresh } = useFavorites();
+
+  // Rafraîchir les favoris au montage de la page
+  useEffect(() => {
+    refresh();
+  }, []);
 
   return (
     <div className="min-h-screen bg-white dark:bg-black text-gray-900 dark:text-white">
@@ -24,7 +30,11 @@ export default function Favorites() {
         </div>
 
         {/* Content */}
-        {favorites.length === 0 ? (
+        {loading ? (
+          <div className="flex justify-center py-20">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-500"></div>
+          </div>
+        ) : favorites.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-center">
             <div className="mb-4 p-6 bg-gray-100 dark:bg-white/5 rounded-full">
               <Heart size={40} className="text-gray-400 dark:text-gray-600" />

@@ -1,4 +1,5 @@
 import { Link, useRouter } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { useFavorites } from "../contexts/FavoritesContext";
 import { useMyList } from "../contexts/MyListContext";
 import { useAuth } from "../contexts/AuthContext";
@@ -8,10 +9,17 @@ import ProfileSection from "../components/profile/ProfileSection";
 import { Heart, List } from "lucide-react";
 
 export default function Profile() {
-  const { favorites } = useFavorites();
+  const { favorites, refresh: refreshFavorites } = useFavorites();
   const { myList } = useMyList();
   const { user, logout } = useAuth();
   const router = useRouter();
+
+  // Rafraîchir les favoris au montage
+  useEffect(() => {
+    if (user) {
+      refreshFavorites();
+    }
+  }, [user?.id]);
 
   if (!user) {
     return (

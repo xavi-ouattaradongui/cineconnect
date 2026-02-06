@@ -1,46 +1,109 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { useAuth } from "./AuthContext";
+import { api } from "../services/api";
 
 const FavoritesContext = createContext();
 
 export function FavoritesProvider({ children }) {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const [favorites, setFavorites] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  // Charger les favoris au montage ou changement d'utilisateur
+  // Charger les favoris depuis le backend
   useEffect(() => {
-    if (user?.id) {
-      const saved = localStorage.getItem(`favorites_${user.id}`);
-      setFavorites(saved ? JSON.parse(saved) : []);
-    } else {
-      // Si pas d'utilisateur, vider les favoris
+    // Vider immédiatement les favoris
+    setFavorites([]);
+
+    if (user?.id && token) {
+      loadFavorites();
+    }
+  }, [user?.id, token]);
+
+  const loadFavorites = async () => {
+    if (!token) {
       setFavorites([]);
+      return;
     }
-  }, [user?.id]);
 
-  // Sauvegarder les favoris quand ils changent
-  useEffect(() => {
-    if (user?.id) {
-      localStorage.setItem(`favorites_${user.id}`, JSON.stringify(favorites));
-    }
-  }, [favorites, user?.id]);
-
-  const addFavorite = (movie) => {
-    if (!favorites.some((m) => m.imdbID === movie.imdbID)) {
-      setFavorites([...favorites, movie]);
+    setLoading(true);
+    try {
+      const data = await api.getFavorites(token);
+      const formattedFavorites = data.map((fav) => ({
+        imdbID: fav.imdbId,
+        Title: fav.title,
+        Poster: fav.poster,
+        Year: fav.year,
+      }));
+      setFavorites(formattedFavorites);
+    } catch (error) {
+      console.error("Erreur chargement favoris:", error);
+      setFavorites([]);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const removeFavorite = (id) => {
-    setFavorites(favorites.filter((m) => m.imdbID !== id));
+  const addFavorite = async (movie) => {
+    if (!token) {
+      console.error("Vous devez être connecté");
+      return;
+    }
+
+    const alreadyExists = favorites.some((m) => m.imdbID === movie.imdbID);
+    if (!alreadyExists) {
+      setFavorites((prev) => [...prev, movie]);
+    }
+
+    try {
+      await api.addFavorite(movie, token);
+      // Recharger pour avoir les données fraîches du backend
+      await loadFavorites();
+    } catch (error) {
+      console.error("Erreur ajout favori:", error);
+      if (!alreadyExists) {
+        setFavorites((prev) => prev.filter((m) => m.imdbID !== movie.imdbID));
+      }
+    }
+  };
+
+  const removeFavorite = async (id) => {
+    if (!token) {
+      console.error("Vous devez être connecté");
+      return;
+    }
+
+    const oldFavorites = [...favorites];
+    setFavorites((prev) => prev.filter((m) => m.imdbID !== id));
+
+    try {
+      await api.removeFavorite(id, token);
+      // Recharger pour avoir les données fraîches du backend
+      await loadFavorites();
+    } catch (error) {
+      console.error("Erreur suppression favori:", error);
+      setFavorites(oldFavorites);
+    }
   };
 
   const isFavorite = (id) => {
     return favorites.some((m) => m.imdbID === id);
   };
 
+  // Utiliser user.id comme clé pour forcer un re-mount complet
+  const providerKey = user?.id ? `favorites-${user.id}` : "favorites-guest";
+
   return (
-    <FavoritesContext.Provider value={{ favorites, addFavorite, removeFavorite, isFavorite }}>
+    <FavoritesContext.Provider
+      key={providerKey}
+      value={{
+        favorites,
+        addFavorite,
+        removeFavorite,
+        isFavorite,
+        loading,
+        refresh: loadFavorites,
+      }}
+    >
       {children}
     </FavoritesContext.Provider>
   );

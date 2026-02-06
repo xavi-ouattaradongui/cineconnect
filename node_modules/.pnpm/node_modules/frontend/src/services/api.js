@@ -173,5 +173,111 @@ export const api = {
     }
     
     return data;
+  },
+
+  // Favoris
+  getFavorites: async (token) => {
+    const response = await fetch(`${API_URL}/favorites`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    
+    const data = await response.json();
+    
+    if (!response.ok) {
+      throw new Error(data.message || 'Erreur lors de la récupération des favoris');
+    }
+    
+    return data;
+  },
+
+  addFavorite: async (movie, token) => {
+    const response = await fetch(`${API_URL}/favorites`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        imdbId: movie.imdbID,
+        title: movie.Title,
+        poster: movie.Poster,
+        year: movie.Year
+      })
+    });
+    
+    const data = await response.json();
+    
+    if (!response.ok) {
+      throw new Error(data.message || 'Erreur lors de l\'ajout aux favoris');
+    }
+    
+    return data;
+  },
+
+  removeFavorite: async (imdbId, token) => {
+    const response = await fetch(`${API_URL}/favorites/${imdbId}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    
+    if (!response.ok) {
+      const data = await response.json();
+      throw new Error(data.message || 'Erreur lors de la suppression');
+    }
+    
+    return true;
+  },
+
+  // Ma Liste
+  getMyList: async (token) => {
+    const response = await fetch(`${API_URL}/mylists`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    
+    const data = await response.json();
+    
+    if (!response.ok) {
+      throw new Error(data.message || 'Erreur lors de la récupération de la liste');
+    }
+    
+    return data;
+  },
+
+  addToMyList: async (movie, token) => {
+    const response = await fetch(`${API_URL}/mylists`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        imdbId: movie.imdbID,
+        title: movie.Title,
+        poster: movie.Poster,
+        year: movie.Year
+      })
+    });
+    
+    const data = await response.json();
+    
+    if (!response.ok) {
+      throw new Error(data.message || 'Erreur lors de l\'ajout à la liste');
+    }
+    
+    return data;
+  },
+
+  removeFromMyList: async (imdbId, token) => {
+    const response = await fetch(`${API_URL}/mylists/${imdbId}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    
+    if (!response.ok) {
+      const data = await response.json();
+      throw new Error(data.message || 'Erreur lors de la suppression');
+    }
+    
+    return true;
   }
 };
