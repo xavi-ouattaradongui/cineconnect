@@ -84,7 +84,14 @@ export default function Home() {
   };
 
   const { location } = useRouterState();
-  const query = location.search?.q || "";
+  const query = useMemo(() => {
+    const search = location?.search;
+    if (!search) return "";
+    if (typeof search === "string") {
+      return new URLSearchParams(search).get("q") || "";
+    }
+    return search.q || "";
+  }, [location?.search]);
 
   return (
     <div className="w-full bg-white dark:bg-black">

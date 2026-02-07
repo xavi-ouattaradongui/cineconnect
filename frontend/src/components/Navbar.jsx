@@ -50,7 +50,7 @@ export default function Navbar({ onSearch }) {
 
   // Synchronise l'input avec ?q UNIQUEMENT sur la page d'accueil
   useEffect(() => {
-    if (location.pathname === "/") {
+    if (location.pathname === "/home") {
       setSearchValue(location.search?.q || "");
     }
   }, [location.search?.q, location.pathname]);
@@ -65,9 +65,9 @@ export default function Navbar({ onSearch }) {
     setSearchValue(value);
 
     // Naviguer seulement si on est sur la page d'accueil
-    if (location.pathname === "/") {
+    if (location.pathname === "/home") {
       router.navigate({
-        to: "/",
+        to: "/home",
         search: (prev) => ({ ...prev, q: value || undefined }),
       });
     }
@@ -115,7 +115,7 @@ export default function Navbar({ onSearch }) {
         {/* LOGO */}
         <div className="flex items-center gap-8">
           <Link
-            to="/"
+            to="/home"
             className="text-lg font-semibold tracking-tighter text-black dark:text-white flex items-center gap-2 hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
           >
             <svg
@@ -140,7 +140,7 @@ export default function Navbar({ onSearch }) {
           {/* DESKTOP NAV */}
           <div className="hidden md:flex items-center gap-6 text-sm">
             <Link
-              to="/"
+              to="/home"
               className="text-gray-600 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
             >
               Découvrir
@@ -206,7 +206,7 @@ export default function Navbar({ onSearch }) {
                         className="h-10 w-7 object-cover rounded"
                       />
                       <div className="flex-1">
-                        <div className="text-sm text-white line-clamp-1">
+                        <div className="text-sm text-gray-900 dark:text-white line-clamp-1">
                           {m.Title}
                         </div>
                         <div className="text-xs text-gray-500">{m.Year}</div>
