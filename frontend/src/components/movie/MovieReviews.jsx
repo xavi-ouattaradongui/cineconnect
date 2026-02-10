@@ -231,7 +231,7 @@ export default function MovieReviews({
         </>
       ) : (
         <div className="mt-4 text-center text-gray-500 dark:text-gray-400 text-sm py-8">
-          Aucun avis pour le moment. Soyez le premier ! 🎬
+          Aucun avis pour le moment. Soyez le premier ! 
         </div>
       )}
     </section>
