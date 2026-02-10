@@ -304,7 +304,7 @@ export default function MovieDetails() {
         onMessageChange={(e) => setMessageText(e.target.value)}
         onToggleCollapse={() => setChatCollapsed((v) => !v)}
         movieTitle={movie.Title}
-        currentUserId={user?.id} // ✅ Passer userId au widget
+        currentUserId={user?.id} 
       />
     </div>
   );

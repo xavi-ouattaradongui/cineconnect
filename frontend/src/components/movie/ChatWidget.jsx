@@ -88,6 +88,43 @@ export default function ChatWidget({
       .slice(0, 2);
   };
 
+  const getDisplayName = (msg) => msg?.displayName || msg?.username || "Utilisateur";
+
+  const NAME_GRADIENTS = [
+    "from-gray-500 to-gray-700",
+    "from-purple-500 to-indigo-600",
+    "from-yellow-500 to-orange-600",
+    "from-pink-500 to-red-600",
+    "from-yellow-400 to-amber-600",
+    "from-orange-500 to-red-600",
+    "from-yellow-500 to-yellow-600",
+    "from-gray-400 to-gray-600",
+    "from-cyan-400 to-blue-600",
+    "from-indigo-400 to-purple-600",
+    "from-yellow-400 to-orange-500",
+    "from-gray-500 to-slate-700",
+    "from-blue-500 to-cyan-600",
+    "from-amber-700 to-brown-800",
+    "from-purple-400 to-pink-500",
+    "from-green-500 to-teal-600",
+    "from-red-500 to-orange-600",
+    "from-yellow-600 to-amber-700",
+    "from-cyan-300 to-blue-500",
+    "from-indigo-500 to-purple-600",
+    "from-yellow-300 to-orange-400",
+    "from-red-600 to-orange-700",
+    "from-red-500 to-pink-600",
+    "from-blue-600 to-indigo-700",
+    "from-teal-400 to-cyan-500",
+  ];
+
+  const getNameGradient = (msg) => {
+    const key = String(msg?.userId ?? msg?.displayName ?? msg?.username ?? "anon");
+    let hash = 0;
+    for (let i = 0; i < key.length; i += 1) hash = (hash * 31 + key.charCodeAt(i)) % 2147483647;
+    return NAME_GRADIENTS[hash % NAME_GRADIENTS.length];
+  };
+
   return (
     <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
       <div className="mb-0 w-[28rem] bg-white dark:bg-[#16191D] border border-gray-200 dark:border-white/10 rounded-2xl shadow-2xl overflow-hidden flex flex-col">
@@ -166,6 +203,11 @@ export default function ChatWidget({
                           size={24}
                         />
                         <div className="max-w-[80%]">
+                          <p
+                            className={`mb-1 text-[10px] font-semibold bg-gradient-to-r bg-clip-text text-transparent ${getNameGradient(msg)}`}
+                          >
+                            {getDisplayName(msg)}
+                          </p>
                           <div className="bg-gray-100 dark:bg-white/5 p-2 rounded-lg rounded-tl-none">
                             <p className="text-[11px] text-gray-700 dark:text-slate-300">
                               {msg.text ?? msg.content}
