@@ -1,5 +1,7 @@
 import { useParams } from "@tanstack/react-router";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
+import { io } from "socket.io-client";
+import { api } from "../services/api";
 import { useMovie } from "../hooks/useMovies";
 import { useReviews } from "../hooks/useReviews";
 import { useFavorites } from "../contexts/FavoritesContext";
@@ -17,7 +19,7 @@ export default function MovieDetails() {
   const { reviews, isLoading: reviewsLoading, createReview, updateReview, deleteReview, toggleReaction } = useReviews(id);
   const { addFavorite, removeFavorite, isFavorite } = useFavorites();
   const { addToList, removeFromList, isInList } = useMyList();
-  const { user } = useAuth();
+  const { user, token } = useAuth();
 
   // États
   const [chatMessages, setChatMessages] = useState([]);
@@ -27,6 +29,8 @@ export default function MovieDetails() {
   const [hoverRating, setHoverRating] = useState(0);
   const [reviewText, setReviewText] = useState("");
   const [chatCollapsed, setChatCollapsed] = useState(false);
+
+  const socketRef = useRef(null);
 
   // Trouver la review de l'utilisateur connecté
   const userReview = useMemo(() => {
@@ -41,6 +45,79 @@ export default function MovieDetails() {
     return (sum / reviewsWithRating.length).toFixed(1);
   }, [reviews]);
 
+  // Effet pour charger les messages depuis l'API
+  useEffect(() => {
+    let active = true;
+
+    const loadMessages = async () => {
+      try {
+        const data = await api.getMessagesByFilm(id);
+        if (!active) return;
+        setChatMessages(
+          data.map((m) => ({
+            id: m.id,
+            userId: m.userId,
+            text: m.content,
+            createdAt: m.createdAt,
+            username: m.username,
+            displayName: m.displayName,
+            avatar: m.avatar,
+            avatarInitials:
+              (m.displayName || m.username || "?")
+                .split(" ")
+                .map((w) => w[0])
+                .join("")
+                .toUpperCase()
+                .slice(0, 2),
+          }))
+        );
+      } catch (err) {
+        console.error("Erreur chargement messages:", err);
+      }
+    };
+
+    loadMessages();
+    return () => { active = false; };
+  }, [id]);
+
+  // Connexion au socket
+  useEffect(() => {
+    const SOCKET_URL = import.meta.env.VITE_API_URL || "http://localhost:3001";
+    const socket = io(SOCKET_URL, { transports: ["websocket"] });
+    socketRef.current = socket;
+
+    socket.emit("joinFilm", { imdbId: id });
+
+    const handleReceive = (m) => {
+      setChatMessages((prev) => [
+        ...prev,
+        {
+          id: m.id,
+          userId: m.userId,
+          text: m.content,
+          createdAt: m.createdAt,
+          username: m.username,
+          displayName: m.displayName,
+          avatar: m.avatar,
+          avatarInitials:
+            (m.displayName || m.username || "?")
+              .split(" ")
+              .map((w) => w[0])
+              .join("")
+              .toUpperCase()
+              .slice(0, 2),
+        },
+      ]);
+    };
+
+    socket.on("receiveMessage", handleReceive);
+
+    return () => {
+      socket.off("receiveMessage", handleReceive);
+      socket.disconnect();
+    };
+  }, [id]);
+
   // Handlers
   const handleFavorite = () => {
     if (isFavorite(id)) removeFavorite(id);
@@ -52,29 +129,60 @@ export default function MovieDetails() {
     else addToList(movie);
   };
 
-  const handleSendMessage = (e) => {
+  const handleSendMessage = async (e) => {
     e.preventDefault();
     if (!messageText.trim()) return;
-    
-    const newMessage = {
-      id: Date.now(),
-      userId: user?.id || "anonymous", // ✅ Ajouter userId
-      text: messageText,
-      username: user?.username || "anonyme",
-      timestamp: new Date().toISOString(), // ✅ Format ISO pour API
-      avatar: user?.avatar || null,
-      avatarInitials:
-        user?.displayName?.split(" ").map((w) => w[0]).join("").toUpperCase().slice(0, 2) || "?",
+    if (!user?.id) {
+      alert("Connectez-vous pour envoyer un message");
+      return;
+    }
+
+    const payload = {
+      content: messageText.trim(),
+      imdbId: id,
+      userId: user.id,
+      title: movie.Title,
+      poster: movie.Poster,
+      year: parseInt(movie.Year),
     };
 
-    setChatMessages([...chatMessages, newMessage]);
-    setMessageText("");
+    if (socketRef.current?.connected) {
+      socketRef.current.emit("sendMessage", payload);
+      setMessageText("");
+      return;
+    }
 
-    // TODO: Remplacer par appel API
-    // await fetch(`/api/movies/${id}/chat`, {
-    //   method: 'POST',
-    //   body: JSON.stringify({ text: messageText })
-    // });
+    // fallback REST si socket indisponible
+    try {
+      const saved = await api.createMessage(
+        id,
+        { content: payload.content, title: payload.title, poster: payload.poster, year: payload.year },
+        token
+      );
+      setChatMessages((prev) => [
+        ...prev,
+        {
+          id: saved.id,
+          userId: saved.userId,
+          text: saved.content,
+          createdAt: saved.createdAt,
+          username: saved.username,
+          displayName: saved.displayName,
+          avatar: saved.avatar,
+          avatarInitials:
+            (saved.displayName || saved.username || "?")
+              .split(" ")
+              .map((w) => w[0])
+              .join("")
+              .toUpperCase()
+              .slice(0, 2),
+        },
+      ]);
+      setMessageText("");
+    } catch (err) {
+      console.error("Erreur envoi message:", err);
+      alert(err.message || "Erreur lors de l'envoi");
+    }
   };
 
   const handleSubmitReview = async (e) => {

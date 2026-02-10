@@ -10,7 +10,7 @@ export default function ChatWidget({
   onMessageChange,
   onToggleCollapse,
   movieTitle,
-  currentUserId, // ✅ Nouveau prop
+  currentUserId, 
 }) {
   const chatEndRef = useRef(null);
 
@@ -18,23 +18,52 @@ export default function ChatWidget({
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [chatMessages]);
 
+  const TIME_ZONE = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
   const getMessageDate = (msg) => {
     const raw = msg?.createdAt ?? msg?.timestamp ?? msg?.time ?? null;
     if (!raw) return null;
+
+    if (typeof raw === "string") {
+      if (raw.endsWith("Z")) {
+        const localIso = raw.replace("Z", "");
+        const dLocal = new Date(localIso);
+        return Number.isNaN(dLocal.getTime()) ? null : dLocal;
+      }
+      const dStr = new Date(raw);
+      return Number.isNaN(dStr.getTime()) ? null : dStr;
+    }
+
     const d = new Date(raw);
     return Number.isNaN(d.getTime()) ? null : d;
   };
 
+  const getYmd = (date) => {
+    const parts = new Intl.DateTimeFormat("fr-FR", {
+      timeZone: TIME_ZONE,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).formatToParts(date);
+    const y = parts.find((p) => p.type === "year")?.value;
+    const m = parts.find((p) => p.type === "month")?.value;
+    const d = parts.find((p) => p.type === "day")?.value;
+    return { y: Number(y), m: Number(m), d: Number(d) };
+  };
+
+  const toStartOfDay = ({ y, m, d }) => new Date(y, m - 1, d);
+
   const formatDayLabel = (date) => {
     const today = new Date();
-    const startOfDay = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
     const diffDays =
-      (startOfDay(today) - startOfDay(date)) / (1000 * 60 * 60 * 24);
+      (toStartOfDay(getYmd(today)) - toStartOfDay(getYmd(date))) /
+      (1000 * 60 * 60 * 24);
 
     if (diffDays === 0) return "Aujourd’hui";
     if (diffDays === 1) return "Hier";
 
     return new Intl.DateTimeFormat("fr-FR", {
+      timeZone: TIME_ZONE,
       weekday: "long",
       day: "numeric",
       month: "long",
@@ -43,9 +72,21 @@ export default function ChatWidget({
 
   const formatTime = (date) =>
     new Intl.DateTimeFormat("fr-FR", {
+      timeZone: TIME_ZONE,
       hour: "2-digit",
       minute: "2-digit",
     }).format(date);
+
+  const getInitials = (msg) => {
+    if (msg?.avatarInitials) return msg.avatarInitials;
+    const base = msg?.displayName || msg?.username || "?";
+    return base
+      .split(" ")
+      .map((w) => w[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+  };
 
   return (
     <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
@@ -79,13 +120,13 @@ export default function ChatWidget({
               </div>
             ) : (
               chatMessages.map((msg, index) => {
-                const isOwn = msg.userId === currentUserId;
+                const isOwn = String(msg.userId) === String(currentUserId);
                 const msgDate = getMessageDate(msg);
                 const prevDate = getMessageDate(chatMessages[index - 1]);
                 const showDaySeparator =
                   msgDate &&
                   (!prevDate ||
-                    msgDate.toDateString() !== prevDate.toDateString());
+                    formatDayLabel(msgDate) !== formatDayLabel(prevDate));
 
                 return (
                   <div key={msg.id} className="space-y-2">
@@ -101,13 +142,13 @@ export default function ChatWidget({
                       <div className="flex gap-2 flex-row-reverse items-start">
                         <AvatarBubble
                           avatar={msg.avatar}
-                          initials={msg.avatarInitials}
+                          initials={getInitials(msg)}
                           size={24}
                         />
                         <div className="max-w-[80%]">
                           <div className="bg-indigo-50 border border-indigo-200 dark:bg-indigo-500/20 dark:border-indigo-500/20 p-2 rounded-lg rounded-tr-none">
                             <p className="text-[11px] text-indigo-700 dark:text-indigo-100">
-                              {msg.text}
+                              {msg.text ?? msg.content}
                             </p>
                           </div>
                           {msgDate && (
@@ -121,13 +162,13 @@ export default function ChatWidget({
                       <div className="flex gap-2 items-start">
                         <AvatarBubble
                           avatar={msg.avatar}
-                          initials={msg.avatarInitials}
+                          initials={getInitials(msg)}
                           size={24}
                         />
                         <div className="max-w-[80%]">
                           <div className="bg-gray-100 dark:bg-white/5 p-2 rounded-lg rounded-tl-none">
                             <p className="text-[11px] text-gray-700 dark:text-slate-300">
-                              {msg.text}
+                              {msg.text ?? msg.content}
                             </p>
                           </div>
                           {msgDate && (

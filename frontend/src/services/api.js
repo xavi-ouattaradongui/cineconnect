@@ -279,5 +279,36 @@ export const api = {
     }
     
     return true;
+  },
+
+  // Messages
+  getMessagesByFilm: async (imdbId) => {
+    const response = await fetch(`${API_URL}/messages/film/${imdbId}`);
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || "Erreur lors du chargement des messages");
+    }
+
+    return data;
+  },
+
+  createMessage: async (imdbId, messageData, token) => {
+    const response = await fetch(`${API_URL}/messages/film/${imdbId}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      body: JSON.stringify(messageData)
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || "Erreur lors de l'envoi du message");
+    }
+
+    return data;
   }
 };
