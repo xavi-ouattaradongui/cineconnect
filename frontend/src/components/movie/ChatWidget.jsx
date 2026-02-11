@@ -161,7 +161,21 @@ export default function ChatWidget({
 
   return (
     <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
-      
+      {chatCollapsed && (
+        <div className="flex items-center justify-between gap-2 w-full">
+          <span className="text-xs text-gray-700 dark:text-gray-300 bg-white/90 dark:bg-black/40 px-2 py-1 rounded-md border border-gray-200 dark:border-white/10">
+            Cliquez pour discuter au tour de {movieTitle}
+          </span>
+          <button
+            type="button"
+            onClick={onToggleCollapse}
+            className="h-20 w-20 rounded-full bg-indigo-600 text-white shadow-xl hover:bg-indigo-500 animate-bounce flex items-center justify-center"
+            title="Discuter"
+          >
+            <MessagesSquare size={28} />
+          </button>
+        </div>
+      )}
 
       {!chatCollapsed && (
         <div className="mb-0 w-[28rem] bg-white dark:bg-[#16191D] border border-gray-200 dark:border-white/10 rounded-2xl shadow-2xl overflow-hidden flex flex-col">
