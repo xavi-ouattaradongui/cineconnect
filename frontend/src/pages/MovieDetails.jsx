@@ -122,12 +122,25 @@ export default function MovieDetails() {
       setChatMessages((prev) => prev.filter((m) => m.id !== deletedId));
     };
 
+    const handleReplyDetached = ({ replyToId, messageIds }) => {
+      if (!messageIds?.length) return;
+      setChatMessages((prev) =>
+        prev.map((m) =>
+          messageIds.includes(m.id)
+            ? { ...m, replyTo: { id: replyToId, content: "Message supprimé", deleted: true } }
+            : m
+        )
+      );
+    };
+
     socket.on("receiveMessage", handleReceive);
     socket.on("messageDeleted", handleDeleted);
+    socket.on("messageReplyDetached", handleReplyDetached);
 
     return () => {
       socket.off("receiveMessage", handleReceive);
       socket.off("messageDeleted", handleDeleted);
+      socket.off("messageReplyDetached", handleReplyDetached);
       socket.disconnect();
     };
   }, [id]);
@@ -264,8 +277,18 @@ export default function MovieDetails() {
   const handleDeleteMessage = async (msg) => {
     if (!user?.id) return;
     try {
-      await api.deleteMessage(msg.id, token);
+      const res = await api.deleteMessage(msg.id, token);
       setChatMessages((prev) => prev.filter((m) => m.id !== msg.id));
+
+      if (res?.detachedReplyIds?.length) {
+        setChatMessages((prev) =>
+          prev.map((m) =>
+            res.detachedReplyIds.includes(m.id)
+              ? { ...m, replyTo: { id: msg.id, content: "Message supprimé", deleted: true } }
+              : m
+          )
+        );
+      }
 
       if (socketRef.current?.connected) {
         socketRef.current.emit("deleteMessage", { messageId: msg.id, userId: user.id, imdbId: id });

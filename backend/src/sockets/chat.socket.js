@@ -94,9 +94,23 @@ export const initSocket = (io) => {
 
       if (!msg || msg.userId !== userId) return;
 
+      const replied = await db
+        .select({ id: messages.id })
+        .from(messages)
+        .where(eq(messages.replyToId, Number(messageId)));
+
+      await db
+        .update(messages)
+        .set({ replyToId: null })
+        .where(eq(messages.replyToId, Number(messageId)));
+
       await db.delete(messages).where(and(eq(messages.id, Number(messageId)), eq(messages.userId, userId)));
 
       io.to(`film-${imdbId}`).emit("messageDeleted", { id: Number(messageId) });
+      io.to(`film-${imdbId}`).emit("messageReplyDetached", {
+        replyToId: Number(messageId),
+        messageIds: replied.map((r) => r.id),
+      });
     });
 
     socket.on("disconnect", () => {

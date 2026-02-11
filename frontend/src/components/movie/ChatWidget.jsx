@@ -132,8 +132,9 @@ export default function ChatWidget({
   const [actionForId, setActionForId] = useState(null);
   const [replyTo, setReplyTo] = useState(null);
 
-  const getReplyName = (msg) => msg?.displayName || msg?.username || "Utilisateur";
+  const getReplyName = (msg) => (msg?.deleted ? "Message supprimé" : msg?.displayName || msg?.username || "Utilisateur");
   const getReplySnippet = (msg) => {
+    if (msg?.deleted) return "Message supprimé";
     const text = msg?.text ?? msg?.content ?? "";
     return text.length > 80 ? `${text.slice(0, 80)}…` : text;
   };

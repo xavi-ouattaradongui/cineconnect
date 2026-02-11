@@ -129,21 +129,33 @@ export const createMessage = async (req, res) => {
 
 export const deleteMessage = async (req, res) => {
   const { id } = req.params;
+  const messageId = Number(id);
+  const authUserId = Number(req.user?.id);
 
   const [msg] = await db
     .select({ id: messages.id, userId: messages.userId })
     .from(messages)
-    .where(eq(messages.id, Number(id)));
+    .where(eq(messages.id, messageId));
 
   if (!msg) {
     return res.status(404).json({ message: "Message introuvable" });
   }
 
-  if (msg.userId !== req.user.id) {
+  if (msg.userId !== authUserId) {
     return res.status(403).json({ message: "Action non autorisée" });
   }
 
-  await db.delete(messages).where(and(eq(messages.id, Number(id)), eq(messages.userId, req.user.id)));
+  const replied = await db
+    .select({ id: messages.id })
+    .from(messages)
+    .where(eq(messages.replyToId, messageId));
 
-  return res.json({ id: msg.id });
+  await db
+    .update(messages)
+    .set({ replyToId: null })
+    .where(eq(messages.replyToId, messageId));
+
+  await db.delete(messages).where(and(eq(messages.id, messageId), eq(messages.userId, req.user.id)));
+
+  return res.json({ id: msg.id, detachedReplyIds: replied.map((r) => r.id) });
 };
