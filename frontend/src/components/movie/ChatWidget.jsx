@@ -271,6 +271,13 @@ export default function ChatWidget({
                                 >
                                   Supprimer
                                 </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleReply(msg)}
+                                  className="block w-full text-left px-2 py-1 hover:bg-gray-100 dark:hover:bg-white/5"
+                                >
+                                  Répondre
+                                </button>
                               </div>
                             )}
                             {msgDate && (
