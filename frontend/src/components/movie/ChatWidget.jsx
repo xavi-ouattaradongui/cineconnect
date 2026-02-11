@@ -14,6 +14,7 @@ export default function ChatWidget({
   onDeleteMessage,
 }) {
   const chatEndRef = useRef(null);
+  const isCollapsed = !chatCollapsed;
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -161,7 +162,7 @@ export default function ChatWidget({
 
   return (
     <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
-      {chatCollapsed && (
+      {isCollapsed && (
         <div className="flex items-center justify-between gap-2 w-full">
           <span className="text-xs text-gray-700 dark:text-gray-300 bg-white/90 dark:bg-black/40 px-2 py-1 rounded-md border border-gray-200 dark:border-white/10">
             Cliquez pour discuter au tour de {movieTitle}
@@ -177,7 +178,7 @@ export default function ChatWidget({
         </div>
       )}
 
-      {!chatCollapsed && (
+      {!isCollapsed && (
         <div className="mb-0 w-[28rem] bg-white dark:bg-[#16191D] border border-gray-200 dark:border-white/10 rounded-2xl shadow-2xl overflow-hidden flex flex-col">
           {/* Header */}
           <div className="p-3 border-b border-gray-200 dark:border-white/5 flex items-center justify-between bg-gray-50 dark:bg-white/5">
@@ -191,14 +192,14 @@ export default function ChatWidget({
             type="button"
             onClick={onToggleCollapse}
             className="px-1 rounded hover:bg-gray-200/60 dark:hover:bg-white/10 text-xs font-medium text-gray-500 dark:text-gray-400 shrink-0"
-            title={chatCollapsed ? "Développer" : "Réduire"}
+            title={isCollapsed ? "Développer" : "Réduire"}
            >
             •••
            </button>
           </div>
 
           {/* Messages */}
-          {!chatCollapsed && (
+          {!isCollapsed && (
             <div
               className="h-64 p-3 overflow-y-auto space-y-3 bg-white dark:bg-[#0f1114]"
               onClick={() => setActionForId(null)}
@@ -344,7 +345,7 @@ export default function ChatWidget({
           )}
 
           {/* Input */}
-          {!chatCollapsed && (
+          {!isCollapsed && (
             <form
               onSubmit={handleSend}
               className="p-3 bg-white dark:bg-[#16191D] border-t border-gray-200 dark:border-white/5"
