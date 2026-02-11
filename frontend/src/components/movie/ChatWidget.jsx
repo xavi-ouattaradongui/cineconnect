@@ -1,5 +1,5 @@
 import { Send } from "lucide-react";
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import AvatarBubble from "./AvatarBubble";
 
 export default function ChatWidget({
@@ -10,7 +10,8 @@ export default function ChatWidget({
   onMessageChange,
   onToggleCollapse,
   movieTitle,
-  currentUserId, 
+  currentUserId,
+  onDeleteMessage,
 }) {
   const chatEndRef = useRef(null);
 
@@ -128,6 +129,35 @@ export default function ChatWidget({
     return NAME_GRADIENTS[hash % NAME_GRADIENTS.length];
   };
 
+  const [actionForId, setActionForId] = useState(null);
+  const [replyTo, setReplyTo] = useState(null);
+
+  const getReplyName = (msg) => msg?.displayName || msg?.username || "Utilisateur";
+  const getReplySnippet = (msg) => {
+    const text = msg?.text ?? msg?.content ?? "";
+    return text.length > 80 ? `${text.slice(0, 80)}…` : text;
+  };
+
+  const handleSend = (e) => {
+    onSendMessage?.(e, replyTo);
+    if (messageText.trim()) setReplyTo(null);
+  };
+
+  const handleReply = (msg) => {
+    setReplyTo({
+      id: msg.id,
+      userId: msg.userId,
+      displayName: getDisplayName(msg),
+      text: msg.text ?? msg.content,
+    });
+    setActionForId(null);
+  };
+
+  const handleDelete = (msg) => {
+    onDeleteMessage?.(msg);
+    setActionForId(null);
+  };
+
   return (
     <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
       <div className="mb-0 w-[28rem] bg-white dark:bg-[#16191D] border border-gray-200 dark:border-white/10 rounded-2xl shadow-2xl overflow-hidden flex flex-col">
@@ -151,7 +181,10 @@ export default function ChatWidget({
 
         {/* Messages */}
         {!chatCollapsed && (
-          <div className="h-64 p-3 overflow-y-auto space-y-3 bg-white dark:bg-[#0f1114]">
+          <div
+            className="h-64 p-3 overflow-y-auto space-y-3 bg-white dark:bg-[#0f1114]"
+            onClick={() => setActionForId(null)}
+          >
             {chatMessages.length === 0 ? (
               <div className="h-full flex items-center justify-center">
                 <p className="text-[11px] text-gray-500 dark:text-slate-400">
@@ -185,12 +218,42 @@ export default function ChatWidget({
                           initials={getInitials(msg)}
                           size={24}
                         />
-                        <div className="max-w-[80%]">
-                          <div className="bg-indigo-50 border border-indigo-200 dark:bg-indigo-500/20 dark:border-indigo-500/20 p-2 rounded-lg rounded-tr-none">
+                        <div className="max-w-[80%] relative">
+                          <div
+                            className="bg-indigo-50 border border-indigo-200 dark:bg-indigo-500/20 dark:border-indigo-500/20 p-2 rounded-lg rounded-tr-none cursor-pointer"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setActionForId((prev) => (prev === msg.id ? null : msg.id));
+                            }}
+                          >
+                            {msg.replyTo?.id && (
+                              <div className="mb-1 px-2 py-1 rounded border-l-2 border-indigo-300 dark:border-indigo-400/60 bg-white/50 dark:bg-black/20">
+                                <p className="text-[9px] text-indigo-600 dark:text-indigo-200 font-semibold">
+                                  {getReplyName(msg.replyTo)}
+                                </p>
+                                <p className="text-[9px] text-indigo-700/80 dark:text-indigo-100/80">
+                                  {getReplySnippet(msg.replyTo)}
+                                </p>
+                              </div>
+                            )}
                             <p className="text-[11px] text-indigo-700 dark:text-indigo-100">
                               {msg.text ?? msg.content}
                             </p>
                           </div>
+                          {actionForId === msg.id && (
+                            <div
+                              className="absolute right-0 mt-1 z-10 bg-white dark:bg-[#16191D] border border-gray-200 dark:border-white/10 rounded-md shadow-lg text-[10px]"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <button
+                                type="button"
+                                onClick={() => handleDelete(msg)}
+                                className="block w-full text-left px-2 py-1 text-red-600 hover:bg-gray-100 dark:hover:bg-white/5"
+                              >
+                                Supprimer
+                              </button>
+                            </div>
+                          )}
                           {msgDate && (
                             <p className="mt-1 text-[9px] text-indigo-500/80 dark:text-indigo-200/80 text-right">
                               {formatTime(msgDate)}
@@ -205,17 +268,47 @@ export default function ChatWidget({
                           initials={getInitials(msg)}
                           size={24}
                         />
-                        <div className="max-w-[80%]">
+                        <div className="max-w-[80%] relative">
                           <p
                             className={`mb-1 text-[10px] font-semibold bg-gradient-to-r bg-clip-text text-transparent ${getNameGradient(msg)}`}
                           >
                             {getDisplayName(msg)}
                           </p>
-                          <div className="bg-gray-100 dark:bg-white/5 p-2 rounded-lg rounded-tl-none">
+                          <div
+                            className="bg-gray-100 dark:bg-white/5 p-2 rounded-lg rounded-tl-none cursor-pointer"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setActionForId((prev) => (prev === msg.id ? null : msg.id));
+                            }}
+                          >
+                            {msg.replyTo?.id && (
+                              <div className="mb-1 px-2 py-1 rounded border-l-2 border-gray-300 dark:border-white/20 bg-white/70 dark:bg-black/20">
+                                <p className="text-[9px] text-gray-600 dark:text-slate-300 font-semibold">
+                                  {getReplyName(msg.replyTo)}
+                                </p>
+                                <p className="text-[9px] text-gray-600/80 dark:text-slate-300/80">
+                                  {getReplySnippet(msg.replyTo)}
+                                </p>
+                              </div>
+                            )}
                             <p className="text-[11px] text-gray-700 dark:text-slate-300">
                               {msg.text ?? msg.content}
                             </p>
                           </div>
+                          {actionForId === msg.id && (
+                            <div
+                              className="absolute left-0 mt-1 z-10 bg-white dark:bg-[#16191D] border border-gray-200 dark:border-white/10 rounded-md shadow-lg text-[10px]"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <button
+                                type="button"
+                                onClick={() => handleReply(msg)}
+                                className="block w-full text-left px-2 py-1 hover:bg-gray-100 dark:hover:bg-white/5"
+                              >
+                                Répondre
+                              </button>
+                            </div>
+                          )}
                           {msgDate && (
                             <p className="mt-1 text-[9px] text-gray-500 dark:text-slate-400">
                               {formatTime(msgDate)}
@@ -235,9 +328,29 @@ export default function ChatWidget({
         {/* Input */}
         {!chatCollapsed && (
           <form
-            onSubmit={onSendMessage}
+            onSubmit={handleSend}
             className="p-3 bg-white dark:bg-[#16191D] border-t border-gray-200 dark:border-white/5"
           >
+            {replyTo && (
+              <div className="mb-2 px-2 py-1 rounded border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/5 flex items-center justify-between gap-2">
+                <div className="min-w-0">
+                  <p className="text-[10px] text-gray-600 dark:text-slate-300 font-semibold">
+                    Réponse à {getReplyName(replyTo)}
+                  </p>
+                  <p className="text-[10px] text-gray-500 dark:text-slate-400 truncate">
+                    {getReplySnippet(replyTo)}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setReplyTo(null)}
+                  className="text-[10px] text-gray-400 hover:text-gray-600 dark:hover:text-white"
+                  title="Annuler"
+                >
+                  ✕
+                </button>
+              </div>
+            )}
             <div className="relative flex items-center">
               <input
                 type="text"

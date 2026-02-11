@@ -69,6 +69,7 @@ export default function MovieDetails() {
                 .join("")
                 .toUpperCase()
                 .slice(0, 2),
+            replyTo: m.replyTo || null,
           }))
         );
       } catch (err) {
@@ -83,10 +84,16 @@ export default function MovieDetails() {
   // Connexion au socket
   useEffect(() => {
     const SOCKET_URL = import.meta.env.VITE_API_URL || "http://localhost:3001";
-    const socket = io(SOCKET_URL, { transports: ["websocket"] });
+    const socket = io(SOCKET_URL, { transports: ["websocket", "polling"] });
     socketRef.current = socket;
 
-    socket.emit("joinFilm", { imdbId: id });
+    socket.on("connect", () => {
+      socket.emit("joinFilm", { imdbId: id });
+    });
+
+    socket.on("connect_error", (err) => {
+      console.error("Socket connect_error:", err);
+    });
 
     const handleReceive = (m) => {
       setChatMessages((prev) => [
@@ -106,14 +113,21 @@ export default function MovieDetails() {
               .join("")
               .toUpperCase()
               .slice(0, 2),
+          replyTo: m.replyTo || null,
         },
       ]);
     };
 
+    const handleDeleted = ({ id: deletedId }) => {
+      setChatMessages((prev) => prev.filter((m) => m.id !== deletedId));
+    };
+
     socket.on("receiveMessage", handleReceive);
+    socket.on("messageDeleted", handleDeleted);
 
     return () => {
       socket.off("receiveMessage", handleReceive);
+      socket.off("messageDeleted", handleDeleted);
       socket.disconnect();
     };
   }, [id]);
@@ -129,7 +143,7 @@ export default function MovieDetails() {
     else addToList(movie);
   };
 
-  const handleSendMessage = async (e) => {
+  const handleSendMessage = async (e, replyTo) => {
     e.preventDefault();
     if (!messageText.trim()) return;
     if (!user?.id) {
@@ -144,6 +158,7 @@ export default function MovieDetails() {
       title: movie.Title,
       poster: movie.Poster,
       year: parseInt(movie.Year),
+      replyToId: replyTo?.id || null,
     };
 
     if (socketRef.current?.connected) {
@@ -152,11 +167,16 @@ export default function MovieDetails() {
       return;
     }
 
-    // fallback REST si socket indisponible
     try {
       const saved = await api.createMessage(
         id,
-        { content: payload.content, title: payload.title, poster: payload.poster, year: payload.year },
+        {
+          content: payload.content,
+          title: payload.title,
+          poster: payload.poster,
+          year: payload.year,
+          replyToId: payload.replyToId,
+        },
         token
       );
       setChatMessages((prev) => [
@@ -176,6 +196,7 @@ export default function MovieDetails() {
               .join("")
               .toUpperCase()
               .slice(0, 2),
+          replyTo: saved.replyTo || null,
         },
       ]);
       setMessageText("");
@@ -238,6 +259,21 @@ export default function MovieDetails() {
 
   const handleRatingChange = (value) => {
     setUserRating(value);
+  };
+
+  const handleDeleteMessage = async (msg) => {
+    if (!user?.id) return;
+    try {
+      await api.deleteMessage(msg.id, token);
+      setChatMessages((prev) => prev.filter((m) => m.id !== msg.id));
+
+      if (socketRef.current?.connected) {
+        socketRef.current.emit("deleteMessage", { messageId: msg.id, userId: user.id, imdbId: id });
+      }
+    } catch (err) {
+      console.error("Erreur suppression message:", err);
+      alert(err.message || "Erreur lors de la suppression");
+    }
   };
 
   if (isLoading) return <Loader />;
@@ -304,7 +340,8 @@ export default function MovieDetails() {
         onMessageChange={(e) => setMessageText(e.target.value)}
         onToggleCollapse={() => setChatCollapsed((v) => !v)}
         movieTitle={movie.Title}
-        currentUserId={user?.id} 
+        currentUserId={user?.id}
+        onDeleteMessage={handleDeleteMessage}
       />
     </div>
   );

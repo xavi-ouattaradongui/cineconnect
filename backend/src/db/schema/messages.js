@@ -11,5 +11,6 @@ export const messages = pgTable("messages", {
   filmId: integer("film_id")
     .references(() => films.id)
     .notNull(),
+  replyToId: integer("reply_to_id").references(() => messages.id),
   createdAt: timestamp("created_at").defaultNow(),
 });

@@ -2,7 +2,7 @@ import { db } from "../db/index.js";
 import { messages } from "../db/schema/messages.js";
 import { films } from "../db/schema/films.js";
 import { users } from "../db/schema/users.js";
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 
 export const initSocket = (io) => {
   io.on("connection", (socket) => {
@@ -14,7 +14,7 @@ export const initSocket = (io) => {
       console.log(`🎬 User joined film ${imdbId}`);
     });
 
-    socket.on("sendMessage", async ({ content, imdbId, userId, title, poster, year }) => {
+    socket.on("sendMessage", async ({ content, imdbId, userId, title, poster, year, replyToId }) => {
       if (!content || !imdbId || !userId) return;
 
       await db
@@ -29,9 +29,37 @@ export const initSocket = (io) => {
 
       if (!film) return;
 
+      let replyTo = null;
+      if (replyToId) {
+        const [replyMsg] = await db
+          .select({
+            id: messages.id,
+            content: messages.content,
+            userId: messages.userId,
+            filmId: messages.filmId,
+          })
+          .from(messages)
+          .where(eq(messages.id, replyToId));
+
+        if (replyMsg && replyMsg.filmId === film.id) {
+          const [replyUser] = await db
+            .select({ id: users.id, username: users.username, displayName: users.displayName })
+            .from(users)
+            .where(eq(users.id, replyMsg.userId));
+
+          replyTo = {
+            id: replyMsg.id,
+            content: replyMsg.content,
+            userId: replyMsg.userId,
+            username: replyUser?.username,
+            displayName: replyUser?.displayName,
+          };
+        }
+      }
+
       const [message] = await db
         .insert(messages)
-        .values({ content, filmId: film.id, userId })
+        .values({ content, filmId: film.id, userId, replyToId: replyToId || null })
         .returning();
 
       const [user] = await db
@@ -52,7 +80,23 @@ export const initSocket = (io) => {
         username: user.username,
         displayName: user.displayName,
         avatar: user.avatar,
+        replyTo,
       });
+    });
+
+    socket.on("deleteMessage", async ({ messageId, userId, imdbId }) => {
+      if (!messageId || !userId || !imdbId) return;
+
+      const [msg] = await db
+        .select({ id: messages.id, userId: messages.userId })
+        .from(messages)
+        .where(eq(messages.id, Number(messageId)));
+
+      if (!msg || msg.userId !== userId) return;
+
+      await db.delete(messages).where(and(eq(messages.id, Number(messageId)), eq(messages.userId, userId)));
+
+      io.to(`film-${imdbId}`).emit("messageDeleted", { id: Number(messageId) });
     });
 
     socket.on("disconnect", () => {
