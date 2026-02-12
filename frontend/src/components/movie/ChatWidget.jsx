@@ -156,12 +156,18 @@ export default function ChatWidget({
     return text.length > 80 ? `${text.slice(0, 80)}…` : text;
   };
 
+  const isDeletedMessage = (msg) =>
+    !!msg?.deletedAt || msg?.text === "Message supprimé" || msg?.content === "Message supprimé";
+
+  const getMessageText = (msg) => (isDeletedMessage(msg) ? "Message supprimé" : msg?.text ?? msg?.content);
+
   const handleSend = (e) => {
     onSendMessage?.(e, replyTo);
     if (messageText.trim()) setReplyTo(null);
   };
 
   const handleReply = (msg) => {
+    if (isDeletedMessage(msg)) return;
     setReplyTo({
       id: msg.id,
       userId: msg.userId,
@@ -321,7 +327,7 @@ export default function ChatWidget({
                                 </div>
                               )}
                               <p className="text-[11px] text-indigo-700 dark:text-indigo-100 break-words">
-                                {msg.text ?? msg.content}
+                                {getMessageText(msg)}
                               </p>
                             </div>
                             {actionForId === msg.id && (
@@ -336,13 +342,15 @@ export default function ChatWidget({
                                 >
                                   Supprimer
                                 </button>
-                                <button
-                                  type="button"
-                                  onClick={() => handleReply(msg)}
-                                  className="block w-full text-left px-2 py-1 hover:bg-gray-100 dark:hover:bg-white/5"
-                                >
-                                  Répondre
-                                </button>
+                                {!isDeletedMessage(msg) && (
+                                  <button
+                                    type="button"
+                                    onClick={() => handleReply(msg)}
+                                    className="block w-full text-left px-2 py-1 hover:bg-gray-100 dark:hover:bg-white/5"
+                                  >
+                                    Répondre
+                                  </button>
+                                )}
                               </div>
                             )}
                             {msgDate && (
@@ -387,7 +395,7 @@ export default function ChatWidget({
                                 </div>
                               )}
                               <p className="text-[11px] text-gray-700 dark:text-slate-300 break-words">
-                                {msg.text ?? msg.content}
+                                {getMessageText(msg)}
                               </p>
                             </div>
                             {actionForId === msg.id && (
@@ -397,11 +405,20 @@ export default function ChatWidget({
                               >
                                 <button
                                   type="button"
-                                  onClick={() => handleReply(msg)}
-                                  className="block w-full text-left px-2 py-1 hover:bg-gray-100 dark:hover:bg-white/5"
+                                  onClick={() => handleDelete(msg)}
+                                  className="block w-full text-left px-2 py-1 text-red-600 hover:bg-gray-100 dark:hover:bg-white/5"
                                 >
-                                  Répondre
+                                  Supprimer
                                 </button>
+                                {!isDeletedMessage(msg) && (
+                                  <button
+                                    type="button"
+                                    onClick={() => handleReply(msg)}
+                                    className="block w-full text-left px-2 py-1 hover:bg-gray-100 dark:hover:bg-white/5"
+                                  >
+                                    Répondre
+                                  </button>
+                                )}
                               </div>
                             )}
                             {msgDate && (

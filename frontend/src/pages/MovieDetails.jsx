@@ -60,6 +60,7 @@ export default function MovieDetails() {
             userId: m.userId,
             text: m.content,
             createdAt: m.createdAt,
+            deletedAt: m.deletedAt || null,
             username: m.username,
             displayName: m.displayName,
             avatar: m.avatar,
@@ -114,6 +115,7 @@ export default function MovieDetails() {
           userId: m.userId,
           text: m.content,
           createdAt: m.createdAt,
+          deletedAt: m.deletedAt || null,
           username: m.username,
           displayName: m.displayName,
           avatar: m.avatar,
@@ -130,7 +132,13 @@ export default function MovieDetails() {
     };
 
     const handleDeleted = ({ id: deletedId }) => {
-      setChatMessages((prev) => prev.filter((m) => m.id !== deletedId));
+      setChatMessages((prev) =>
+        prev.map((m) =>
+          m.id === deletedId
+            ? { ...m, text: "Message supprimé", content: "Message supprimé", deletedAt: new Date().toISOString() }
+            : m
+        )
+      );
     };
 
     const handleReplyDetached = ({ replyToId, messageIds }) => {
@@ -289,17 +297,17 @@ export default function MovieDetails() {
     if (!user?.id) return;
     try {
       const res = await api.deleteMessage(msg.id, token);
-      setChatMessages((prev) => prev.filter((m) => m.id !== msg.id));
-
-      if (res?.detachedReplyIds?.length) {
-        setChatMessages((prev) =>
-          prev.map((m) =>
-            res.detachedReplyIds.includes(m.id)
-              ? { ...m, replyTo: { id: msg.id, content: "Message supprimé", deleted: true } }
-              : m
-          )
-        );
-      }
+      setChatMessages((prev) =>
+        prev.map((m) =>
+          m.id === msg.id
+            ? {
+                ...m,
+                text: res?.content || "Message supprimé",
+                content: res?.content || "Message supprimé",
+              }
+            : m
+        )
+      );
 
       if (socketRef.current?.connected) {
         socketRef.current.emit("deleteMessage", { messageId: msg.id, userId: user.id, imdbId: id });

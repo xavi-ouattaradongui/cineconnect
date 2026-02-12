@@ -17,6 +17,7 @@ export const getMessagesByFilm = async (req, res) => {
       id: messages.id,
       content: messages.content,
       createdAt: messages.createdAt,
+      deletedAt: messages.deletedAt,
       userId: users.id,
       username: users.username,
       displayName: users.displayName,
@@ -24,6 +25,7 @@ export const getMessagesByFilm = async (req, res) => {
       replyTo: {
         id: repliedMessages.id,
         content: repliedMessages.content,
+        deletedAt: repliedMessages.deletedAt,
         userId: repliedUsers.id,
         username: repliedUsers.username,
         displayName: repliedUsers.displayName,
@@ -53,7 +55,14 @@ export const getMessagesByFilm = async (req, res) => {
   res.json({
     messages: data.map((m) => ({
       ...m,
-      replyTo: m.replyTo?.id ? m.replyTo : null,
+      content: m.deletedAt ? "Message supprimé" : m.content,
+      replyTo: m.replyTo?.id
+        ? {
+            ...m.replyTo,
+            content: m.replyTo.deletedAt ? "Message supprimé" : m.replyTo.content,
+            deleted: !!m.replyTo.deletedAt,
+          }
+        : null,
     })),
     lastSeenAt,
   });
@@ -148,7 +157,7 @@ export const deleteMessage = async (req, res) => {
   const authUserId = Number(req.user?.id);
 
   const [msg] = await db
-    .select({ id: messages.id, userId: messages.userId })
+    .select({ id: messages.id, userId: messages.userId, deletedAt: messages.deletedAt })
     .from(messages)
     .where(eq(messages.id, messageId));
 
@@ -156,23 +165,29 @@ export const deleteMessage = async (req, res) => {
     return res.status(404).json({ message: "Message introuvable" });
   }
 
-  if (msg.userId !== authUserId) {
+  if (!msg.deletedAt && msg.userId !== authUserId) {
     return res.status(403).json({ message: "Action non autorisée" });
   }
 
-  const replied = await db
-    .select({ id: messages.id })
-    .from(messages)
-    .where(eq(messages.replyToId, messageId));
+  if (msg.deletedAt) {
+    await db.delete(messages).where(eq(messages.id, messageId));
+    return res.json({ id: msg.id, hardDeleted: true });
+  }
 
-  await db
+  const now = new Date();
+
+  const [updated] = await db
     .update(messages)
-    .set({ replyToId: null })
-    .where(eq(messages.replyToId, messageId));
+    .set({ content: "Message supprimé", deletedAt: now })
+    .where(and(eq(messages.id, messageId), eq(messages.userId, req.user.id)))
+    .returning();
 
-  await db.delete(messages).where(and(eq(messages.id, messageId), eq(messages.userId, req.user.id)));
-
-  return res.json({ id: msg.id, detachedReplyIds: replied.map((r) => r.id) });
+  return res.json({
+    id: updated.id,
+    content: updated.content,
+    deletedAt: updated.deletedAt,
+    hardDeleted: false,
+  });
 };
 
 // Endpoint pour mettre à jour la date de consultation

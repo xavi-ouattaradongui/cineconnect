@@ -13,4 +13,5 @@ export const messages = pgTable("messages", {
     .notNull(),
   replyToId: integer("reply_to_id").references(() => messages.id),
   createdAt: timestamp("created_at").defaultNow(),
+  deletedAt: timestamp("deleted_at"),
 });
