@@ -63,13 +63,30 @@ export default function ChatWidget({
 
     if (diffDays === 0) return "Aujourd’hui";
     if (diffDays === 1) return "Hier";
-
+    if (diffDays <= 2) {
+      return new Intl.DateTimeFormat("fr-FR", {
+        timeZone: TIME_ZONE,
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+      }).format(date);
+    }
+    // Pour plus de 2 jours, date complète
     return new Intl.DateTimeFormat("fr-FR", {
       timeZone: TIME_ZONE,
-      weekday: "long",
-      day: "numeric",
-      month: "long",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
     }).format(date);
+  };
+
+  // Ajoute une fonction pour savoir si on doit afficher la date complète sous le message
+  const shouldShowFullDate = (date) => {
+    const today = new Date();
+    const diffDays =
+      (toStartOfDay(getYmd(today)) - toStartOfDay(getYmd(date))) /
+      (1000 * 60 * 60 * 24);
+    return diffDays > 2;
   };
 
   const formatTime = (date) =>
@@ -170,7 +187,7 @@ export default function ChatWidget({
           <button
             type="button"
             onClick={onToggleCollapse}
-            className="h-20 w-20 rounded-full bg-indigo-600 text-white shadow-xl hover:bg-indigo-500 animate-bounce flex items-center justify-center"
+            className="h-20 w-20 rounded-full bg-blue-600 text-white shadow-xl hover:bg-blue-500 animate-bounce flex items-center justify-center"
             title="Discuter"
           >
             <MessagesSquare size={28} />
@@ -179,7 +196,7 @@ export default function ChatWidget({
       )}
 
       {!isCollapsed && (
-        <div className="mb-0 w-[28rem] bg-white dark:bg-[#16191D] border border-gray-200 dark:border-white/10 rounded-2xl shadow-2xl overflow-hidden flex flex-col">
+        <div className="mb-0 w-[38rem] bg-white dark:bg-[#16191D] border border-gray-200 dark:border-white/10 rounded-2xl shadow-2xl overflow-hidden flex flex-col">
           {/* Header */}
           <div className="p-3 border-b border-gray-200 dark:border-white/5 flex items-center justify-between bg-gray-50 dark:bg-white/5">
             <div className="flex items-center gap-2 min-w-0">
@@ -201,7 +218,7 @@ export default function ChatWidget({
           {/* Messages */}
           {!isCollapsed && (
             <div
-              className="h-64 p-3 overflow-y-auto space-y-3 bg-white dark:bg-[#0f1114]"
+              className="h-[32rem] p-3 overflow-y-auto space-y-3 bg-white dark:bg-[#0f1114]"
               onClick={() => setActionForId(null)}
             >
               {chatMessages.length === 0 ? (
@@ -255,7 +272,7 @@ export default function ChatWidget({
                                   </p>
                                 </div>
                               )}
-                              <p className="text-[11px] text-indigo-700 dark:text-indigo-100">
+                              <p className="text-[11px] text-indigo-700 dark:text-indigo-100 break-words">
                                 {msg.text ?? msg.content}
                               </p>
                             </div>
@@ -281,9 +298,13 @@ export default function ChatWidget({
                               </div>
                             )}
                             {msgDate && (
-                              <p className="mt-1 text-[9px] text-indigo-500/80 dark:text-indigo-200/80 text-right">
-                                {formatTime(msgDate)}
-                              </p>
+                              <>
+                                <p className="mt-1 text-[9px] text-indigo-500/80 dark:text-indigo-200/80 text-right">
+                                  {shouldShowFullDate(msgDate)
+                                    ? `${formatDayLabel(msgDate)} ${formatTime(msgDate)}`
+                                    : formatTime(msgDate)}
+                                </p>
+                              </>
                             )}
                           </div>
                         </div>
@@ -317,7 +338,7 @@ export default function ChatWidget({
                                   </p>
                                 </div>
                               )}
-                              <p className="text-[11px] text-gray-700 dark:text-slate-300">
+                              <p className="text-[11px] text-gray-700 dark:text-slate-300 break-words">
                                 {msg.text ?? msg.content}
                               </p>
                             </div>
@@ -336,9 +357,13 @@ export default function ChatWidget({
                               </div>
                             )}
                             {msgDate && (
-                              <p className="mt-1 text-[9px] text-gray-500 dark:text-slate-400">
-                                {formatTime(msgDate)}
-                              </p>
+                              <>
+                                <p className="mt-1 text-[9px] text-gray-500 dark:text-slate-400">
+                                  {shouldShowFullDate(msgDate)
+                                    ? `${formatDayLabel(msgDate)} ${formatTime(msgDate)}`
+                                    : formatTime(msgDate)}
+                                </p>
+                              </>
                             )}
                           </div>
                         </div>
@@ -378,12 +403,20 @@ export default function ChatWidget({
                 </div>
               )}
               <div className="relative flex items-center">
-                <input
-                  type="text"
+                {/* Remplacement de l'input par un textarea */}
+                <textarea
                   value={messageText}
                   onChange={onMessageChange}
                   placeholder="Écrire un message..."
-                  className="w-full bg-gray-100 dark:bg-black/20 text-black dark:text-white text-xs px-3 py-2 rounded-md border border-gray-200 dark:border-white/10 focus:border-indigo-500/50 focus:ring-0 outline-none placeholder:text-gray-400"
+                  className="w-full bg-gray-100 dark:bg-black/20 text-black dark:text-white text-xs px-3 py-2 pr-5 rounded-md border border-gray-200 dark:border-white/10 focus:border-indigo-500/50 focus:ring-0 outline-none placeholder:text-gray-400 resize-none overflow-y-auto"
+                  rows={1}
+                  style={{ minHeight: 28, maxHeight: 60 }}
+                  onKeyDown={e => {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault();
+                      if (messageText.trim()) handleSend(e);
+                    }
+                  }}
                 />
                 <button
                   className="absolute right-2 text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300 transition-colors disabled:opacity-40"
