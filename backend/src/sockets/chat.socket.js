@@ -84,33 +84,24 @@ export const initSocket = (io) => {
       });
     });
 
-    socket.on("deleteMessage", async ({ messageId, userId, imdbId }) => {
-      if (!messageId || !userId || !imdbId) return;
-
+    socket.on("deleteMessage", async ({ messageId, imdbId, userId }) => {
       const [msg] = await db
-        .select({ id: messages.id, userId: messages.userId })
+        .select({ id: messages.id, userId: messages.userId, deletedAt: messages.deletedAt })
         .from(messages)
         .where(eq(messages.id, Number(messageId)));
 
-      if (!msg || msg.userId !== userId) return;
+      if (!msg) return;
+      if (!msg.deletedAt && String(msg.userId) !== String(userId)) return;
 
-      const replied = await db
-        .select({ id: messages.id })
-        .from(messages)
-        .where(eq(messages.replyToId, Number(messageId)));
+      if (!msg.deletedAt) {
+        const now = new Date();
+        await db
+          .update(messages)
+          .set({ content: "Message supprimé", deletedAt: now })
+          .where(eq(messages.id, Number(messageId)));
+      }
 
-      await db
-        .update(messages)
-        .set({ replyToId: null })
-        .where(eq(messages.replyToId, Number(messageId)));
-
-      await db.delete(messages).where(and(eq(messages.id, Number(messageId)), eq(messages.userId, userId)));
-
-      io.to(`film-${imdbId}`).emit("messageDeleted", { id: Number(messageId) });
-      io.to(`film-${imdbId}`).emit("messageReplyDetached", {
-        replyToId: Number(messageId),
-        messageIds: replied.map((r) => r.id),
-      });
+      io.to(imdbId).emit("messageDeleted", { id: Number(messageId), hardDeleted: false });
     });
 
     socket.on("disconnect", () => {

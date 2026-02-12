@@ -170,8 +170,12 @@ export const deleteMessage = async (req, res) => {
   }
 
   if (msg.deletedAt) {
-    await db.delete(messages).where(eq(messages.id, messageId));
-    return res.json({ id: msg.id, hardDeleted: true });
+    return res.json({
+      id: msg.id,
+      content: "Message supprimé",
+      deletedAt: msg.deletedAt,
+      hardDeleted: false,
+    });
   }
 
   const now = new Date();

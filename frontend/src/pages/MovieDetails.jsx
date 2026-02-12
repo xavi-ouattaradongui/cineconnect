@@ -297,6 +297,7 @@ export default function MovieDetails() {
     if (!user?.id) return;
     try {
       const res = await api.deleteMessage(msg.id, token);
+
       setChatMessages((prev) =>
         prev.map((m) =>
           m.id === msg.id
@@ -304,6 +305,7 @@ export default function MovieDetails() {
                 ...m,
                 text: res?.content || "Message supprimé",
                 content: res?.content || "Message supprimé",
+                deletedAt: res?.deletedAt || new Date().toISOString(),
               }
             : m
         )
