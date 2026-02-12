@@ -23,12 +23,15 @@ export default function MovieReviews({
   const visibleReviews = reviews.slice(0, visibleCount);
   const hasMore = reviews.length > visibleCount;
 
+  // Trouver si l'utilisateur a déjà laissé un avis
+  const userReview = reviews.find((r) => r.userId === currentUserId);
+
   return (
     <section>
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-sm font-semibold text-black dark:text-white uppercase tracking-widest flex items-center gap-2">
           <Star size={16} className="text-yellow-400" />
-          Noter et commenter
+          {userReview ? "Avis et commentaire" : "Noter et commenter"}
         </h3>
 
         {averageRating && (
@@ -43,60 +46,64 @@ export default function MovieReviews({
           </div>
         )}
       </div>
+      {/* Barre de notation/commentaire MASQUÉE si userReview existe */}
+      {!userReview && (
+        <>
+          {/* Stars */}
+          <div className="flex items-center gap-2 mb-3">
+            {[1, 2, 3, 4, 5].map((value) => (
+              <button
+                key={value}
+                type="button"
+                onMouseEnter={() => onRatingHover(value)}
+                onMouseLeave={() => onRatingHover(0)}
+                onClick={() => onRatingChange(value)}
+                className="p-1"
+                title={`${value}/5`}
+              >
+                <Star
+                  size={28}
+                  className={`transition-colors ${
+                    (hoverRating || userRating) >= value
+                      ? "text-yellow-400 fill-yellow-400"
+                      : "text-gray-300 dark:text-gray-600"
+                  }`}
+                />
+              </button>
+            ))}
+            <span className="text-sm text-gray-600 dark:text-gray-400 ml-2">
+              {userRating ? `${userRating}/5` : "Pas encore noté"}
+            </span>
+          </div>
 
-      {/* Stars */}
-      <div className="flex items-center gap-2 mb-3">
-        {[1, 2, 3, 4, 5].map((value) => (
-          <button
-            key={value}
-            type="button"
-            onMouseEnter={() => onRatingHover(value)}
-            onMouseLeave={() => onRatingHover(0)}
-            onClick={() => onRatingChange(value)}
-            className="p-1"
-            title={`${value}/5`}
-          >
-            <Star
-              size={28}
-              className={`transition-colors ${
-                (hoverRating || userRating) >= value
-                  ? "text-yellow-400 fill-yellow-400"
-                  : "text-gray-300 dark:text-gray-600"
-              }`}
-            />
-          </button>
-        ))}
-        <span className="text-sm text-gray-600 dark:text-gray-400 ml-2">
-          {userRating ? `${userRating}/5` : "Pas encore noté"}
-        </span>
-      </div>
-
-      {/* Comment input */}
-      <form onSubmit={onReviewSubmit} className="space-y-3">
-        <div className="relative">
-          <input
-            type="text"
-            value={reviewText}
-            onChange={onReviewChange}
-            placeholder="Écrivez votre avis..."
-            disabled={isSubmitting}
-            className="w-full bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2.5 text-sm text-black dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-600 focus:outline-none focus:ring-1 focus:ring-indigo-500/50 focus:border-indigo-500/30 transition disabled:opacity-50"
-          />
-          <button
-            type="submit"
-            disabled={!userRating || isSubmitting}
-            className="absolute right-1.5 top-1.5 p-2 bg-indigo-600/90 hover:bg-indigo-600 text-white rounded-md transition disabled:opacity-40 disabled:cursor-not-allowed"
-            title="Envoyer"
-          >
-            <Send size={16} />
-          </button>
-        </div>
-        <p className="text-xs text-gray-500 dark:text-gray-600">
-          {isSubmitting
-            ? "Envoi en cours..."
-            : "Une note est obligatoire. Le commentaire est optionnel."}
-        </p>
-      </form>
+          {/* Comment input */}
+          <form onSubmit={onReviewSubmit} className="space-y-3">
+            <div className="relative">
+              <input
+                type="text"
+                value={reviewText}
+                onChange={onReviewChange}
+                placeholder="Écrivez votre avis..."
+                disabled={isSubmitting}
+                className="w-full bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2.5 text-sm text-black dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-600 focus:outline-none focus:ring-1 focus:ring-indigo-500/50 focus:border-indigo-500/30 transition disabled:opacity-50"
+              />
+              <button
+                type="submit"
+                disabled={!userRating || isSubmitting}
+                className="absolute right-1.5 top-1.5 p-2 bg-indigo-600/90 hover:bg-indigo-600 text-white rounded-md transition disabled:opacity-40 disabled:cursor-not-allowed"
+                title="Envoyer"
+              >
+                <Send size={16} />
+              </button>
+            </div>
+            <p className="text-xs text-gray-500 dark:text-gray-600">
+              {isSubmitting
+                ? "Envoi en cours..."
+                : "Une note est obligatoire. Le commentaire est optionnel."}
+            </p>
+          </form>
+        </>
+      )}
 
       {/* Liste des avis */}
       {isLoading ? (
