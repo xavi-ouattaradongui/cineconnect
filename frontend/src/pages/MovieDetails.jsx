@@ -131,7 +131,11 @@ export default function MovieDetails() {
       ]);
     };
 
-    const handleDeleted = ({ id: deletedId }) => {
+    const handleDeleted = ({ id: deletedId, hardDeleted }) => {
+      if (hardDeleted) {
+        setChatMessages((prev) => prev.filter((m) => m.id !== deletedId));
+        return;
+      }
       setChatMessages((prev) =>
         prev.map((m) =>
           m.id === deletedId
@@ -298,21 +302,30 @@ export default function MovieDetails() {
     try {
       const res = await api.deleteMessage(msg.id, token);
 
-      setChatMessages((prev) =>
-        prev.map((m) =>
-          m.id === msg.id
-            ? {
-                ...m,
-                text: res?.content || "Message supprimé",
-                content: res?.content || "Message supprimé",
-                deletedAt: res?.deletedAt || new Date().toISOString(),
-              }
-            : m
-        )
-      );
+      if (res?.hardDeleted) {
+        setChatMessages((prev) => prev.filter((m) => m.id !== msg.id));
+      } else {
+        setChatMessages((prev) =>
+          prev.map((m) =>
+            m.id === msg.id
+              ? {
+                  ...m,
+                  text: res?.content || "Message supprimé",
+                  content: res?.content || "Message supprimé",
+                  deletedAt: res?.deletedAt || new Date().toISOString(),
+                }
+              : m
+          )
+        );
+      }
 
       if (socketRef.current?.connected) {
-        socketRef.current.emit("deleteMessage", { messageId: msg.id, userId: user.id, imdbId: id });
+        socketRef.current.emit("deleteMessage", {
+          messageId: msg.id,
+          userId: user.id,
+          imdbId: id,
+          hardDeleted: !!res?.hardDeleted,
+        });
       }
     } catch (err) {
       console.error("Erreur suppression message:", err);
