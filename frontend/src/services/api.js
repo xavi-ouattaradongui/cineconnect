@@ -282,8 +282,9 @@ export const api = {
   },
 
   // Messages
-  getMessagesByFilm: async (imdbId) => {
-    const response = await fetch(`${API_URL}/messages/film/${imdbId}`);
+  getMessagesByFilm: async (imdbId, token) => {
+    const headers = token ? { "Authorization": `Bearer ${token}` } : {};
+    const response = await fetch(`${API_URL}/messages/film/${imdbId}`, { headers });
     const data = await response.json();
 
     if (!response.ok) {
@@ -324,6 +325,18 @@ export const api = {
       throw new Error(data.message || "Erreur lors de la suppression");
     }
 
+    return data;
+  },
+
+  updateChatSeen: async (imdbId, token) => {
+    const response = await fetch(`${API_URL}/messages/film/${imdbId}/seen`, {
+      method: "POST",
+      headers: { "Authorization": `Bearer ${token}` }
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message || "Erreur lors de la mise à jour du vu");
+    }
     return data;
   }
 };

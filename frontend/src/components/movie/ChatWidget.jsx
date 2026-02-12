@@ -12,14 +12,13 @@ export default function ChatWidget({
   movieTitle,
   currentUserId,
   onDeleteMessage,
+  lastSeenAt,
 }) {
   const chatEndRef = useRef(null);
+  const firstNewRef = useRef(null);
   const isCollapsed = !chatCollapsed;
 
-  useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [chatMessages]);
-
+  // Déplace la déclaration ici (avant toute utilisation)
   const TIME_ZONE = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
   const getMessageDate = (msg) => {
@@ -177,6 +176,41 @@ export default function ChatWidget({
     setActionForId(null);
   };
 
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [chatMessages]);
+
+  // Trouve l'index du premier message non vu
+  const lastSeenDate = lastSeenAt ? new Date(lastSeenAt) : null;
+  const firstNewIndex = lastSeenDate
+    ? chatMessages.findIndex(msg => {
+        const msgDate = getMessageDate(msg);
+        return msgDate && msgDate > lastSeenDate;
+      })
+    : -1;
+
+  // Si l'utilisateur a envoyé un message après lastSeenAt, on ne montre plus "Nouveau"
+  const hasOwnNewMessage = lastSeenDate
+    ? chatMessages.some(
+        (msg) =>
+          String(msg.userId) === String(currentUserId) &&
+          getMessageDate(msg) &&
+          getMessageDate(msg) > lastSeenDate
+      )
+    : false;
+
+  // Scroll automatique sur "Nouveau" ou tout en bas
+  useEffect(() => {
+    if (!isCollapsed) {
+      if (firstNewRef.current && firstNewIndex !== -1 && !hasOwnNewMessage) {
+        firstNewRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+      } else if (chatEndRef.current) {
+        chatEndRef.current.scrollIntoView({ behavior: "smooth" });
+      }
+    }
+    // eslint-disable-next-line
+  }, [chatCollapsed, chatMessages, firstNewIndex, hasOwnNewMessage]);
+
   return (
     <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
       {isCollapsed && (
@@ -239,6 +273,20 @@ export default function ChatWidget({
 
                   return (
                     <div key={msg.id} className="space-y-2">
+                      {/* Séparateur "Nouveaux messages" */}
+                      {index === firstNewIndex && !hasOwnNewMessage && (
+                        <div
+                          className="flex items-center my-4"
+                          ref={firstNewRef}
+                        >
+                          <div className="flex-1 h-px bg-gray-200 dark:bg-white/10"></div>
+                          <span className="mx-4 px-3 py-0.5 text-xs font-bold rounded-full bg-gray-100 dark:bg-white/10 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-white/10 shadow">
+                            Nouveaux messages
+                          </span>
+                          <div className="flex-1 h-px bg-gray-200 dark:bg-white/10"></div>
+                        </div>
+                      )}
+
                       {showDaySeparator && (
                         <div className="flex items-center justify-center">
                           <span className="px-2 py-0.5 text-[10px] rounded-full bg-gray-100 dark:bg-white/5 text-gray-500 dark:text-slate-400">

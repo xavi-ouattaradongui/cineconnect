@@ -24,6 +24,7 @@ export default function MovieDetails() {
   // États
   const [chatMessages, setChatMessages] = useState([]);
   const [messageText, setMessageText] = useState("");
+  const [lastSeenAt, setLastSeenAt] = useState(null);
   
   const [userRating, setUserRating] = useState(null);
   const [hoverRating, setHoverRating] = useState(0);
@@ -45,16 +46,16 @@ export default function MovieDetails() {
     return (sum / reviewsWithRating.length).toFixed(1);
   }, [reviews]);
 
-  // Effet pour charger les messages depuis l'API
+  // Effet pour charger les messages et la date de consultation
   useEffect(() => {
     let active = true;
 
     const loadMessages = async () => {
       try {
-        const data = await api.getMessagesByFilm(id);
+        const data = await api.getMessagesByFilm(id, token);
         if (!active) return;
         setChatMessages(
-          data.map((m) => ({
+          data.messages.map((m) => ({
             id: m.id,
             userId: m.userId,
             text: m.content,
@@ -72,6 +73,7 @@ export default function MovieDetails() {
             replyTo: m.replyTo || null,
           }))
         );
+        setLastSeenAt(data.lastSeenAt || null);
       } catch (err) {
         console.error("Erreur chargement messages:", err);
       }
@@ -79,7 +81,16 @@ export default function MovieDetails() {
 
     loadMessages();
     return () => { active = false; };
-  }, [id]);
+  }, [id, token]);
+
+  // Effet pour mettre à jour la date de consultation à chaque ouverture du chat
+  useEffect(() => {
+    if (!chatCollapsed && user?.id && token) {
+      api.updateChatSeen(id, token)
+        .then(res => setLastSeenAt(res.lastSeenAt))
+        .catch(() => {});
+    }
+  }, [chatCollapsed, id, user?.id, token]);
 
   // Connexion au socket
   useEffect(() => {
@@ -365,6 +376,7 @@ export default function MovieDetails() {
         movieTitle={movie.Title}
         currentUserId={user?.id}
         onDeleteMessage={handleDeleteMessage}
+        lastSeenAt={lastSeenAt}
       />
     </div>
   );

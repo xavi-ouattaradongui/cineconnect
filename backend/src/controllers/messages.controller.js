@@ -1,12 +1,13 @@
 import { db } from "../db/index.js";
 import { messages } from "../db/schema/messages.js";
 import { films } from "../db/schema/films.js";
-import { users } from "../db/schema/users.js";
+import { users, userChatSeen } from "../db/schema/users.js";
 import { eq, and } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
 export const getMessagesByFilm = async (req, res) => {
   const { imdbId } = req.params;
+  const authUserId = req.user?.id;
 
   const repliedMessages = alias(messages, "replied_messages");
   const repliedUsers = alias(users, "replied_users");
@@ -36,12 +37,26 @@ export const getMessagesByFilm = async (req, res) => {
     .where(eq(films.imdbId, imdbId))
     .orderBy(messages.createdAt);
 
-  res.json(
-    data.map((m) => ({
+  // Ajoute la date de dernière consultation
+  let lastSeenAt = null;
+  if (authUserId) {
+    const [film] = await db.select({ id: films.id }).from(films).where(eq(films.imdbId, imdbId));
+    if (film) {
+      const [seen] = await db
+        .select({ lastSeenAt: userChatSeen.lastSeenAt })
+        .from(userChatSeen)
+        .where(and(eq(userChatSeen.userId, authUserId), eq(userChatSeen.filmId, film.id)));
+      lastSeenAt = seen?.lastSeenAt || null;
+    }
+  }
+
+  res.json({
+    messages: data.map((m) => ({
       ...m,
       replyTo: m.replyTo?.id ? m.replyTo : null,
-    }))
-  );
+    })),
+    lastSeenAt,
+  });
 };
 
 export const createMessage = async (req, res) => {
@@ -158,4 +173,36 @@ export const deleteMessage = async (req, res) => {
   await db.delete(messages).where(and(eq(messages.id, messageId), eq(messages.userId, req.user.id)));
 
   return res.json({ id: msg.id, detachedReplyIds: replied.map((r) => r.id) });
+};
+
+// Endpoint pour mettre à jour la date de consultation
+export const updateChatSeen = async (req, res) => {
+  const { imdbId } = req.params;
+  const authUserId = req.user?.id;
+
+  if (!authUserId) return res.status(401).json({ message: "Non authentifié" });
+
+  const [film] = await db.select({ id: films.id }).from(films).where(eq(films.imdbId, imdbId));
+  if (!film) return res.status(404).json({ message: "Film non trouvé" });
+
+  const now = new Date();
+
+  // Upsert
+  const [existing] = await db
+    .select({ id: userChatSeen.id })
+    .from(userChatSeen)
+    .where(and(eq(userChatSeen.userId, authUserId), eq(userChatSeen.filmId, film.id)));
+
+  if (existing) {
+    await db
+      .update(userChatSeen)
+      .set({ lastSeenAt: now })
+      .where(eq(userChatSeen.id, existing.id));
+  } else {
+    await db
+      .insert(userChatSeen)
+      .values({ userId: authUserId, filmId: film.id, lastSeenAt: now });
+  }
+
+  res.json({ lastSeenAt: now });
 };
