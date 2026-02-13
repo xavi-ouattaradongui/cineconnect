@@ -335,6 +335,7 @@ export default function ChatWidget({
                                 className="absolute right-0 mt-1 z-10 bg-white dark:bg-[#16191D] border border-gray-200 dark:border-white/10 rounded-md shadow-lg text-[10px]"
                                 onClick={(e) => e.stopPropagation()}
                               >
+                                {/* Affiche "Supprimer" seulement pour ses propres messages */}
                                 <button
                                   type="button"
                                   onClick={() => handleDelete(msg)}
@@ -403,6 +404,8 @@ export default function ChatWidget({
                                 className="absolute left-0 mt-1 z-10 bg-white dark:bg-[#16191D] border border-gray-200 dark:border-white/10 rounded-md shadow-lg text-[10px]"
                                 onClick={(e) => e.stopPropagation()}
                               >
+                                {/* Affiche "Supprimer" seulement si c'est le message de l'utilisateur courant */}
+                                {String(msg.userId) === String(currentUserId) && (
                                 <button
                                   type="button"
                                   onClick={() => handleDelete(msg)}
@@ -410,6 +413,7 @@ export default function ChatWidget({
                                 >
                                   Supprimer
                                 </button>
+                                )}
                                 {!isDeletedMessage(msg) && (
                                   <button
                                     type="button"
