@@ -70,13 +70,25 @@ export default function ChatWidget({
         month: "long",
       }).format(date);
     }
-    // Pour plus de 2 jours, date complète
-    return new Intl.DateTimeFormat("fr-FR", {
+    // Format court: "jeu. 5 févr."
+    const parts = new Intl.DateTimeFormat("fr-FR", {
       timeZone: TIME_ZONE,
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    }).format(date);
+      weekday: "short",
+      day: "numeric",
+      month: "short",
+    }).formatToParts(date);
+
+    const wd = parts.find(p => p.type === "weekday")?.value?.replace(/\.$/, "") || "";
+    const d = parts.find(p => p.type === "day")?.value || "";
+    let mo = parts.find(p => p.type === "month")?.value || "";
+
+    // Correction manuelle pour "févr." (certains navigateurs mettent "févr." d'autres "fév.")
+    if (mo === "fév") mo = "févr.";
+
+    // Ajoute un point à la fin du mois si absent (sauf si déjà présent)
+    if (!mo.endsWith(".")) mo = mo + ".";
+
+    return `${wd}. ${d} ${mo}`;
   };
 
   // Ajoute une fonction pour savoir si on doit afficher la date complète sous le message
@@ -308,7 +320,7 @@ export default function ChatWidget({
                             initials={getInitials(msg)}
                             size={24}
                           />
-                          <div className="max-w-[80%] relative">
+                          <div className="max-w-[80%] relative flex flex-col">
                             <div
                               className="bg-indigo-50 border border-indigo-200 dark:bg-indigo-500/20 dark:border-indigo-500/20 p-2 rounded-lg rounded-tr-none cursor-pointer"
                               onClick={(e) => {
@@ -355,13 +367,9 @@ export default function ChatWidget({
                               </div>
                             )}
                             {msgDate && (
-                              <>
-                                <p className="mt-1 text-[9px] text-indigo-500/80 dark:text-indigo-200/80 text-right">
-                                  {shouldShowFullDate(msgDate)
-                                    ? `${formatDayLabel(msgDate)} ${formatTime(msgDate)}`
-                                    : formatTime(msgDate)}
-                                </p>
-                              </>
+                              <p className="mt-1 text-[9px] text-indigo-500/80 dark:text-indigo-200/80 text-right w-full">
+                                {formatTime(msgDate)}
+                              </p>
                             )}
                           </div>
                         </div>
@@ -372,7 +380,7 @@ export default function ChatWidget({
                             initials={getInitials(msg)}
                             size={24}
                           />
-                          <div className="max-w-[80%] relative">
+                          <div className="max-w-[80%] relative flex flex-col">
                             <p
                               className={`mb-1 text-[10px] font-semibold bg-gradient-to-r bg-clip-text text-transparent ${getNameGradient(msg)}`}
                             >
@@ -426,13 +434,9 @@ export default function ChatWidget({
                               </div>
                             )}
                             {msgDate && (
-                              <>
-                                <p className="mt-1 text-[9px] text-gray-500 dark:text-slate-400">
-                                  {shouldShowFullDate(msgDate)
-                                    ? `${formatDayLabel(msgDate)} ${formatTime(msgDate)}`
-                                    : formatTime(msgDate)}
-                                </p>
-                              </>
+                              <p className="mt-1 text-[9px] text-gray-500 dark:text-slate-400 text-right w-full">
+                                {formatTime(msgDate)}
+                              </p>
                             )}
                           </div>
                         </div>
