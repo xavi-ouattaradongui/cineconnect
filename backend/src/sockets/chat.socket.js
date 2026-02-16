@@ -101,6 +101,20 @@ export const initSocket = (io) => {
           .where(eq(messages.id, Number(messageId)));
       }
 
+      // Mettre à jour les réponses (replyTo) en temps réel
+      const replyMessages = await db
+        .select({ id: messages.id })
+        .from(messages)
+        .where(eq(messages.replyToId, Number(messageId)));
+      const replyIds = replyMessages.map((m) => m.id);
+
+      if (replyIds.length > 0) {
+        io.to(`film-${imdbId}`).emit("messageReplyDetached", {
+          replyToId: Number(messageId),
+          messageIds: replyIds,
+        });
+      }
+
       // Toujours soft delete côté socket : hardDeleted = false
       io.to(`film-${imdbId}`).emit("messageDeleted", { id: Number(messageId), hardDeleted: false });
     });
