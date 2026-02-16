@@ -28,7 +28,7 @@ import {
 } from "lucide-react";
 
 const AVATAR_PRESETS = [
-  { id: null, icon: User, label: "Initiales", color: "from-indigo-500 to-purple-600" }, // Option par défaut
+  { id: null, icon: User, label: "Initiales", color: "from-indigo-500 to-purple-600" }, 
   { id: "skull", icon: Skull, label: "Skull", color: "from-gray-500 to-gray-700" },
   { id: "ghost", icon: Ghost, label: "Ghost", color: "from-purple-500 to-indigo-600" },
   { id: "zap", icon: Zap, label: "Thunder", color: "from-yellow-500 to-orange-600" },
