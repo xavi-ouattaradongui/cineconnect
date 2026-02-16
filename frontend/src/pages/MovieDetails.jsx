@@ -25,7 +25,7 @@ export default function MovieDetails() {
   const [chatMessages, setChatMessages] = useState([]);
   const [messageText, setMessageText] = useState("");
   const [lastSeenAt, setLastSeenAt] = useState(null);
-  
+
   const [userRating, setUserRating] = useState(null);
   const [hoverRating, setHoverRating] = useState(0);
   const [reviewText, setReviewText] = useState("");
@@ -131,11 +131,8 @@ export default function MovieDetails() {
       ]);
     };
 
-    const handleDeleted = ({ id: deletedId, hardDeleted }) => {
-      if (hardDeleted) {
-        setChatMessages((prev) => prev.filter((m) => m.id !== deletedId));
-        return;
-      }
+    // Toujours soft delete : on ne retire jamais le message du chat
+    const handleDeleted = ({ id: deletedId }) => {
       setChatMessages((prev) =>
         prev.map((m) =>
           m.id === deletedId
@@ -244,7 +241,7 @@ export default function MovieDetails() {
 
   const handleSubmitReview = async (e) => {
     e.preventDefault();
-    
+
     if (!userRating) {
       alert("Veuillez d'abord donner une note");
       return;
@@ -261,7 +258,6 @@ export default function MovieDetails() {
         await createReview.mutateAsync({
           rating: userRating,
           comment: reviewText.trim() || "",
-          // Passer les données du film pour créer l'entrée dans la table films
           title: movie.Title,
           poster: movie.Poster,
           year: parseInt(movie.Year),
@@ -302,29 +298,24 @@ export default function MovieDetails() {
     try {
       const res = await api.deleteMessage(msg.id, token);
 
-      if (res?.hardDeleted) {
-        setChatMessages((prev) => prev.filter((m) => m.id !== msg.id));
-      } else {
-        setChatMessages((prev) =>
-          prev.map((m) =>
-            m.id === msg.id
-              ? {
-                  ...m,
-                  text: res?.content || "Message supprimé",
-                  content: res?.content || "Message supprimé",
-                  deletedAt: res?.deletedAt || new Date().toISOString(),
-                }
-              : m
-          )
-        );
-      }
+      setChatMessages((prev) =>
+        prev.map((m) =>
+          m.id === msg.id
+            ? {
+                ...m,
+                text: res?.content || "Message supprimé",
+                content: res?.content || "Message supprimé",
+                deletedAt: res?.deletedAt || new Date().toISOString(),
+              }
+            : m
+        )
+      );
 
       if (socketRef.current?.connected) {
         socketRef.current.emit("deleteMessage", {
           messageId: msg.id,
           userId: user.id,
-          imdbId: id,
-          hardDeleted: !!res?.hardDeleted,
+          imdbId: id
         });
       }
     } catch (err) {

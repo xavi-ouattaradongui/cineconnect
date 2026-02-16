@@ -101,7 +101,8 @@ export const initSocket = (io) => {
           .where(eq(messages.id, Number(messageId)));
       }
 
-      io.to(imdbId).emit("messageDeleted", { id: Number(messageId), hardDeleted: false });
+      // Toujours soft delete côté socket : hardDeleted = false
+      io.to(`film-${imdbId}`).emit("messageDeleted", { id: Number(messageId), hardDeleted: false });
     });
 
     socket.on("disconnect", () => {
