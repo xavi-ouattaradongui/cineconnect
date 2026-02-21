@@ -338,5 +338,20 @@ export const api = {
       throw new Error(data.message || "Erreur lors de la mise à jour du vu");
     }
     return data;
+  },
+
+  // Catégories
+  getCategories: async () => {
+    const response = await fetch(`${API_URL}/categories`);
+    return response.json();
+  },
+
+  createCategory: async (name) => {
+    const response = await fetch(`${API_URL}/categories`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name })
+    });
+    return response.json();
   }
 };

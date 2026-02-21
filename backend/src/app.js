@@ -8,6 +8,7 @@ import reviewRoutes from "./routes/reviews.routes.js";
 import messageRoutes from "./routes/messages.routes.js";
 import favoritesRoutes from "./routes/favorites.routes.js";
 import mylistsRoutes from "./routes/mylists.routes.js";
+import categoriesRoutes from "./routes/categories.routes.js";
 import { swaggerSpec } from "./docs/swagger.js";
 
 const app = express(); 
@@ -23,6 +24,7 @@ app.use("/reviews", reviewRoutes);
 app.use("/messages", messageRoutes);
 app.use("/favorites", favoritesRoutes);
 app.use("/mylists", mylistsRoutes);
+app.use("/categories", categoriesRoutes);
 app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 

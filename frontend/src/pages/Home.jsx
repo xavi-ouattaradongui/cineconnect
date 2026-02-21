@@ -6,6 +6,7 @@ import CategoryFilters from "../components/home/CategoryFilters";
 import CategorySection from "../components/home/CategorySection";
 import SearchResults from "../components/home/SearchResults";
 import { useSearchMovies, useMovie } from "../hooks/useMovies";
+import { useCategories } from "../hooks/useCategories";
 import { useMyList } from "../contexts/MyListContext";
 
 export default function Home() {
@@ -13,27 +14,15 @@ export default function Home() {
   const navigate = useNavigate();
   const [visibleCategories, setVisibleCategories] = useState(3);
 
-  const categories = [
-    "Action",
-    "Comédie",
-    "Horreur",
-    "Sci-Fi",
-    "Aventure",
-    "Romance",
-    "Thriller",
-    "Drame",
-    "Animation",
-    "Fantasy",
-    "Crime",
-    "Western",
-    "Documentaire",
-    "Mystere",
-  ];
+  const { data: categories = [], isLoading: isCategoriesLoading } = useCategories();
 
   // Hero logic
   const heroQuery = useMemo(
-    () => categories[Math.floor(Math.random() * categories.length)],
-    []
+    () => {
+      if (!categories || categories.length === 0) return null;
+      return categories[Math.floor(Math.random() * categories.length)];
+    },
+    [categories]
   );
   const { data: heroData } = useSearchMovies(heroQuery);
   const heroMovies = heroData?.Search || [];
@@ -112,59 +101,67 @@ export default function Home() {
 
   return (
     <div className="w-full bg-white dark:bg-black">
-      {/* HERO SECTION */}
-      {!query && (
-        <HeroSection
-          heroPicking={heroPicking}
-          fullMovie={fullMovie}
-          isInList={isInList}
-          onAddToList={handleHeroListClick}
-        />
-      )}
+      {isCategoriesLoading ? (
+        <div className="px-10 py-8">
+          <Loader />
+        </div>
+      ) : (
+        <>
+          {/* HERO SECTION */}
+          {!query && (
+            <HeroSection
+              heroPicking={heroPicking}
+              fullMovie={fullMovie}
+              isInList={isInList}
+              onAddToList={handleHeroListClick}
+            />
+          )}
 
-      {/* CATEGORIES */}
-      {!query && (
-        <CategoryFilters
-          categories={categories}
-          selectedCategory={null}
-          onSelectCategory={handleCategorySelect}
-        />
-      )}
+          {/* CATEGORIES */}
+          {!query && (
+            <CategoryFilters
+              categories={categories}
+              selectedCategory={null}
+              onSelectCategory={handleCategorySelect}
+            />
+          )}
 
-      {/* FILMS */}
-      <div className="px-10 py-8">
-        {query ? (
-          <SearchResults query={query} />
-        ) : (
-          <>
-            <h2 className="text-lg font-medium text-black dark:text-white tracking-tight border-b border-gray-200 dark:border-white/10 pb-4 mb-6">
-              {query ? `Résultats pour "${query}"` : "Tous les films"}
-            </h2>
-            <div className="space-y-8">
-              {categories.slice(0, visibleCategories).map((category) => (
-                <CategorySection
-                  key={category}
-                  category={category}
-                  displayCount={displayCount}
-                  onSelectCategory={handleCategorySelect}
-                  isSelected={false}
-                />
-              ))}
-            </div>
-            {visibleCategories < categories.length && (
-              <div className="flex justify-center mt-8">
-                <button
-                  type="button"
-                  onClick={() => setVisibleCategories((c) => c + 3)}
-                  className="px-5 py-2.5 rounded-full text-sm font-semibold border border-gray-300 dark:border-white/10 text-gray-700 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400 hover:border-blue-400 transition-colors"
-                >
-                  Charger plus
-                </button>
-              </div>
+          {/* FILMS */}
+          <div className="px-10 py-8">
+            {query ? (
+              <SearchResults query={query} />
+            ) : (
+              <>
+                <h2 className="text-lg font-medium text-black dark:text-white tracking-tight border-b border-gray-200 dark:border-white/10 pb-4 mb-6">
+                  {query ? `Résultats pour "${query}"` : "Tous les films"}
+                </h2>
+                <div className="space-y-8">
+                  {categories.slice(0, visibleCategories).map((category) => (
+                    <CategorySection
+                      key={category}
+                      category={category}
+                      displayCount={displayCount}
+                      onSelectCategory={handleCategorySelect}
+                      isSelected={false}
+                    />
+                  ))}
+                </div>
+                {visibleCategories < categories.length && (
+                  <div className="flex justify-center mt-8">
+                    <button
+                      type="button"
+                      onClick={() => setVisibleCategories((c) => c + 3)}
+                      className="px-5 py-2.5 rounded-full text-sm font-semibold border border-gray-300 dark:border-white/10 text-gray-700 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400 hover:border-blue-400 transition-colors"
+                    >
+                      Charger plus
+                    </button>
+                  </div>
+                )}
+              </>
             )}
-          </>
-        )}
-      </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }
