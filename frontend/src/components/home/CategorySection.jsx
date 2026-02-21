@@ -1,7 +1,9 @@
+import { useMemo } from "react";
 import { RotateCcw, Smile, Ghost, Zap, Shield, Heart } from "lucide-react";
-import { useSearchMovies } from "../../hooks/useMovies";
+import { useSearchMoviesMultiTerms } from "../../hooks/useMovies";
 import MovieCard from "../MovieCard";
 import Loader from "../Loader";
+import { getCategorySearchTerms } from "../../utils/categorySearch";
 
 const categoryIcons = {
   Action: <RotateCcw size={18} />,
@@ -21,7 +23,11 @@ const categoryIcons = {
 };
 
 export default function CategorySection({ category, displayCount, onSelectCategory, isSelected }) {
-  const { data, isLoading } = useSearchMovies(category);
+  const searchTerms = useMemo(
+    () => getCategorySearchTerms(category),
+    [category]
+  );
+  const { data, isLoading } = useSearchMoviesMultiTerms(searchTerms, 1);
   
   // Si la catégorie est sélectionnée, afficher TOUS les films, sinon limiter à displayCount
   const movies = isSelected 

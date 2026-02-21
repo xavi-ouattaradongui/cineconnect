@@ -11,6 +11,7 @@ import { useMyList } from "../contexts/MyListContext";
 export default function Home() {
   const displayCount = 6;
   const navigate = useNavigate();
+  const [visibleCategories, setVisibleCategories] = useState(3);
 
   const categories = [
     "Action",
@@ -140,7 +141,7 @@ export default function Home() {
               {query ? `Résultats pour "${query}"` : "Tous les films"}
             </h2>
             <div className="space-y-8">
-              {categories.map((category) => (
+              {categories.slice(0, visibleCategories).map((category) => (
                 <CategorySection
                   key={category}
                   category={category}
@@ -150,6 +151,17 @@ export default function Home() {
                 />
               ))}
             </div>
+            {visibleCategories < categories.length && (
+              <div className="flex justify-center mt-8">
+                <button
+                  type="button"
+                  onClick={() => setVisibleCategories((c) => c + 3)}
+                  className="px-5 py-2.5 rounded-full text-sm font-semibold border border-gray-300 dark:border-white/10 text-gray-700 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400 hover:border-blue-400 transition-colors"
+                >
+                  Charger plus
+                </button>
+              </div>
+            )}
           </>
         )}
       </div>
