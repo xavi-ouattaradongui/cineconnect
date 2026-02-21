@@ -13,6 +13,8 @@ import {
   Swords,
   Sparkles,
   Camera,
+  Sun,
+  Moon,
 } from "lucide-react";
 
 const AVATAR_ICONS = {
@@ -44,9 +46,20 @@ const AVATAR_COLORS = {
 export default function Navbar({ onSearch }) {
   const [searchValue, setSearchValue] = useState("");
   const [isFocused, setIsFocused] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(false);
   const router = useRouter();
   const { location } = useRouterState();
   const { user } = useAuth();
+
+  useEffect(() => {
+    const storedTheme = localStorage.getItem("theme");
+    const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const shouldUseDark = storedTheme ? storedTheme === "dark" : prefersDark;
+    setIsDarkMode(shouldUseDark);
+    document.documentElement.classList.toggle("dark", shouldUseDark);
+    document.body.classList.toggle("dark", shouldUseDark);
+    document.getElementById("root")?.classList.toggle("dark", shouldUseDark);
+  }, []);
 
   // Synchronise l'input avec ?q UNIQUEMENT sur la page d'accueil
   useEffect(() => {
@@ -73,6 +86,17 @@ export default function Navbar({ onSearch }) {
     }
 
     if (onSearch) onSearch(value);
+  };
+
+  const toggleTheme = () => {
+    setIsDarkMode((prev) => {
+      const next = !prev;
+      document.documentElement.classList.toggle("dark", next);
+      document.body.classList.toggle("dark", next);
+      document.getElementById("root")?.classList.toggle("dark", next);
+      localStorage.setItem("theme", next ? "dark" : "light");
+      return next;
+    });
   };
 
   const getAvatarIcon = () => {
@@ -156,6 +180,15 @@ export default function Navbar({ onSearch }) {
 
         {/* SEARCH & PROFILE */}
         <div className="flex items-center gap-4">
+          <button
+            type="button"
+            onClick={toggleTheme}
+            className="inline-flex items-center justify-center w-9 h-9 rounded-full border border-gray-200 dark:border-white/10 bg-white/70 dark:bg-white/5 text-gray-700 dark:text-gray-200 hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
+            aria-label={isDarkMode ? "Passer en mode clair" : "Passer en mode sombre"}
+            title={isDarkMode ? "Mode clair" : "Mode sombre"}
+          >
+            {isDarkMode ? <Sun size={16} /> : <Moon size={16} />}
+          </button>
           {/* SEARCH */}
           <div className="hidden sm:flex items-center bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/5 rounded-full px-3 py-1.5 focus-within:ring-1 focus-within:ring-gray-300 dark:focus-within:ring-white/20 transition-all relative">
             <svg
