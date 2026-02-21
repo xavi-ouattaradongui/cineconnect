@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
-import { useRouterState } from "@tanstack/react-router";
+import { useNavigate, useRouterState } from "@tanstack/react-router";
 import Loader from "../components/Loader";
 import HeroSection from "../components/home/HeroSection";
 import CategoryFilters from "../components/home/CategoryFilters";
@@ -9,8 +9,8 @@ import { useSearchMovies, useMovie } from "../hooks/useMovies";
 import { useMyList } from "../contexts/MyListContext";
 
 export default function Home() {
-  const [selectedCategory, setSelectedCategory] = useState(null);
-  const [displayCount] = useState(6);
+  const displayCount = 6;
+  const navigate = useNavigate();
 
   const categories = [
     "Action",
@@ -19,6 +19,14 @@ export default function Home() {
     "Sci-Fi",
     "Aventure",
     "Romance",
+    "Thriller",
+    "Drame",
+    "Animation",
+    "Fantasy",
+    "Crime",
+    "Western",
+    "Documentaire",
+    "Mystere",
   ];
 
   // Hero logic
@@ -93,6 +101,14 @@ export default function Home() {
     return search.q || "";
   }, [location?.search]);
 
+  const handleCategorySelect = (category) => {
+    if (!category) {
+      navigate({ to: "/home" });
+      return;
+    }
+    navigate({ to: "/categorie/$category", params: { category } });
+  };
+
   return (
     <div className="w-full bg-white dark:bg-black">
       {/* HERO SECTION */}
@@ -109,40 +125,32 @@ export default function Home() {
       {!query && (
         <CategoryFilters
           categories={categories}
-          selectedCategory={selectedCategory}
-          onSelectCategory={setSelectedCategory}
+          selectedCategory={null}
+          onSelectCategory={handleCategorySelect}
         />
       )}
 
       {/* FILMS */}
       <div className="px-10 py-8">
-        {!selectedCategory && (
-          <h2 className="text-lg font-medium text-black dark:text-white tracking-tight border-b border-gray-200 dark:border-white/10 pb-4 mb-6">
-            {query ? `Résultats pour "${query}"` : "Tous les films"}
-          </h2>
-        )}
-
         {query ? (
           <SearchResults query={query} />
-        ) : selectedCategory ? (
-          <CategorySection
-            category={selectedCategory}
-            displayCount={displayCount}
-            onSelectCategory={setSelectedCategory}
-            isSelected={true}
-          />
         ) : (
-          <div className="space-y-8">
-            {categories.map((category) => (
-              <CategorySection
-                key={category}
-                category={category}
-                displayCount={displayCount}
-                onSelectCategory={setSelectedCategory}
-                isSelected={false}
-              />
-            ))}
-          </div>
+          <>
+            <h2 className="text-lg font-medium text-black dark:text-white tracking-tight border-b border-gray-200 dark:border-white/10 pb-4 mb-6">
+              {query ? `Résultats pour "${query}"` : "Tous les films"}
+            </h2>
+            <div className="space-y-8">
+              {categories.map((category) => (
+                <CategorySection
+                  key={category}
+                  category={category}
+                  displayCount={displayCount}
+                  onSelectCategory={handleCategorySelect}
+                  isSelected={false}
+                />
+              ))}
+            </div>
+          </>
         )}
       </div>
     </div>

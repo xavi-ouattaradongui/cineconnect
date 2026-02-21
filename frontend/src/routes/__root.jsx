@@ -10,6 +10,7 @@ import ProfileEdit from "../pages/ProfileEdit";
 import ProfileSecurity from "../pages/ProfileSecurity";
 import Login from "../pages/Login";
 import Register from "../pages/Register";
+import CategoryPage from "../pages/CategoryPage";
 
 // Root route
 export const rootRoute = new RootRoute({
@@ -37,6 +38,12 @@ export const homeRoute = new Route({
   getParentRoute: () => rootRoute,
   path: "/home",
   component: Home,
+});
+
+export const categoryRoute = new Route({
+  getParentRoute: () => rootRoute,
+  path: "categorie/$category",
+  component: CategoryPage,
 });
 
 export const filmRoute = new Route({
@@ -97,6 +104,7 @@ export const errorRoute = new Route({
 const routeTree = rootRoute.addChildren([
   loginRoute,
   homeRoute,
+  categoryRoute,
   filmRoute,
   favoritesRoute,
   myListRoute,

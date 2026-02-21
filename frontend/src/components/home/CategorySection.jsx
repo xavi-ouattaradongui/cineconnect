@@ -10,6 +10,14 @@ const categoryIcons = {
   "Sci-Fi": <Zap size={18} />,
   Aventure: <Shield size={18} />,
   Romance: <Heart size={18} />,
+  Thriller: <Zap size={18} />,
+  Drame: <Heart size={18} />,
+  Animation: <Smile size={18} />,
+  Fantasy: <Shield size={18} />,
+  Crime: <Shield size={18} />,
+  Western: <RotateCcw size={18} />,
+  Documentaire: <Smile size={18} />,
+  Mystere: <Ghost size={18} />,
 };
 
 export default function CategorySection({ category, displayCount, onSelectCategory, isSelected }) {
@@ -44,7 +52,7 @@ export default function CategorySection({ category, displayCount, onSelectCatego
             onClick={handleSeeMore}
             className="group flex items-center gap-1.5 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 transition-all"
           >
-            <span>Voir plus</span>
+            <span>Voir tout</span>
             <svg
               className="w-4 h-4 transition-transform group-hover:translate-x-1"
               fill="none"

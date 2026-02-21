@@ -7,6 +7,14 @@ const categoryIcons = {
   "Sci-Fi": <Zap size={18} />,
   Aventure: <Shield size={18} />,
   Romance: <Heart size={18} />,
+  Thriller: <Zap size={18} />,
+  Drame: <Heart size={18} />,
+  Animation: <Smile size={18} />,
+  Fantasy: <Shield size={18} />,
+  Crime: <Shield size={18} />,
+  Western: <RotateCcw size={18} />,
+  Documentaire: <Smile size={18} />,
+  Mystere: <Ghost size={18} />,
 };
 
 export default function CategoryFilters({ 
