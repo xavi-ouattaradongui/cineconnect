@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useRouter, useNavigate } from "@tanstack/react-router";
 import { Mail, Lock, Eye, EyeOff, User } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
+import ThemeToggle from "../components/ThemeToggle";
 
 export default function Login() {
   const [emailOrUsername, setEmailOrUsername] = useState("");
@@ -34,6 +35,11 @@ export default function Login() {
 
   return (
     <div className="min-h-screen bg-white dark:bg-black text-gray-900 dark:text-white flex items-center justify-center px-6 py-12">
+      {/* Bouton Theme Toggle */}
+      <div className="absolute top-6 right-6">
+        <ThemeToggle />
+      </div>
+
       <div className="w-full max-w-md space-y-8">
         {/* Header */}
         <div className="text-center space-y-2">

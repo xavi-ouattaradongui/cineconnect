@@ -1,4 +1,4 @@
-import { RootRoute, Route, createRouter, Outlet, useLocation } from "@tanstack/react-router";
+import { RootRoute, Route, createRouter, Outlet, useLocation, redirect } from "@tanstack/react-router";
 import Navbar from "../components/Navbar";
 import Home from "../pages/Home";
 import MovieDetails from "../pages/MovieDetails";
@@ -11,6 +11,28 @@ import ProfileSecurity from "../pages/ProfileSecurity";
 import Login from "../pages/Login";
 import Register from "../pages/Register";
 import CategoryPage from "../pages/CategoryPage";
+
+// Fonction pour vérifier l'authentification
+const requireAuth = () => {
+  const token = localStorage.getItem("token");
+  if (!token) {
+    throw redirect({
+      to: "/login",
+      replace: true,
+    });
+  }
+};
+
+// Fonction pour rediriger les utilisateurs authentifiés
+const redirectIfAuthenticated = () => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    throw redirect({
+      to: "/home",
+      replace: true,
+    });
+  }
+};
 
 // Root route
 export const rootRoute = new RootRoute({
@@ -27,71 +49,83 @@ export const rootRoute = new RootRoute({
   },
 });
 
-// Routes enfants
+// Routes PUBLIQUES (sans authentification)
 export const loginRoute = new Route({
   getParentRoute: () => rootRoute,
   path: "/",
   component: Login,
-});
-
-export const homeRoute = new Route({
-  getParentRoute: () => rootRoute,
-  path: "/home",
-  component: Home,
-});
-
-export const categoryRoute = new Route({
-  getParentRoute: () => rootRoute,
-  path: "categorie/$category",
-  component: CategoryPage,
-});
-
-export const filmRoute = new Route({
-  getParentRoute: () => rootRoute,
-  path: "film/$id",
-  component: MovieDetails,
-});
-
-export const favoritesRoute = new Route({
-  getParentRoute: () => rootRoute,
-  path: "favoris",
-  component: Favorites,
-});
-
-export const myListRoute = new Route({
-  getParentRoute: () => rootRoute,
-  path: "ma-liste",
-  component: MyList,
-});
-
-export const profileRoute = new Route({
-  getParentRoute: () => rootRoute,
-  path: "profil",
-  component: Profile,
-});
-
-export const profileEditRoute = new Route({
-  getParentRoute: () => rootRoute,
-  path: "profil/edition",
-  component: ProfileEdit,
-});
-
-export const profileSecurityRoute = new Route({
-  getParentRoute: () => rootRoute,
-  path: "profil/securite",
-  component: ProfileSecurity,
+  beforeLoad: redirectIfAuthenticated,
 });
 
 export const loginAltRoute = new Route({
   getParentRoute: () => rootRoute,
   path: "login",
   component: Login,
+  beforeLoad: redirectIfAuthenticated,
 });
 
 export const registerRoute = new Route({
   getParentRoute: () => rootRoute,
   path: "register",
   component: Register,
+  beforeLoad: redirectIfAuthenticated,
+});
+
+// Routes PRIVÉES (nécessitent authentification)
+export const homeRoute = new Route({
+  getParentRoute: () => rootRoute,
+  path: "/home",
+  component: Home,
+  beforeLoad: requireAuth,
+});
+
+export const categoryRoute = new Route({
+  getParentRoute: () => rootRoute,
+  path: "categorie/$category",
+  component: CategoryPage,
+  beforeLoad: requireAuth,
+});
+
+export const filmRoute = new Route({
+  getParentRoute: () => rootRoute,
+  path: "film/$id",
+  component: MovieDetails,
+  beforeLoad: requireAuth,
+});
+
+export const favoritesRoute = new Route({
+  getParentRoute: () => rootRoute,
+  path: "favoris",
+  component: Favorites,
+  beforeLoad: requireAuth,
+});
+
+export const myListRoute = new Route({
+  getParentRoute: () => rootRoute,
+  path: "ma-liste",
+  component: MyList,
+  beforeLoad: requireAuth,
+});
+
+export const profileRoute = new Route({
+  getParentRoute: () => rootRoute,
+  path: "profil",
+  component: Profile,
+  beforeLoad: requireAuth,
+});
+
+export const profileEditRoute = new Route({
+  getParentRoute: () => rootRoute,
+  path: "profil/edition",
+  component: ProfileEdit,
+  beforeLoad: requireAuth,
+});
+
+export const profileSecurityRoute = new Route({
+  getParentRoute: () => rootRoute,
+  path: "profil/securite",
+  component: ProfileSecurity,
+  beforeLoad: requireAuth,
 });
 
 export const errorRoute = new Route({
@@ -103,6 +137,8 @@ export const errorRoute = new Route({
 // Créer routeTree
 const routeTree = rootRoute.addChildren([
   loginRoute,
+  loginAltRoute,
+  registerRoute,
   homeRoute,
   categoryRoute,
   filmRoute,
@@ -111,8 +147,6 @@ const routeTree = rootRoute.addChildren([
   profileRoute,
   profileEditRoute,
   profileSecurityRoute,
-  loginAltRoute,
-  registerRoute,
   errorRoute,
 ]);
 
