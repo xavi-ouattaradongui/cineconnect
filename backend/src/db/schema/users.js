@@ -8,6 +8,8 @@ export const users = pgTable("users", {
   password: varchar("password", { length: 255 }).notNull(),
   displayName: varchar("display_name", { length: 100 }),
   avatar: varchar("avatar", { length: 255 }),
+  resetPasswordToken: varchar("reset_password_token", { length: 255 }),
+  resetPasswordExpires: timestamp("reset_password_expires"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 

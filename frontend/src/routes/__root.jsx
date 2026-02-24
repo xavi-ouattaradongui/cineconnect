@@ -11,6 +11,8 @@ import ProfileSecurity from "../pages/ProfileSecurity";
 import Login from "../pages/Login";
 import Register from "../pages/Register";
 import CategoryPage from "../pages/CategoryPage";
+import ForgotPassword from "../pages/ForgotPassword";
+import ResetPassword from "../pages/ResetPassword";
 
 // Fonction pour vérifier l'authentification
 const requireAuth = () => {
@@ -38,7 +40,7 @@ const redirectIfAuthenticated = () => {
 export const rootRoute = new RootRoute({
   component: () => {
     const location = useLocation();
-    const hideNavbar = location.pathname === "/" || location.pathname === "/login" || location.pathname === "/register";
+    const hideNavbar = location.pathname === "/" || location.pathname === "/login" || location.pathname === "/register" || location.pathname === "/forgot-password" || location.pathname === "/reset-password";
 
     return (
       <div>
@@ -68,6 +70,20 @@ export const registerRoute = new Route({
   getParentRoute: () => rootRoute,
   path: "register",
   component: Register,
+  beforeLoad: redirectIfAuthenticated,
+});
+
+export const forgotPasswordRoute = new Route({
+  getParentRoute: () => rootRoute,
+  path: "forgot-password",
+  component: ForgotPassword,
+  beforeLoad: redirectIfAuthenticated,
+});
+
+export const resetPasswordRoute = new Route({
+  getParentRoute: () => rootRoute,
+  path: "reset-password",
+  component: ResetPassword,
   beforeLoad: redirectIfAuthenticated,
 });
 
@@ -139,6 +155,8 @@ const routeTree = rootRoute.addChildren([
   loginRoute,
   loginAltRoute,
   registerRoute,
+  forgotPasswordRoute,
+  resetPasswordRoute,
   homeRoute,
   categoryRoute,
   filmRoute,

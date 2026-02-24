@@ -123,7 +123,7 @@ export default function Login() {
               <span className="text-gray-600 dark:text-gray-400">Se souvenir de moi</span>
             </label>
             <Link
-              to="#"
+              to="/forgot-password"
               className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 transition"
             >
               Mot de passe oublié?
