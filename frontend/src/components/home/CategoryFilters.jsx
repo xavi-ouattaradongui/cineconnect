@@ -25,7 +25,6 @@ export default function CategoryFilters({
 }) {
   const [showMore, setShowMore] = useState(false);
 
-  // Trouver l'index de "Fantasy" pour limiter l'affichage
   const fantasyIndex = categories.findIndex(cat => cat === "Fantasy");
   const visibleCategories = fantasyIndex !== -1 
     ? categories.slice(0, fantasyIndex + 1) 
@@ -36,7 +35,7 @@ export default function CategoryFilters({
 
   const buttonClass = (isSelected) => `whitespace-nowrap flex items-center gap-2 px-4 py-2 rounded-full font-semibold transition-all text-sm shrink-0 ${
     isSelected
-      ? "bg-gradient-to-r from-indigo-600 to-indigo-500 text-white border border-indigo-600 shadow-lg"
+      ? "bg-black text-white dark:bg-white dark:text-black border border-black dark:border-white shadow-lg"
       : "bg-gray-100 dark:bg-white/5 border border-gray-300 dark:border-white/10 text-gray-600 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 hover:bg-gray-200 dark:hover:bg-white/10"
   }`;
 

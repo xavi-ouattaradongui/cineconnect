@@ -22,26 +22,24 @@ const categoryIcons = {
   Mystere: <Ghost size={18} />,
 };
 
-export default function CategorySection({ category, displayCount, onSelectCategory, isSelected }) {
+export default function CategorySection({ category, displayCount, onSelectCategory, onSeeMore, isSelected }) {
   const searchTerms = useMemo(
     () => getCategorySearchTerms(category),
     [category]
   );
   const { data, isLoading } = useSearchMoviesMultiTerms(searchTerms, 1);
   
-  // Si la catégorie est sélectionnée, afficher TOUS les films, sinon limiter à displayCount
-  const movies = isSelected 
-    ? (data?.Search || [])
-    : (data?.Search || []).slice(0, displayCount);
+  // Toujours afficher displayCount films
+  const movies = (data?.Search || []).slice(0, displayCount);
 
   if (isLoading) return <Loader />;
   if (movies.length === 0) return null;
 
-  // Le bouton "Voir plus" ne s'affiche que s'il y a plus de films que displayCount ET que la catégorie n'est pas sélectionnée
-  const hasMoreMovies = !isSelected && (data?.Search || []).length > displayCount;
+  // Le bouton "Voir plus" s'affiche s'il y a plus de films que displayCount
+  const hasMoreMovies = (data?.Search || []).length > displayCount;
 
   const handleSeeMore = () => {
-    onSelectCategory(category);
+    onSeeMore(category);
   };
 
   return (

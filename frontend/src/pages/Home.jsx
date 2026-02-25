@@ -13,6 +13,7 @@ export default function Home() {
   const displayCount = 6;
   const navigate = useNavigate();
   const [visibleCategories, setVisibleCategories] = useState(3);
+  const [selectedCategory, setSelectedCategory] = useState(null);
 
   const { data: categories = [], isLoading: isCategoriesLoading } = useCategories();
 
@@ -92,10 +93,10 @@ export default function Home() {
   }, [location?.search]);
 
   const handleCategorySelect = (category) => {
-    if (!category) {
-      navigate({ to: "/home" });
-      return;
-    }
+    setSelectedCategory(category);
+  };
+
+  const handleSeeMore = (category) => {
     navigate({ to: "/categorie/$category", params: { category } });
   };
 
@@ -121,7 +122,7 @@ export default function Home() {
           {!query && (
             <CategoryFilters
               categories={categories}
-              selectedCategory={null}
+              selectedCategory={selectedCategory}
               onSelectCategory={handleCategorySelect}
             />
           )}
@@ -133,20 +134,32 @@ export default function Home() {
             ) : (
               <>
                 <h2 className="text-lg font-medium text-black dark:text-white tracking-tight border-b border-gray-200 dark:border-white/10 pb-4 mb-6">
-                  {query ? `Résultats pour "${query}"` : "Tous les films"}
+                  {selectedCategory ? `${selectedCategory}` : "Tous les films"}
                 </h2>
                 <div className="space-y-8">
-                  {categories.slice(0, visibleCategories).map((category) => (
+                  {selectedCategory ? (
                     <CategorySection
-                      key={category}
-                      category={category}
+                      key={selectedCategory}
+                      category={selectedCategory}
                       displayCount={displayCount}
                       onSelectCategory={handleCategorySelect}
-                      isSelected={false}
+                      onSeeMore={handleSeeMore}
+                      isSelected={true}
                     />
-                  ))}
+                  ) : (
+                    categories.slice(0, visibleCategories).map((category) => (
+                      <CategorySection
+                        key={category}
+                        category={category}
+                        displayCount={displayCount}
+                        onSelectCategory={handleCategorySelect}
+                        onSeeMore={handleSeeMore}
+                        isSelected={false}
+                      />
+                    ))
+                  )}
                 </div>
-                {visibleCategories < categories.length && (
+                {!selectedCategory && visibleCategories < categories.length && (
                   <div className="flex justify-center mt-8">
                     <button
                       type="button"
