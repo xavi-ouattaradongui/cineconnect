@@ -1,6 +1,7 @@
 import { Link, useRouter, useRouterState } from "@tanstack/react-router";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSearchMovies } from "../hooks/useMovies";
+import { useCategories } from "../hooks/useCategories";
 import { useAuth } from "../contexts/AuthContext";
 import {
   Skull,
@@ -15,6 +16,7 @@ import {
   Camera,
   Sun,
   Moon,
+  ChevronDown,
 } from "lucide-react";
 
 const AVATAR_ICONS = {
@@ -47,9 +49,22 @@ export default function Navbar({ onSearch }) {
   const [searchValue, setSearchValue] = useState("");
   const [isFocused, setIsFocused] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [showCategories, setShowCategories] = useState(false);
+  const categoriesRef = useRef(null);
   const router = useRouter();
   const { location } = useRouterState();
   const { user } = useAuth();
+  const { data: categories = [] } = useCategories();
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (categoriesRef.current && !categoriesRef.current.contains(event.target)) {
+        setShowCategories(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   useEffect(() => {
     const storedTheme = localStorage.getItem("theme");
@@ -169,12 +184,40 @@ export default function Navbar({ onSearch }) {
             >
               Découvrir
             </Link>
+            
             <Link
               to="/ma-liste"
               className="text-gray-600 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
             >
               Ma Liste
             </Link>
+            
+            {/* Dropdown Catégorie */}
+            <div className="relative" ref={categoriesRef}>
+              <button
+                onClick={() => setShowCategories(!showCategories)}
+                className="text-gray-600 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 transition-colors flex items-center gap-1"
+              >
+                Catégorie
+                <ChevronDown size={14} className={`transition-transform ${showCategories ? 'rotate-180' : ''}`} />
+              </button>
+              
+              {showCategories && (
+                <div className="absolute top-full left-0 mt-2 w-48 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-white/10 rounded-lg shadow-xl overflow-hidden z-50">
+                  {categories.map((category) => (
+                    <Link
+                      key={category}
+                      to="/categorie/$category"
+                      params={{ category }}
+                      onClick={() => setShowCategories(false)}
+                      className="block px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"
+                    >
+                      {category}
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
