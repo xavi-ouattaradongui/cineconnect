@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Plus, Check, Heart } from "lucide-react";
-import { useMovie } from "../hooks/useMovies";
-import { useFavorites } from "../contexts/FavoritesContext";
-import { useMyList } from "../contexts/MyListContext";
+import { useMovie } from "../../hooks/useMovies";
+import { useFavorites } from "../../contexts/FavoritesContext";
+import { useMyList } from "../../contexts/MyListContext";
 
 export default function MovieCard({ movie }) {
   const { addFavorite, removeFavorite, isFavorite } = useFavorites();

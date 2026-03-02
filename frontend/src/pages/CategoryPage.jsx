@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "@tanstack/react-router";
-import Loader from "../components/Loader";
-import MovieCard from "../components/MovieCard";
+import Loader from "../components/shared/Loader";
+import MovieCard from "../components/shared/MovieCard";
 import { useSearchMoviesMultiTerms } from "../hooks/useMovies";
 import { getCategorySearchTerms } from "../utils/categorySearch";
 

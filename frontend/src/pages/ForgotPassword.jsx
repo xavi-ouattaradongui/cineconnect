@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { api } from "../services/api";
-import Loader from "../components/Loader";
-import ThemeToggle from "../components/ThemeToggle";
+import Loader from "../components/shared/Loader";
+import ThemeToggle from "../components/shared/ThemeToggle";
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");

@@ -1,6 +1,6 @@
 import { useSearchMovies } from "../../hooks/useMovies";
-import MovieCard from "../MovieCard";
-import Loader from "../Loader";
+import MovieCard from "../shared/MovieCard";
+import Loader from "../shared/Loader";
 
 export default function SearchResults({ query }) {
   const { data, isLoading } = useSearchMovies(query);

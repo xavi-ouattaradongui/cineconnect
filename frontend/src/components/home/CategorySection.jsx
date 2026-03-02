@@ -1,8 +1,8 @@
 import { useMemo } from "react";
 import { RotateCcw, Smile, Ghost, Zap, Shield, Heart } from "lucide-react";
 import { useSearchMoviesMultiTerms } from "../../hooks/useMovies";
-import MovieCard from "../MovieCard";
-import Loader from "../Loader";
+import MovieCard from "../shared/MovieCard";
+import Loader from "../shared/Loader";
 import { getCategorySearchTerms } from "../../utils/categorySearch";
 
 const categoryIcons = {

@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import MovieCard from "../MovieCard";
+import MovieCard from "../shared/MovieCard";
 
 export default function ProfileSection({ 
   title, 

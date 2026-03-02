@@ -7,7 +7,7 @@ import { useReviews } from "../hooks/useReviews";
 import { useFavorites } from "../contexts/FavoritesContext";
 import { useMyList } from "../contexts/MyListContext";
 import { useAuth } from "../contexts/AuthContext";
-import Loader from "../components/Loader";
+import Loader from "../components/shared/Loader";
 import MovieHero from "../components/movie/MovieHero";
 import MovieInfo from "../components/movie/MovieInfo";
 import MovieReviews from "../components/movie/MovieReviews";

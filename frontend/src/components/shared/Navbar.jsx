@@ -1,8 +1,8 @@
 import { Link, useRouter, useRouterState } from "@tanstack/react-router";
 import { useState, useEffect, useRef } from "react";
-import { useSearchMovies } from "../hooks/useMovies";
-import { useCategories } from "../hooks/useCategories";
-import { useAuth } from "../contexts/AuthContext";
+import { useSearchMovies } from "../../hooks/useMovies";
+import { useCategories } from "../../hooks/useCategories";
+import { useAuth } from "../../contexts/AuthContext";
 import {
   Skull,
   Ghost,

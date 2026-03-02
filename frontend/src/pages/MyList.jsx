@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { List } from "lucide-react";
 import { useMyList } from "../contexts/MyListContext";
-import MovieCard from "../components/MovieCard";
+import MovieCard from "../components/shared/MovieCard";
 
 export default function MyList() {
   const { myList, loading, refresh } = useMyList();

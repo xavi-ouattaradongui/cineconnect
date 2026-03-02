@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 import { Heart } from "lucide-react";
 import { useFavorites } from "../contexts/FavoritesContext";
-import MovieCard from "../components/MovieCard";
-import Loader from "../components/Loader";
+import MovieCard from "../components/shared/MovieCard";
+import Loader from "../components/shared/Loader";
 
 export default function Favorites() {
   const { favorites, loading, refresh } = useFavorites();

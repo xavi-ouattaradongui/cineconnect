@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useRouter } from "@tanstack/react-router";
 import { Mail, Lock, User, Eye, EyeOff } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
-import ThemeToggle from "../components/ThemeToggle";
+import ThemeToggle from "../components/shared/ThemeToggle";
 
 export default function Register() {
   const [displayName, setDisplayName] = useState("");

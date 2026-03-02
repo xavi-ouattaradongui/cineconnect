@@ -1,5 +1,5 @@
 import { RootRoute, Route, createRouter, Outlet, useLocation, redirect } from "@tanstack/react-router";
-import Navbar from "../components/Navbar";
+import Navbar from "../components/shared/Navbar";
 import Home from "../pages/Home";
 import MovieDetails from "../pages/MovieDetails";
 import ErrorPage from "../pages/ErrorPage";

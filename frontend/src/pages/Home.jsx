@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
-import Loader from "../components/Loader";
+import Loader from "../components/shared/Loader";
 import HeroSection from "../components/home/HeroSection";
 import CategoryFilters from "../components/home/CategoryFilters";
 import CategorySection from "../components/home/CategorySection";

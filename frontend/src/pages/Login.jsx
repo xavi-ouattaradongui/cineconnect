@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useRouter, useNavigate } from "@tanstack/react-router";
 import { Mail, Lock, Eye, EyeOff, User } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
-import ThemeToggle from "../components/ThemeToggle";
+import ThemeToggle from "../components/shared/ThemeToggle";
 
 export default function Login() {
   const [emailOrUsername, setEmailOrUsername] = useState("");
