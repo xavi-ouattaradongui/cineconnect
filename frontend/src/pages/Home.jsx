@@ -1,11 +1,14 @@
 import { useState, useMemo, useEffect } from "react";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
 import Loader from "../components/shared/Loader";
+import MovieCard from "../components/shared/MovieCard";
 import HeroSection from "../components/home/HeroSection";
+import HomeSections from "../components/home/HomeSections";
 import CategoryFilters from "../components/home/CategoryFilters";
 import CategorySection from "../components/home/CategorySection";
 import SearchResults from "../components/home/SearchResults";
 import { useSearchMovies, useMovie } from "../hooks/useMovies";
+import { useSectionMovies } from "../hooks/useSectionMovies";
 import { useCategories } from "../hooks/useCategories";
 import { useMyList } from "../contexts/MyListContext";
 
@@ -14,8 +17,13 @@ export default function Home() {
   const navigate = useNavigate();
   const [visibleCategories, setVisibleCategories] = useState(3);
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const [selectedSection, setSelectedSection] = useState(null);
 
   const { data: categories = [], isLoading: isCategoriesLoading } = useCategories();
+
+  // Fetch movies for selected section
+  const { data: sectionMoviesData, isLoading: isSectionMoviesLoading } =
+    useSectionMovies(selectedSection);
 
   // Hero logic
   const heroQuery = useMemo(
@@ -100,6 +108,23 @@ export default function Home() {
     navigate({ to: "/categorie/$category", params: { category } });
   };
 
+  const getSectionTitle = (section) => {
+    const titles = {
+      trending: "Tendances",
+      new: "Nouveautés",
+      popular: "Les plus vus",
+      recommended: "Recommandés pour toi",
+      family: "Films familiaux",
+      top10: "Top 10",
+      mostLiked: "Les plus aimés",
+      discover: "À découvrir",
+      random: "Suggestion aléatoire",
+      international: "Cinéma international",
+      actionNonStop: "Action non-stop",
+    };
+    return titles[section] || "";
+  };
+
   return (
     <div className="w-full bg-white dark:bg-black">
       {isCategoriesLoading ? (
@@ -118,8 +143,16 @@ export default function Home() {
             />
           )}
 
-          {/* CATEGORIES */}
+          {/* HOME SECTIONS */}
           {!query && (
+            <HomeSections
+              selectedSection={selectedSection}
+              onSelectSection={setSelectedSection}
+            />
+          )}
+
+          {/* CATEGORIES */}
+          {!query && !selectedSection && (
             <CategoryFilters
               categories={categories}
               selectedCategory={selectedCategory}
@@ -131,6 +164,32 @@ export default function Home() {
           <div className="px-10 py-8">
             {query ? (
               <SearchResults query={query} />
+            ) : selectedSection ? (
+              // Show section movies
+              <>
+                <div className="flex items-center gap-4 mb-6">
+                  <button
+                    onClick={() => setSelectedSection(null)}
+                    className="px-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors text-sm font-medium text-gray-700 dark:text-gray-300"
+                  >
+                    ← Retour
+                  </button>
+                  <h2 className="text-lg font-medium text-black dark:text-white tracking-tight border-b border-gray-200 dark:border-white/10 pb-4 flex-1">
+                    {getSectionTitle(selectedSection)}
+                  </h2>
+                </div>
+                {isSectionMoviesLoading ? (
+                  <Loader />
+                ) : (
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
+                    {sectionMoviesData?.Search?.slice(0, 24)?.map(
+                      (movie) => (
+                        <MovieCard key={movie.imdbID} movie={movie} />
+                      )
+                    )}
+                  </div>
+                )}
+              </>
             ) : (
               <>
                 <h2 className="text-lg font-medium text-black dark:text-white tracking-tight border-b border-gray-200 dark:border-white/10 pb-4 mb-6">
