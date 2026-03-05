@@ -16,8 +16,18 @@ import {
 const sections = [
   {
     id: "trending",
-    label: "Tendances",
+    label: "On pense que vous allez adorer",
     icon: <TrendingUp size={20} />,
+  },
+  {
+    id: "recommended",
+    label: "Trouvez votre prochain coup de cœur",
+    icon: <Heart size={20} />,
+  },
+  {
+    id: "discover",
+    label: "Pépites pour vous",
+    icon: <Compass size={20} />,
   },
   {
     id: "new",
@@ -26,48 +36,58 @@ const sections = [
   },
   {
     id: "popular",
-    label: "Les plus vus",
+    label: "Grands succès",
     icon: <Eye size={20} />,
   },
   {
-    id: "recommended",
-    label: "Recommandés pour toi",
-    icon: <Heart size={20} />,
-  },
-  {
-    id: "family",
-    label: "Films familiaux",
-    icon: <Film size={20} />,
-  },
-  {
-    id: "top10",
-    label: "Top 10",
+    id: "mustWatch",
+    label: "À ne pas manquer",
     icon: <Trophy size={20} />,
   },
   {
-    id: "mostLiked",
-    label: "Les plus aimés",
+    id: "actionNonStop",
+    label: "Films d'action",
+    icon: <Zap size={20} />,
+  },
+  {
+    id: "comedy",
+    label: "Comédies",
     icon: <ThumbsUp size={20} />,
   },
   {
-    id: "discover",
-    label: "À découvrir",
-    icon: <Compass size={20} />,
-  },
-  {
-    id: "random",
-    label: "Suggestion aléatoire",
+    id: "thriller",
+    label: "Thrillers",
     icon: <Shuffle size={20} />,
   },
   {
-    id: "international",
-    label: "Cinéma international",
+    id: "sciFi",
+    label: "Films de science-fiction",
+    icon: <Film size={20} />,
+  },
+  {
+    id: "futuristicSciFi",
+    label: "SF futuriste",
+    icon: <Zap size={20} />,
+  },
+  {
+    id: "alienSciFi",
+    label: "Aliens et science-fiction",
     icon: <Globe size={20} />,
   },
   {
-    id: "actionNonStop",
-    label: "Action non-stop",
-    icon: <Zap size={20} />,
+    id: "international",
+    label: "Films internationaux",
+    icon: <Globe size={20} />,
+  },
+  {
+    id: "anime",
+    label: "Anime japonais",
+    icon: <Film size={20} />,
+  },
+  {
+    id: "family",
+    label: "À voir en famille",
+    icon: <Heart size={20} />,
   },
 ];
 

@@ -79,10 +79,10 @@ export const useSectionMovies = (section) => {
         return data;
       },
     },
-    top10: {
+    mustWatch: {
       enabled: true,
       queryFn: async () => {
-        const topTerms = [
+        const mustWatchTerms = [
           "masterpiece",
           "award",
           "best film",
@@ -90,22 +90,22 @@ export const useSectionMovies = (section) => {
           "godfather",
           "pulp fiction",
         ];
-        const data = await searchMoviesMultiTerms(topTerms, 1);
+        const data = await searchMoviesMultiTerms(mustWatchTerms, 1);
         return data;
       },
     },
-    mostLiked: {
+    comedy: {
       enabled: true,
       queryFn: async () => {
-        const mostLikedTerms = [
-          "romance",
-          "love",
-          "heartwarming",
+        const comedyTerms = [
+          "comedy",
+          "funny",
+          "laugh",
           "romantic comedy",
+          "sitcom",
           "feel good",
-          "beloved",
         ];
-        const data = await searchMoviesMultiTerms(mostLikedTerms, 1);
+        const data = await searchMoviesMultiTerms(comedyTerms, 1);
         return data;
       },
     },
@@ -124,18 +124,63 @@ export const useSectionMovies = (section) => {
         return data;
       },
     },
-    random: {
+    thriller: {
       enabled: true,
       queryFn: async () => {
-        const randomTerms = [
-          "adventure",
-          "comedy",
-          "horror",
-          "sci-fi",
-          "western",
-          "musical",
+        const thrillerTerms = [
+          "thriller",
+          "suspense",
+          "murder mystery",
+          "psychological thriller",
+          "crime thriller",
+          "noir",
         ];
-        const data = await searchMoviesMultiTerms(randomTerms, 1);
+        const data = await searchMoviesMultiTerms(thrillerTerms, 1);
+        return data;
+      },
+    },
+    sciFi: {
+      enabled: true,
+      queryFn: async () => {
+        const sciFiTerms = [
+          "sci-fi",
+          "science fiction",
+          "space",
+          "future",
+          "cyberpunk",
+          "dystopia",
+        ];
+        const data = await searchMoviesMultiTerms(sciFiTerms, 1);
+        return data;
+      },
+    },
+    futuristicSciFi: {
+      enabled: true,
+      queryFn: async () => {
+        const futuristicSciFiTerms = [
+          "future city",
+          "cyberpunk",
+          "ai",
+          "android",
+          "time travel",
+          "utopia",
+        ];
+        const data = await searchMoviesMultiTerms(futuristicSciFiTerms, 1);
+        return data;
+      },
+    },
+    alienSciFi: {
+      enabled: true,
+      queryFn: async () => {
+        const alienSciFiTerms = [
+          "alien",
+          "extraterrestrial",
+          "ufo",
+          "space invasion",
+          "contact",
+          "xenomorph",
+        ];
+        const data = await searchMoviesMultiTerms(alienSciFiTerms, 1);
         return data;
       },
     },
@@ -151,6 +196,21 @@ export const useSectionMovies = (section) => {
           "japanese",
         ];
         const data = await searchMoviesMultiTerms(internationalTerms, 1);
+        return data;
+      },
+    },
+    anime: {
+      enabled: true,
+      queryFn: async () => {
+        const animeTerms = [
+          "anime",
+          "studio ghibli",
+          "japanese animation",
+          "shonen",
+          "manga adaptation",
+          "otaku",
+        ];
+        const data = await searchMoviesMultiTerms(animeTerms, 1);
         return data;
       },
     },

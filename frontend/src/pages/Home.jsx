@@ -1,23 +1,17 @@
-import { useState, useMemo, useEffect } from "react";
-import { useNavigate, useRouterState } from "@tanstack/react-router";
+import { useState, useMemo } from "react";
+import { useRouterState } from "@tanstack/react-router";
 import Loader from "../components/shared/Loader";
 import MovieCard from "../components/shared/MovieCard";
 import HeroSection from "../components/home/HeroSection";
 import ExploreSection from "../components/home/ExploreSection";
-import CategoryFilters from "../components/home/CategoryFilters";
-import CategorySection from "../components/home/CategorySection";
+import ExploreItemSection from "../components/home/ExploreItemSection";
 import SearchResults from "../components/home/SearchResults";
 import { useSearchMovies, useMovie } from "../hooks/useMovies";
 import { useSectionMovies } from "../hooks/useSectionMovies";
 import { useCategories } from "../hooks/useCategories";
 import { useMyList } from "../contexts/MyListContext";
-import { getCategoryDisplayName } from "../utils/categoryNames";
 
 export default function Home() {
-  const displayCount = 15;
-  const navigate = useNavigate();
-  const [visibleCategories, setVisibleCategories] = useState(3);
-  const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedSection, setSelectedSection] = useState(null);
 
   const { data: categories = [], isLoading: isCategoriesLoading } = useCategories();
@@ -27,53 +21,28 @@ export default function Home() {
     useSectionMovies(selectedSection);
 
   // Hero logic
+  const heroCategories = ["Action", "Comédie", "Horreur", "Animation", "Crime"];
   const heroQuery = useMemo(
     () => {
-      if (!categories || categories.length === 0) return null;
-      return categories[Math.floor(Math.random() * categories.length)];
+      const availableHeroCategories = heroCategories.filter((category) =>
+        categories.includes(category)
+      );
+      const source =
+        availableHeroCategories.length > 0 ? availableHeroCategories : heroCategories;
+      return source[Math.floor(Math.random() * source.length)];
     },
     [categories]
   );
-  const { data: heroData } = useSearchMovies(heroQuery);
+  const { data: heroData, isLoading: isHeroMoviesLoading } = useSearchMovies(heroQuery);
   const heroMovies = heroData?.Search || [];
-
-  const [heroBestId, setHeroBestId] = useState(null);
-  const [heroPicking, setHeroPicking] = useState(false);
-
-  useEffect(() => {
-    let cancelled = false;
-    const pickBest = async () => {
-      if (!heroMovies.length) return;
-      setHeroPicking(true);
-      const candidates = heroMovies.slice(0, 6);
-      const results = await Promise.all(
-        candidates.map(async (m) => {
-          try {
-            const res = await fetch(
-              `https://www.omdbapi.com/?apikey=${import.meta.env.VITE_OMDB_API_KEY}&i=${m.imdbID}`
-            );
-            const data = await res.json();
-            const rating = parseFloat(data.imdbRating) || 0;
-            return { movie: m, rating };
-          } catch {
-            return { movie: m, rating: 0 };
-          }
-        })
-      );
-      if (cancelled || results.length === 0) return;
-      const best = results.reduce((best, cur) =>
-        cur.rating > best.rating ? cur : best
-      );
-      setHeroBestId(best.movie.imdbID);
-      setHeroPicking(false);
-    };
-    pickBest();
-    return () => {
-      cancelled = true;
-    };
+  const heroRandomId = useMemo(() => {
+    if (!heroMovies.length) return null;
+    const randomMovie = heroMovies[Math.floor(Math.random() * heroMovies.length)];
+    return randomMovie?.imdbID || null;
   }, [heroMovies]);
 
-  const { data: fullMovie } = useMovie(heroBestId);
+  const { data: fullMovie, isLoading: isHeroMovieLoading } = useMovie(heroRandomId);
+  const heroPicking = isHeroMoviesLoading || isHeroMovieLoading;
   const { addToList, removeFromList, isInList } = useMyList();
 
   const handleHeroListClick = () => {
@@ -101,27 +70,23 @@ export default function Home() {
     return search.q || "";
   }, [location?.search]);
 
-  const handleCategorySelect = (category) => {
-    setSelectedCategory(category);
-  };
-
-  const handleSeeMore = (category) => {
-    navigate({ to: "/categorie/$category", params: { category } });
-  };
-
   const getSectionTitle = (section) => {
     const titles = {
-      trending: "Tendances",
+      trending: "On pense que vous allez adorer",
+      recommended: "Trouvez votre prochain coup de cœur",
+      discover: "Pépites pour vous",
       new: "Nouveautés",
-      popular: "Les plus vus",
-      recommended: "Recommandés pour toi",
-      family: "Films familiaux",
-      top10: "Top 10",
-      mostLiked: "Les plus aimés",
-      discover: "À découvrir",
-      random: "Suggestion aléatoire",
-      international: "Cinéma international",
-      actionNonStop: "Action non-stop",
+      popular: "Grands succès",
+      mustWatch: "À ne pas manquer",
+      actionNonStop: "Films d'action",
+      comedy: "Comédies",
+      thriller: "Thrillers",
+      sciFi: "Films de science-fiction",
+      futuristicSciFi: "SF futuriste",
+      alienSciFi: "Aliens et science-fiction",
+      international: "Films internationaux",
+      anime: "Anime japonais",
+      family: "À voir en famille",
     };
     return titles[section] || "";
   };
@@ -149,15 +114,6 @@ export default function Home() {
             <ExploreSection
               selectedSection={selectedSection}
               onSelectSection={setSelectedSection}
-            />
-          )}
-
-          {/* CATEGORIES */}
-          {!query && !selectedSection && (
-            <CategoryFilters
-              categories={categories}
-              selectedCategory={selectedCategory}
-              onSelectCategory={handleCategorySelect}
             />
           )}
 
@@ -193,43 +149,18 @@ export default function Home() {
               </>
             ) : (
               <>
-                <h2 className="text-lg font-medium text-black dark:text-white tracking-tight border-b border-gray-200 dark:border-white/10 pb-4 mb-6">
-                  {selectedCategory ? getCategoryDisplayName(selectedCategory) : "Tous les films"}
+                <h2 className="text-sm font-medium uppercase tracking-widest text-gray-600 dark:text-gray-400 mb-4">
+                  Explorez nos collections
                 </h2>
                 <div className="space-y-8">
-                  {selectedCategory ? (
-                    <CategorySection
-                      key={selectedCategory}
-                      category={selectedCategory}
-                      displayCount={displayCount}
-                      onSelectCategory={handleCategorySelect}
-                      onSeeMore={handleSeeMore}
-                      isSelected={true}
+                  {['trending', 'recommended', 'discover', 'new', 'popular', 'mustWatch', 'actionNonStop', 'comedy', 'thriller', 'sciFi', 'futuristicSciFi', 'alienSciFi', 'international', 'anime', 'family'].map((section) => (
+                    <ExploreItemSection
+                      key={section}
+                      section={section}
+                      displayCount={15}
                     />
-                  ) : (
-                    categories.slice(0, visibleCategories).map((category) => (
-                      <CategorySection
-                        key={category}
-                        category={category}
-                        displayCount={displayCount}
-                        onSelectCategory={handleCategorySelect}
-                        onSeeMore={handleSeeMore}
-                        isSelected={false}
-                      />
-                    ))
-                  )}
+                  ))}
                 </div>
-                {!selectedCategory && visibleCategories < categories.length && (
-                  <div className="flex justify-center mt-8">
-                    <button
-                      type="button"
-                      onClick={() => setVisibleCategories((c) => c + 3)}
-                      className="px-5 py-2.5 rounded-full text-sm font-semibold border border-gray-300 dark:border-white/10 text-gray-700 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400 hover:border-blue-400 transition-colors"
-                    >
-                      Charger plus
-                    </button>
-                  </div>
-                )}
               </>
             )}
           </div>

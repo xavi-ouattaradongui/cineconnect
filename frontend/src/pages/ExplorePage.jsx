@@ -5,17 +5,21 @@ import MovieCard from "../components/shared/MovieCard";
 import { useSectionMovies } from "../hooks/useSectionMovies";
 
 const sectionTitles = {
-  trending: "Tendances",
+  trending: "On pense que vous allez adorer",
+  recommended: "Trouvez votre prochain coup de cœur",
+  discover: "Pépites pour vous",
   new: "Nouveautés",
-  popular: "Les plus vus",
-  recommended: "Recommandés pour toi",
-  family: "Films familiaux",
-  top10: "Top 10",
-  mostLiked: "Les plus aimés",
-  discover: "À découvrir",
-  random: "Suggestion aléatoire",
-  international: "Cinéma international",
-  actionNonStop: "Action non-stop",
+  popular: "Grands succès",
+  mustWatch: "À ne pas manquer",
+  actionNonStop: "Films d'action",
+  comedy: "Comédies",
+  thriller: "Thrillers",
+  sciFi: "Films de science-fiction",
+  futuristicSciFi: "SF futuriste",
+  alienSciFi: "Aliens et science-fiction",
+  international: "Films internationaux",
+  anime: "Anime japonais",
+  family: "À voir en famille",
 };
 
 export default function ExplorePage() {
