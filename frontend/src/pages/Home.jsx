@@ -21,7 +21,7 @@ export default function Home() {
     useSectionMovies(selectedSection);
 
   // Hero logic
-  const heroCategories = ["Action", "Comédie", "Horreur", "Animation", "Crime"];
+  const heroCategories = ["Action", "Comédie", "Animation", "Crime"];
   const heroQuery = useMemo(
     () => {
       const availableHeroCategories = heroCategories.filter((category) =>
