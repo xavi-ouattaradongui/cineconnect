@@ -1,9 +1,10 @@
-import { useMemo } from "react";
-import { RotateCcw, Smile, Ghost, Zap, Shield, Heart } from "lucide-react";
+import { useMemo, useRef, useState } from "react";
+import { RotateCcw, Smile, Ghost, Zap, Shield, Heart, ChevronLeft, ChevronRight } from "lucide-react";
 import { useSearchMoviesMultiTerms } from "../../hooks/useMovies";
 import MovieCard from "../shared/MovieCard";
 import Loader from "../shared/Loader";
 import { getCategorySearchTerms } from "../../utils/categorySearch";
+import { getCategoryDisplayName } from "../../utils/categoryNames";
 
 const categoryIcons = {
   Action: <RotateCcw size={18} />,
@@ -29,6 +30,10 @@ export default function CategorySection({ category, displayCount, onSelectCatego
   );
   const { data, isLoading } = useSearchMoviesMultiTerms(searchTerms, 1);
   
+  const scrollContainerRef = useRef(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
+  
   // Toujours afficher displayCount films
   const movies = (data?.Search || []).slice(0, displayCount);
 
@@ -42,12 +47,34 @@ export default function CategorySection({ category, displayCount, onSelectCatego
     onSeeMore(category);
   };
 
+  const checkScrollButtons = () => {
+    const container = scrollContainerRef.current;
+    if (container) {
+      setCanScrollLeft(container.scrollLeft > 0);
+      setCanScrollRight(
+        container.scrollLeft < container.scrollWidth - container.clientWidth - 10
+      );
+    }
+  };
+
+  const scroll = (direction) => {
+    const container = scrollContainerRef.current;
+    if (container) {
+      const scrollAmount = container.clientWidth * 0.8;
+      container.scrollBy({
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth'
+      });
+      setTimeout(checkScrollButtons, 300);
+    }
+  };
+
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-xl font-bold flex items-center gap-2 text-black dark:text-white">
           {categoryIcons[category]}
-          {category}
+          {getCategoryDisplayName(category)}
         </h3>
 
         {/* Le bouton "Voir plus" ne s'affiche que s'il y a plus de films ET que la catégorie n'est pas sélectionnée */}
@@ -69,10 +96,42 @@ export default function CategorySection({ category, displayCount, onSelectCatego
         )}
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
-        {movies.map((m) => (
-          <MovieCard key={m.imdbID} movie={m} />
-        ))}
+      <div className="relative group/carousel">
+        {/* Bouton gauche */}
+        {canScrollLeft && (
+          <button
+            onClick={() => scroll('left')}
+            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-black/70 hover:bg-black/90 text-white p-2 rounded-full opacity-0 group-hover/carousel:opacity-100 transition-opacity"
+            aria-label="Précédent"
+          >
+            <ChevronLeft size={24} />
+          </button>
+        )}
+
+        {/* Bouton droit */}
+        {canScrollRight && (
+          <button
+            onClick={() => scroll('right')}
+            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-black/70 hover:bg-black/90 text-white p-2 rounded-full opacity-0 group-hover/carousel:opacity-100 transition-opacity"
+            aria-label="Suivant"
+          >
+            <ChevronRight size={24} />
+          </button>
+        )}
+
+        {/* Conteneur scrollable */}
+        <div
+          ref={scrollContainerRef}
+          onScroll={checkScrollButtons}
+          className="flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth"
+          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+        >
+          {movies.map((m) => (
+            <div key={m.imdbID} className="flex-shrink-0 w-[200px]">
+              <MovieCard movie={m} />
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

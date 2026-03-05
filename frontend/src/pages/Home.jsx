@@ -11,9 +11,10 @@ import { useSearchMovies, useMovie } from "../hooks/useMovies";
 import { useSectionMovies } from "../hooks/useSectionMovies";
 import { useCategories } from "../hooks/useCategories";
 import { useMyList } from "../contexts/MyListContext";
+import { getCategoryDisplayName } from "../utils/categoryNames";
 
 export default function Home() {
-  const displayCount = 6;
+  const displayCount = 15;
   const navigate = useNavigate();
   const [visibleCategories, setVisibleCategories] = useState(3);
   const [selectedCategory, setSelectedCategory] = useState(null);
@@ -143,20 +144,20 @@ export default function Home() {
             />
           )}
 
-          {/* HOME SECTIONS */}
-          {!query && (
-            <HomeSections
-              selectedSection={selectedSection}
-              onSelectSection={setSelectedSection}
-            />
-          )}
-
           {/* CATEGORIES */}
           {!query && !selectedSection && (
             <CategoryFilters
               categories={categories}
               selectedCategory={selectedCategory}
               onSelectCategory={handleCategorySelect}
+            />
+          )}
+
+          {/* HOME SECTIONS */}
+          {!query && (
+            <HomeSections
+              selectedSection={selectedSection}
+              onSelectSection={setSelectedSection}
             />
           )}
 
@@ -193,7 +194,7 @@ export default function Home() {
             ) : (
               <>
                 <h2 className="text-lg font-medium text-black dark:text-white tracking-tight border-b border-gray-200 dark:border-white/10 pb-4 mb-6">
-                  {selectedCategory ? `${selectedCategory}` : "Tous les films"}
+                  {selectedCategory ? getCategoryDisplayName(selectedCategory) : "Tous les films"}
                 </h2>
                 <div className="space-y-8">
                   {selectedCategory ? (

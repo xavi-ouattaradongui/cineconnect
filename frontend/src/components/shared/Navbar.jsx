@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import { useSearchMovies } from "../../hooks/useMovies";
 import { useCategories } from "../../hooks/useCategories";
 import { useAuth } from "../../contexts/AuthContext";
+import { getCategoryDisplayName } from "../../utils/categoryNames";
 import {
   Skull,
   Ghost,
@@ -212,7 +213,7 @@ export default function Navbar({ onSearch }) {
                       onClick={() => setShowCategories(false)}
                       className="block px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"
                     >
-                      {category}
+                      {getCategoryDisplayName(category)}
                     </Link>
                   ))}
                 </div>

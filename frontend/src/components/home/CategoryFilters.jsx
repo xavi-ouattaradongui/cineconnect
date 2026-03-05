@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { RotateCcw, Smile, Ghost, Zap, Shield, Heart, MoreHorizontal } from "lucide-react";
+import { getCategoryDisplayName } from "../../utils/categoryNames";
 
 const categoryIcons = {
   Action: <RotateCcw size={18} />,
@@ -65,7 +66,7 @@ export default function CategoryFilters({
             className={buttonClass(selectedCategory === category)}
           >
             {categoryIcons[category]}
-            {category}
+            {getCategoryDisplayName(category)}
           </button>
         ))}
 

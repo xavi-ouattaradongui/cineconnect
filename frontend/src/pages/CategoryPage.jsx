@@ -4,6 +4,7 @@ import Loader from "../components/shared/Loader";
 import MovieCard from "../components/shared/MovieCard";
 import { useSearchMoviesMultiTerms } from "../hooks/useMovies";
 import { getCategorySearchTerms } from "../utils/categorySearch";
+import { getCategoryDisplayName } from "../utils/categoryNames";
 
 export default function CategoryPage() {
   const { category } = useParams({ from: "/categorie/$category" });
@@ -42,7 +43,7 @@ export default function CategoryPage() {
       <div className="flex items-center justify-between gap-4 mb-6">
         <div>
           <h2 className="text-2xl font-bold text-black dark:text-white">
-            {categoryName}
+            {getCategoryDisplayName(categoryName)}
           </h2>
           <p className="text-sm text-gray-600 dark:text-gray-400">
             {shownCount} film{shownCount > 1 ? "s" : ""}

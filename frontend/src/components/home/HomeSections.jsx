@@ -11,6 +11,7 @@ import {
   Shuffle,
   Globe,
   Zap,
+  ChevronRight,
 } from "lucide-react";
 
 const sections = [
@@ -75,67 +76,89 @@ export default function HomeSections({
   selectedSection, 
   onSelectSection 
 }) {
-  const buttonClass = (isSelected) => `
-    whitespace-nowrap flex items-center gap-2 px-4 py-2 rounded-full 
-    font-semibold transition-all text-sm shrink-0 
-    ${
-      isSelected
-        ? "bg-black text-white dark:bg-white dark:text-black border border-black dark:border-white shadow-lg"
-        : "bg-gray-100 dark:bg-white/5 border border-gray-300 dark:border-white/10 text-gray-600 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 hover:bg-gray-200 dark:hover:bg-white/10"
-    }
-  `;
+  const [showAll, setShowAll] = useState(false);
 
   return (
-    <section className="w-full space-y-4 mb-8 mt-10">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-10">
-        <h3 className="text-sm font-medium uppercase tracking-widest text-gray-600 dark:text-gray-400 shrink-0">
-          Explorez
-        </h3>
-      </div>
-
-      <div className="relative overflow-hidden">
-        <style>{`
-          @keyframes scroll-left {
-            0% {
-              transform: translateX(0);
-            }
-            100% {
-              transform: translateX(-50%);
-            }
-          }
-          .scroll-container {
-            animation: scroll-left 30s linear infinite;
-          }
-          .scroll-container:hover {
-            animation-play-state: paused;
-          }
-        `}</style>
-        
-        <div className="flex gap-3 scroll-container px-10">
-          {/* Première série de sections */}
-          {sections.map((section) => (
-            <button
+    <section className="w-full mb-8 mt-10">
+      {!showAll ? (
+        // Affichage des 5 premiers + bouton Plus
+        <div className="flex gap-8 px-10 items-center">
+          {sections.slice(0, 5).map((section) => (
+            <div
               key={section.id}
               onClick={() => onSelectSection(section.id)}
-              className={buttonClass(selectedSection === section.id)}
+              className="whitespace-nowrap flex flex-row items-center gap-2 shrink-0 cursor-pointer"
             >
-              {section.icon}
-              {section.label}
-            </button>
+              <div className="text-2xl">
+                {section.icon}
+              </div>
+              <span className="text-xs font-semibold text-gray-700 dark:text-gray-300">
+                {section.label}
+              </span>
+            </div>
           ))}
-          {/* Duplication pour l'effet de boucle infinie */}
-          {sections.map((section) => (
-            <button
-              key={`${section.id}-duplicate`}
-              onClick={() => onSelectSection(section.id)}
-              className={buttonClass(selectedSection === section.id)}
-            >
-              {section.icon}
-              {section.label}
-            </button>
-          ))}
+          <button
+            onClick={() => setShowAll(true)}
+            className="flex items-center gap-1 px-4 py-2 text-xs font-semibold text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+          >
+            Plus
+            <ChevronRight size={16} />
+          </button>
         </div>
-      </div>
+      ) : (
+        // Affichage avec animation de tous les éléments
+        <div className="relative overflow-hidden">
+          <style>{`
+            @keyframes scroll-left {
+              0% {
+                transform: translateX(0);
+              }
+              100% {
+                transform: translateX(-50%);
+              }
+            }
+            .scroll-container {
+              animation: scroll-left 30s linear infinite;
+            }
+            .scroll-container:hover {
+              animation-play-state: paused;
+            }
+          `}</style>
+          
+          <div className="flex gap-8 scroll-container px-10">
+            {/* Première série de sections */}
+            {sections.map((section) => (
+              <div
+                key={section.id}
+                onClick={() => onSelectSection(section.id)}
+                className="whitespace-nowrap flex flex-row items-center gap-2 shrink-0 cursor-pointer"
+              >
+                <div className="text-2xl">
+                  {section.icon}
+                </div>
+                <span className="text-xs font-semibold text-gray-700 dark:text-gray-300">
+                  {section.label}
+                </span>
+              </div>
+            ))}
+            {/* Duplication pour l'effet de boucle infinie */}
+            {sections.map((section) => (
+              <div
+                key={`${section.id}-duplicate`}
+                onClick={() => onSelectSection(section.id)}
+                className="whitespace-nowrap flex flex-row items-center gap-2 shrink-0 cursor-pointer"
+              >
+                <div className="text-2xl">
+                  {section.icon}
+                </div>
+                <span className="text-xs font-semibold text-gray-700 dark:text-gray-300">
+                  {section.label}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </section>
   );
 }
