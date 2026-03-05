@@ -3,7 +3,7 @@ import { useNavigate, useRouterState } from "@tanstack/react-router";
 import Loader from "../components/shared/Loader";
 import MovieCard from "../components/shared/MovieCard";
 import HeroSection from "../components/home/HeroSection";
-import HomeSections from "../components/home/HomeSections";
+import ExploreSection from "../components/home/ExploreSection";
 import CategoryFilters from "../components/home/CategoryFilters";
 import CategorySection from "../components/home/CategorySection";
 import SearchResults from "../components/home/SearchResults";
@@ -144,20 +144,20 @@ export default function Home() {
             />
           )}
 
+          {/* HOME SECTIONS */}
+          {!query && (
+            <ExploreSection
+              selectedSection={selectedSection}
+              onSelectSection={setSelectedSection}
+            />
+          )}
+
           {/* CATEGORIES */}
           {!query && !selectedSection && (
             <CategoryFilters
               categories={categories}
               selectedCategory={selectedCategory}
               onSelectCategory={handleCategorySelect}
-            />
-          )}
-
-          {/* HOME SECTIONS */}
-          {!query && (
-            <HomeSections
-              selectedSection={selectedSection}
-              onSelectSection={setSelectedSection}
             />
           )}
 

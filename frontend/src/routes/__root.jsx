@@ -11,6 +11,7 @@ import ProfileSecurity from "../pages/ProfileSecurity";
 import Login from "../pages/Login";
 import Register from "../pages/Register";
 import CategoryPage from "../pages/CategoryPage";
+import ExplorePage from "../pages/ExplorePage";
 import ForgotPassword from "../pages/ForgotPassword";
 import ResetPassword from "../pages/ResetPassword";
 
@@ -102,6 +103,13 @@ export const categoryRoute = new Route({
   beforeLoad: requireAuth,
 });
 
+export const sectionRoute = new Route({
+  getParentRoute: () => rootRoute,
+  path: "explorez/$section",
+  component: ExplorePage,
+  beforeLoad: requireAuth,
+});
+
 export const filmRoute = new Route({
   getParentRoute: () => rootRoute,
   path: "film/$id",
@@ -159,6 +167,7 @@ const routeTree = rootRoute.addChildren([
   resetPasswordRoute,
   homeRoute,
   categoryRoute,
+  sectionRoute,
   filmRoute,
   favoritesRoute,
   myListRoute,
