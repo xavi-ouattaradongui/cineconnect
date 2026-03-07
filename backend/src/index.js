@@ -22,21 +22,5 @@ initSocket(io);
 
 server.listen(PORT, () => {
   console.log(`✅ Serveur CineConnect démarré sur http://localhost:${PORT}`);
-  console.log(`📚 Documentation: http://localhost:${PORT}/docs`);
-  console.log(`🔗 Routes disponibles:`);
-  console.log(`   - POST   /auth/register`);
-  console.log(`   - POST   /auth/login`);
-  console.log(`   - GET    /films`);
-  console.log(`   - POST   /reviews`);
-  console.log(`   - GET    /reviews/film/:filmId`);
-  console.log(`   - PUT    /reviews/:id`);
-  console.log(`   - DELETE /reviews/:id`);
-  console.log(`   - GET    /favorites`);
-  console.log(`   - POST   /favorites`);
-  console.log(`   - DELETE /favorites/:imdbId`);
-  console.log(`   - GET    /mylists`);
-  console.log(`   - POST   /mylists`);
-  console.log(`   - DELETE /mylists/:imdbId`);
-  console.log(`   - GET    /messages/film/:imdbId`);
-  console.log(`   - POST   /messages/film/:imdbId`);
+  console.log(`📚 Documentation Swagger: http://localhost:${PORT}/docs`);
 });

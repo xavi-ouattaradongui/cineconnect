@@ -104,7 +104,7 @@ export default function ExploreSection({
   return (
     <section className="w-full mb-8 mt-10 px-10">
       <h3 className="text-sm font-medium uppercase tracking-widest text-gray-600 dark:text-gray-400 mb-4">
-        Explorez
+        Collection
       </h3>
       
       <div className="relative overflow-hidden">
