@@ -79,7 +79,7 @@ export default function Navbar({ onSearch }) {
 
   // Synchronise l'input avec ?q UNIQUEMENT sur la page d'accueil
   useEffect(() => {
-    if (location.pathname === "/home") {
+    if (location.pathname === "/" || location.pathname === "/home") {
       setSearchValue(location.search?.q || "");
     }
   }, [location.search?.q, location.pathname]);
@@ -94,9 +94,9 @@ export default function Navbar({ onSearch }) {
     setSearchValue(value);
 
     // Naviguer seulement si on est sur la page d'accueil
-    if (location.pathname === "/home") {
+    if (location.pathname === "/" || location.pathname === "/home") {
       router.navigate({
-        to: "/home",
+        to: "/",
         search: (prev) => ({ ...prev, q: value || undefined }),
       });
     }
@@ -155,7 +155,7 @@ export default function Navbar({ onSearch }) {
         {/* LOGO */}
         <div className="flex items-center gap-8">
           <Link
-            to="/home"
+            to="/"
             className="text-lg font-semibold tracking-tighter text-black dark:text-white flex items-center gap-2 hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
           >
             <svg
@@ -180,18 +180,20 @@ export default function Navbar({ onSearch }) {
           {/* DESKTOP NAV */}
           <div className="hidden md:flex items-center gap-6 text-sm">
             <Link
-              to="/home"
+              to="/"
               className="text-gray-600 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
             >
               Découvrir
             </Link>
             
-            <Link
-              to="/ma-liste"
-              className="text-gray-600 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
-            >
-              Ma Liste
-            </Link>
+            {user && (
+              <Link
+                to="/ma-liste"
+                className="text-gray-600 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
+              >
+                Ma Liste
+              </Link>
+            )}
             
             {/* Dropdown Catégorie */}
             <div className="relative" ref={categoriesRef}>
@@ -299,19 +301,28 @@ export default function Navbar({ onSearch }) {
             )}
           </div>
 
-          {/* PROFILE */}
-          <Link to="/profil" className="relative group">
-            <div
-              className={`h-8 w-8 rounded-full bg-gradient-to-br ${getAvatarColor()} p-[1px]`}
-            >
+          {/* PROFILE / LOGIN */}
+          {user ? (
+            <Link to="/profil" className="relative group">
               <div
-                className={`h-full w-full rounded-full bg-gradient-to-br ${getAvatarColor()} flex items-center justify-center text-xs font-medium group-hover:opacity-80 transition-all`}
+                className={`h-8 w-8 rounded-full bg-gradient-to-br ${getAvatarColor()} p-[1px]`}
               >
-                {getAvatarIcon()}
+                <div
+                  className={`h-full w-full rounded-full bg-gradient-to-br ${getAvatarColor()} flex items-center justify-center text-xs font-medium group-hover:opacity-80 transition-all`}
+                >
+                  {getAvatarIcon()}
+                </div>
               </div>
-            </div>
-            <div className="absolute top-0 right-0 h-2.5 w-2.5 bg-green-500 rounded-full border-2 border-black"></div>
-          </Link>
+              <div className="absolute top-0 right-0 h-2.5 w-2.5 bg-green-500 rounded-full border-2 border-black"></div>
+            </Link>
+          ) : (
+            <Link
+              to="/login"
+              className="inline-flex items-center justify-center h-9 px-4 rounded-full border border-gray-200 dark:border-white/10 bg-white/70 dark:bg-white/5 text-sm font-medium text-gray-800 dark:text-gray-100 hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
+            >
+              Se connecter
+            </Link>
+          )}
         </div>
       </div>
     </nav>

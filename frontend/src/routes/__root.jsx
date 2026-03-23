@@ -31,7 +31,7 @@ const redirectIfAuthenticated = () => {
   const token = localStorage.getItem("token");
   if (token) {
     throw redirect({
-      to: "/home",
+      to: "/",
       replace: true,
     });
   }
@@ -41,7 +41,7 @@ const redirectIfAuthenticated = () => {
 export const rootRoute = new RootRoute({
   component: () => {
     const location = useLocation();
-    const hideNavbar = location.pathname === "/" || location.pathname === "/login" || location.pathname === "/register" || location.pathname === "/forgot-password" || location.pathname === "/reset-password";
+    const hideNavbar = location.pathname === "/login" || location.pathname === "/register" || location.pathname === "/forgot-password" || location.pathname === "/reset-password";
 
     return (
       <div>
@@ -53,11 +53,10 @@ export const rootRoute = new RootRoute({
 });
 
 // Routes PUBLIQUES (sans authentification)
-export const loginRoute = new Route({
+export const landingRoute = new Route({
   getParentRoute: () => rootRoute,
   path: "/",
-  component: Login,
-  beforeLoad: redirectIfAuthenticated,
+  component: Home,
 });
 
 export const loginAltRoute = new Route({
@@ -88,35 +87,33 @@ export const resetPasswordRoute = new Route({
   beforeLoad: redirectIfAuthenticated,
 });
 
-// Routes PRIVÉES (nécessitent authentification)
+// Route publique alias vers l'accueil
 export const homeRoute = new Route({
   getParentRoute: () => rootRoute,
   path: "/home",
   component: Home,
-  beforeLoad: requireAuth,
 });
 
+// Routes publiques de consultation
 export const categoryRoute = new Route({
   getParentRoute: () => rootRoute,
   path: "categorie/$category",
   component: CategoryPage,
-  beforeLoad: requireAuth,
 });
 
 export const sectionRoute = new Route({
   getParentRoute: () => rootRoute,
   path: "explorez/$section",
   component: ExplorePage,
-  beforeLoad: requireAuth,
 });
 
 export const filmRoute = new Route({
   getParentRoute: () => rootRoute,
   path: "film/$id",
   component: MovieDetails,
-  beforeLoad: requireAuth,
 });
 
+// Routes PRIVÉES (nécessitent authentification)
 export const favoritesRoute = new Route({
   getParentRoute: () => rootRoute,
   path: "favoris",
@@ -160,7 +157,7 @@ export const errorRoute = new Route({
 
 // Créer routeTree
 const routeTree = rootRoute.addChildren([
-  loginRoute,
+  landingRoute,
   loginAltRoute,
   registerRoute,
   forgotPasswordRoute,
