@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { useAuth } from "./AuthContext";
 import { api } from "../services/api";
+import { filterUsableMovies, normalizeMovieData } from "../api/omdb";
 
 const FavoritesContext = createContext();
 
@@ -28,12 +29,16 @@ export function FavoritesProvider({ children }) {
     setLoading(true);
     try {
       const data = await api.getFavorites(token);
-      const formattedFavorites = data.map((fav) => ({
-        imdbID: fav.imdbId,
-        Title: fav.title,
-        Poster: fav.poster,
-        Year: fav.year,
-      }));
+      const formattedFavorites = filterUsableMovies(
+        data.map((fav) =>
+          normalizeMovieData({
+            imdbID: fav.imdbId,
+            Title: fav.title,
+            Poster: fav.poster,
+            Year: fav.year,
+          })
+        )
+      );
       setFavorites(formattedFavorites);
     } catch (error) {
       console.error("Erreur chargement favoris:", error);
@@ -51,7 +56,7 @@ export function FavoritesProvider({ children }) {
 
     const alreadyExists = favorites.some((m) => m.imdbID === movie.imdbID);
     if (!alreadyExists) {
-      setFavorites((prev) => [...prev, movie]);
+      setFavorites((prev) => filterUsableMovies([...prev, normalizeMovieData(movie)]));
     }
 
     try {

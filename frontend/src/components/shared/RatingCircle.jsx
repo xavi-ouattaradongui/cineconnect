@@ -1,5 +1,7 @@
 export default function RatingCircle({ rating }) {
-  const value = Math.round((rating / 10) * 100);
+  const numericRating = Number.parseFloat(rating);
+  const hasRating = Number.isFinite(numericRating) && numericRating > 0;
+  const value = hasRating ? Math.round((numericRating / 10) * 100) : 0;
 
   return (
     <div className="relative w-14 h-14">
@@ -29,7 +31,7 @@ export default function RatingCircle({ rating }) {
 
       {/* Texte */}
       <div className="absolute inset-0 flex items-center justify-center text-white font-bold">
-        {rating ? rating : "N/A"}
+        {hasRating ? rating : "-"}
       </div>
     </div>
   );

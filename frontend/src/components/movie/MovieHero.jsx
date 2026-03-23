@@ -8,6 +8,13 @@ export default function MovieHero({
   onFavorite, 
   onAddToList 
 }) {
+  const meta = [movie.Year, movie.Runtime].filter(Boolean);
+  const shortPlot = movie.Plot
+    ? `${movie.Plot.slice(0, 100)}${movie.Plot.length > 100 ? "..." : ""}`
+    : "Synopsis indisponible.";
+  const numericRating = Number.parseFloat(movie.imdbRating);
+  const hasRating = Number.isFinite(numericRating) && numericRating > 0;
+
   return (
     <div className="relative w-full h-[60vh] lg:h-[70vh] overflow-hidden">
       <div className="absolute inset-0">
@@ -45,14 +52,17 @@ export default function MovieHero({
                     {movie.Genre.split(",")[0]}
                   </span>
                 )}
-                <span>{movie.Year}</span>
-                <span className="w-1 h-1 bg-gray-500 rounded-full"></span>
-                <span>{movie.Runtime}</span>
+                {meta.map((item, index) => (
+                  <div key={item} className="flex items-center gap-3">
+                    {index > 0 && <span className="w-1 h-1 bg-gray-500 rounded-full"></span>}
+                    <span>{item}</span>
+                  </div>
+                ))}
               </div>
               <h1 className="text-4xl md:text-6xl font-bold text-white tracking-tight">
                 {movie.Title}
               </h1>
-              <p className="text-lg text-gray-400 italic font-light">{movie.Plot.substring(0, 100)}...</p>
+              <p className="text-lg text-gray-400 italic font-light">{shortPlot}</p>
             </div>
 
             {/* ACTION BUTTONS */}
@@ -88,25 +98,27 @@ export default function MovieHero({
           </div>
 
           {/* RATING CIRCLE */}
-          <div className="hidden lg:flex flex-col items-center gap-2 bg-white/5 border border-white/10 p-6 rounded-2xl">
-            <div className="relative w-20 h-20 flex items-center justify-center">
-              <svg className="w-full h-full transform -rotate-90">
-                <circle cx="40" cy="40" r="35" stroke="currentColor" strokeWidth="3" fill="transparent" className="text-white/10" />
-                <circle
-                  cx="40"
-                  cy="40"
-                  r="35"
-                  stroke="currentColor"
-                  strokeWidth="3"
-                  fill="transparent"
-                  strokeDasharray={`${(parseFloat(movie.imdbRating) / 10) * 220}`}
-                  strokeDashoffset="0"
-                  className="text-green-500"
-                />
-              </svg>
-              <span className="absolute text-2xl font-bold text-white">{movie.imdbRating}</span>
+          {hasRating && (
+            <div className="hidden lg:flex flex-col items-center gap-2 bg-white/5 border border-white/10 p-6 rounded-2xl">
+              <div className="relative w-20 h-20 flex items-center justify-center">
+                <svg className="w-full h-full transform -rotate-90">
+                  <circle cx="40" cy="40" r="35" stroke="currentColor" strokeWidth="3" fill="transparent" className="text-white/10" />
+                  <circle
+                    cx="40"
+                    cy="40"
+                    r="35"
+                    stroke="currentColor"
+                    strokeWidth="3"
+                    fill="transparent"
+                    strokeDasharray={`${(numericRating / 10) * 220}`}
+                    strokeDashoffset="0"
+                    className="text-green-500"
+                  />
+                </svg>
+                <span className="absolute text-2xl font-bold text-white">{movie.imdbRating}</span>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </div>

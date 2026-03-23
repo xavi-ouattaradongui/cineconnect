@@ -5,14 +5,51 @@ const DETAIL_CACHE = new Map();
 const BATCH_SIZE = 5;
 const BATCH_DELAY = 150;
 
+export const normalizeOmdbValue = (value) => {
+  if (value == null) return null;
+  const normalized = value.toString().trim();
+  return normalized !== "" && normalized !== "N/A" ? value : null;
+};
+
+const hasValue = (value) => normalizeOmdbValue(value) !== null;
+
+export const normalizeMovieData = (movie) => {
+  if (!movie || typeof movie !== "object") return movie;
+
+  return Object.fromEntries(
+    Object.entries(movie).map(([key, value]) => [key, normalizeOmdbValue(value)])
+  );
+};
+
+export const hasUsableMovieSummary = (movie) => {
+  if (!movie?.imdbID) return false;
+  return [movie.Title, movie.Year, movie.Poster].every(hasValue);
+};
+
+export const hasUsableMovieDetails = (movie) => {
+  return hasUsableMovieSummary(movie);
+};
+
+export const filterUsableMovies = (movies = []) =>
+  movies.map(normalizeMovieData).filter(hasUsableMovieSummary);
+
 export const omdb = axios.create({
   baseURL: "https://www.omdbapi.com/",
   params: { apikey: API_KEY },
 });
 
 export const searchMovies = async (title, page = 1) => {
-  const { data } = await omdb.get("/", { params: { s: title, page } });
-  return data;
+  const { data } = await omdb.get("/", {
+    params: { s: title, page, type: "movie" },
+  });
+  const filteredMovies = filterUsableMovies(data?.Search || []);
+
+  return {
+    ...data,
+    Search: filteredMovies,
+    totalResults: filteredMovies.length,
+    Response: filteredMovies.length ? "True" : "False",
+  };
 };
 
 export const searchMoviesPages = async (title, pages = 2) => {
@@ -31,10 +68,12 @@ export const searchMoviesPages = async (title, pages = 2) => {
     unique.push(movie);
   }
 
+  const filteredMovies = filterUsableMovies(unique);
+
   return {
-    Search: unique,
-    totalResults: results[0]?.totalResults,
-    Response: results[0]?.Response,
+    Search: filteredMovies,
+    totalResults: filteredMovies.length,
+    Response: filteredMovies.length ? "True" : "False",
   };
 };
 
@@ -62,10 +101,12 @@ export const searchMoviesMultiTerms = async (terms, pagesPerTerm = 1) => {
     unique.push(movie);
   }
 
+  const filteredMovies = filterUsableMovies(unique);
+
   return {
-    Search: unique,
-    totalResults: unique.length,
-    Response: unique.length ? "True" : "False",
+    Search: filteredMovies,
+    totalResults: filteredMovies.length,
+    Response: filteredMovies.length ? "True" : "False",
   };
 };
 
@@ -110,10 +151,11 @@ export const searchMoviesByGenre = async (
     ? genres.map(normalizeGenre).filter(Boolean)
     : [];
   if (normalizedGenres.length === 0) {
+    const filteredMovies = filterUsableMovies(unique);
     return {
-      Search: unique,
-      totalResults: unique.length,
-      Response: unique.length ? "True" : "False",
+      Search: filteredMovies,
+      totalResults: filteredMovies.length,
+      Response: filteredMovies.length ? "True" : "False",
     };
   }
 
@@ -139,8 +181,10 @@ export const getMovieDetails = async (id) => {
   }
   try {
     const { data } = await omdb.get("/", { params: { i: id, plot: "full" } });
-    DETAIL_CACHE.set(id, data);
-    return data;
+    const movie = data?.Response === "False" ? null : normalizeMovieData(data);
+    const validMovie = hasUsableMovieDetails(movie) ? movie : null;
+    DETAIL_CACHE.set(id, validMovie);
+    return validMovie;
   } catch (error) {
     console.error(`Error fetching details for ${id}:`, error);
     return null;

@@ -371,9 +371,9 @@ export default function MovieDetails() {
               À propos
             </h3>
             <div className="space-y-3 text-sm text-gray-600 dark:text-gray-400">
-              <p><span className="text-black dark:text-white font-medium">Note:</span> {movie.imdbRating}/10</p>
-              <p><span className="text-black dark:text-white font-medium">Année:</span> {movie.Year}</p>
-              <p><span className="text-black dark:text-white font-medium">Pays:</span> {movie.Country || "N/A"}</p>
+                <p><span className="text-black dark:text-white font-medium">Note:</span> {movie.imdbRating ? `${movie.imdbRating}/10` : "Non noté"}</p>
+                <p><span className="text-black dark:text-white font-medium">Année:</span> {movie.Year || "Inconnue"}</p>
+                <p><span className="text-black dark:text-white font-medium">Pays:</span> {movie.Country || "Inconnu"}</p>
             </div>
           </div>
         </div>

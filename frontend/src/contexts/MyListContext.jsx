@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { useAuth } from "./AuthContext";
 import { api } from "../services/api";
+import { filterUsableMovies, normalizeMovieData } from "../api/omdb";
 
 const MyListContext = createContext();
 
@@ -28,12 +29,16 @@ export function MyListProvider({ children }) {
     setLoading(true);
     try {
       const data = await api.getMyList(token);
-      const formattedList = data.map((item) => ({
-        imdbID: item.imdbId,
-        Title: item.title,
-        Poster: item.poster,
-        Year: item.year,
-      }));
+      const formattedList = filterUsableMovies(
+        data.map((item) =>
+          normalizeMovieData({
+            imdbID: item.imdbId,
+            Title: item.title,
+            Poster: item.poster,
+            Year: item.year,
+          })
+        )
+      );
       setMyList(formattedList);
     } catch (error) {
       console.error("Erreur chargement liste:", error);
@@ -51,7 +56,7 @@ export function MyListProvider({ children }) {
 
     const alreadyExists = myList.some((m) => m.imdbID === movie.imdbID);
     if (!alreadyExists) {
-      setMyList((prev) => [...prev, movie]);
+      setMyList((prev) => filterUsableMovies([...prev, normalizeMovieData(movie)]));
     }
 
     try {
