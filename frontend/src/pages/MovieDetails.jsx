@@ -379,19 +379,21 @@ export default function MovieDetails() {
         </div>
       </div>
 
-      {/* CHAT WIDGET */}
-      <ChatWidget
-        chatMessages={chatMessages}
-        messageText={messageText}
-        chatCollapsed={chatCollapsed}
-        onSendMessage={handleSendMessage}
-        onMessageChange={(e) => setMessageText(e.target.value)}
-        onToggleCollapse={() => setChatCollapsed((v) => !v)}
-        movieTitle={movie.Title}
-        currentUserId={user?.id}
-        onDeleteMessage={handleDeleteMessage}
-        lastSeenAt={lastSeenAt}
-      />
+      {/* CHAT WIDGET (utilisateurs connectes uniquement) */}
+      {user?.id && token && (
+        <ChatWidget
+          chatMessages={chatMessages}
+          messageText={messageText}
+          chatCollapsed={chatCollapsed}
+          onSendMessage={handleSendMessage}
+          onMessageChange={(e) => setMessageText(e.target.value)}
+          onToggleCollapse={() => setChatCollapsed((v) => !v)}
+          movieTitle={movie.Title}
+          currentUserId={user?.id}
+          onDeleteMessage={handleDeleteMessage}
+          lastSeenAt={lastSeenAt}
+        />
+      )}
     </div>
   );
 }
