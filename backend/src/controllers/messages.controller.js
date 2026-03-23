@@ -5,13 +5,16 @@ import { users, userChatSeen } from "../db/schema/users.js";
 import { eq, and } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
+// Récupération des messages d'un film
 export const getMessagesByFilm = async (req, res) => {
   const { imdbId } = req.params;
   const authUserId = req.user?.id;
 
+  // Alias pour les jointures sur la table messages (message cité)
   const repliedMessages = alias(messages, "replied_messages");
   const repliedUsers = alias(users, "replied_users");
 
+  // Jointure : messages + auteur + message cité + auteur du message cité
   const data = await db
     .select({
       id: messages.id,
@@ -39,7 +42,7 @@ export const getMessagesByFilm = async (req, res) => {
     .where(eq(films.imdbId, imdbId))
     .orderBy(messages.createdAt);
 
-  // Ajoute la date de dernière consultation
+  // Récupération de la date de dernière consultation (pour les badges "non lu")
   let lastSeenAt = null;
   if (authUserId) {
     const [film] = await db.select({ id: films.id }).from(films).where(eq(films.imdbId, imdbId));
@@ -52,6 +55,7 @@ export const getMessagesByFilm = async (req, res) => {
     }
   }
 
+  // Masquage du contenu des messages supprimés
   res.json({
     messages: data.map((m) => ({
       ...m,
@@ -68,6 +72,7 @@ export const getMessagesByFilm = async (req, res) => {
   });
 };
 
+// Création d'un message (REST fallback, le socket est utilisé en priorité)
 export const createMessage = async (req, res) => {
   const { imdbId } = req.params;
   const { content, title, poster, year, replyToId } = req.body;
@@ -81,6 +86,7 @@ export const createMessage = async (req, res) => {
     .values({ imdbId, title, poster, year })
     .onConflictDoNothing();
 
+  // Récupération de l'id interne du film
   const [film] = await db
     .select({ id: films.id })
     .from(films)
@@ -90,6 +96,7 @@ export const createMessage = async (req, res) => {
     return res.status(400).json({ message: "Film introuvable" });
   }
 
+  // Récupération du message cité (replyTo)
   let replyTo = null;
   if (replyToId) {
     const [replyMsg] = await db
@@ -124,6 +131,7 @@ export const createMessage = async (req, res) => {
     };
   }
 
+  // Insertion du message en base
   const [message] = await db
     .insert(messages)
     .values({ content, filmId: film.id, userId: req.user.id, replyToId: replyToId || null })
@@ -151,6 +159,7 @@ export const createMessage = async (req, res) => {
   });
 };
 
+// Suppression d'un message
 export const deleteMessage = async (req, res) => {
   const { id } = req.params;
   const messageId = Number(id);
@@ -169,6 +178,7 @@ export const deleteMessage = async (req, res) => {
     return res.status(403).json({ message: "Action non autorisée" });
   }
 
+  // Hard delete si le message était déjà soft-deleted
   if (msg.deletedAt) {
     await db
       .update(messages)
@@ -180,6 +190,7 @@ export const deleteMessage = async (req, res) => {
     return res.json({ id: msg.id, hardDeleted: true });
   }
 
+  // Soft delete : remplacement du contenu + horodatage
   const now = new Date();
 
   const [updated] = await db
@@ -196,7 +207,7 @@ export const deleteMessage = async (req, res) => {
   });
 };
 
-// Endpoint pour mettre à jour la date de consultation
+// Mise à jour de la date de dernière consultation du chat
 export const updateChatSeen = async (req, res) => {
   const { imdbId } = req.params;
   const authUserId = req.user?.id;
@@ -208,7 +219,7 @@ export const updateChatSeen = async (req, res) => {
 
   const now = new Date();
 
-  // Upsert
+  // Upsert de la date de consultation
   const [existing] = await db
     .select({ id: userChatSeen.id })
     .from(userChatSeen)
