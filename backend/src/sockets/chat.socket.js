@@ -4,19 +4,23 @@ import { films } from "../db/schema/films.js";
 import { users } from "../db/schema/users.js";
 import { eq, and } from "drizzle-orm";
 
+// Initialisation du serveur Socket.io
 export const initSocket = (io) => {
   io.on("connection", (socket) => {
     console.log("🟢 User connected", socket.id);
 
+    // Rejoindre la room d'un film
     socket.on("joinFilm", ({ imdbId }) => {
       if (!imdbId) return;
       socket.join(`film-${imdbId}`);
       console.log(`🎬 User joined film ${imdbId}`);
     });
 
+    // Envoi d'un message
     socket.on("sendMessage", async ({ content, imdbId, userId, title, poster, year, replyToId }) => {
       if (!content || !imdbId || !userId) return;
 
+      // Upsert du film
       await db
         .insert(films)
         .values({ imdbId, title, poster, year })
@@ -29,6 +33,7 @@ export const initSocket = (io) => {
 
       if (!film) return;
 
+      // Récupération du message cité (replyTo)
       let replyTo = null;
       if (replyToId) {
         const [replyMsg] = await db
@@ -57,6 +62,7 @@ export const initSocket = (io) => {
         }
       }
 
+      // Insertion du message en base
       const [message] = await db
         .insert(messages)
         .values({ content, filmId: film.id, userId, replyToId: replyToId || null })
@@ -72,6 +78,7 @@ export const initSocket = (io) => {
         .from(users)
         .where(eq(users.id, userId));
 
+      // Diffusion du message à la room
       io.to(`film-${imdbId}`).emit("receiveMessage", {
         id: message.id,
         content: message.content,
@@ -84,6 +91,7 @@ export const initSocket = (io) => {
       });
     });
 
+    // Suppression d'un message (soft delete)
     socket.on("deleteMessage", async ({ messageId, imdbId, userId }) => {
       const [msg] = await db
         .select({ id: messages.id, userId: messages.userId, deletedAt: messages.deletedAt })
@@ -119,6 +127,7 @@ export const initSocket = (io) => {
       io.to(`film-${imdbId}`).emit("messageDeleted", { id: Number(messageId), hardDeleted: false });
     });
 
+    // Déconnexion
     socket.on("disconnect", () => {
       console.log("🔴 User disconnected", socket.id);
     });

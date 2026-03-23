@@ -4,6 +4,10 @@ Plateforme collaborative autour du cinema: decouverte de films, notes/avis, favo
 
 Projet realise dans le cadre du module Web2 - HETIC.
 
+## Presentation
+
+[Voir la presentation de soutenance](https://view.genially.com/69c12229e48622b08152befb)
+
 ## Stack technique
 
 - Frontend: React, TanStack Router, TanStack Query, TailwindCSS, Vite
