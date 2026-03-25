@@ -17,7 +17,7 @@ Les objectifs principaux etaient les suivants:
 - Proposer un module de discussion temps reel avec Socket.io.
 - Documenter l'API avec Swagger pour faciliter les tests et la soutenance.
 
-Au-dela des objectifs techniques, le projet devait egalement repondre a des objectifs methodologiques: travail collaboratif, gestion de version, clarte de la documentation et capacite a justifier les choix effectues.
+Au-dela des objectifs techniques, le projet devait egalement repondre a des objectifs methodologiques: travail en autonomie, gestion de version, clarte de la documentation et capacite a justifier les choix effectues.
 
 ## 3. Architecture technique
 
@@ -88,17 +88,16 @@ Sur la qualite logicielle, des efforts ont ete faits sur:
 - la documentation API et technique,
 - la coherence des conventions de nommage et d'organisation.
 
-## 7. Organisation de projet et collaboration
+## 7. Organisation du projet 
 
-Le travail a ete mene en mode monorepo avec GitHub, afin de centraliser le code, les scripts et la documentation. La collaboration s'appuie sur une logique de decoupage par fonctionnalite, avec l'objectif de garder des contributions lisibles et revues.
+L'organisation du travail s'est faite par phases fonctionnelles:
 
-Repartition type des roles (a adapter selon l'equipe reelle):
+- Conception de l'architecture et modelisation de la base de donnees.
+- Developpement du backend (API REST, authentification JWT, sockets).
+- Developpement du frontend (interfaces, navigation, interactions utilisateur).
+- Documentation technique, tests et preparation de la soutenance.
 
-- Developpement frontend et experience utilisateur.
-- Developpement backend et securite API.
-- Modelisation BDD, migrations, documentation et soutenance.
-
-Cette organisation permet de progresser en parallele tout en gardant une vision produit commune.
+Ce fonctionnement a permis de garder une vision globale et coherente du produit, avec des choix techniques homogenes entre frontend, backend et base de donnees.
 
 ## 8. Difficultes rencontrees et solutions apportees
 

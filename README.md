@@ -1,6 +1,6 @@
 # CineConnect
 
-Plateforme collaborative autour du cinema: decouverte de films, notes/avis, favoris, liste personnelle et discussion en temps reel.
+Plateforme sociale autour du cinema: decouverte de films, notes/avis, favoris, liste personnelle et discussion en temps reel.
 
 Projet realise dans le cadre du module Web2 - HETIC.
 
@@ -118,10 +118,10 @@ pnpm --dir backend start
 - Schema base de donnees: `docs/schema-bdd.md`
 - API: `docs/api.md`
 
-## Equipe et organisation
+## Organisation du projet
 
-Projet realise en groupe (3 personnes max) avec GitHub.
-Recommande: une branche par fonctionnalite + pull requests + revues croisees.
+Projet realise en solo avec GitHub.
+Recommande: une branche par fonctionnalite + revues personnelles avant fusion.
 
 ## Etat du projet
 
