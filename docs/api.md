@@ -5,7 +5,7 @@ Swagger UI: `http://localhost:3001/docs`
 
 ## 1. Authentification
 
-Les routes protegees attendent:
+Les routes protégées attendent:
 
 ```http
 Authorization: Bearer <JWT>
@@ -75,7 +75,7 @@ Content-Type: application/json
 }
 ```
 
-### Creer une review
+### Créer une review
 
 ```http
 POST /reviews
@@ -107,19 +107,19 @@ Content-Type: application/json
 }
 ```
 
-## 4. Reponses d'erreur frequentes
+## 4. Réponses d'erreur fréquentes
 
 - `400`: payload invalide / champs manquants
-- `401`: non authentifie
+- `401`: non authentifié
 - `403`: action interdite
 - `404`: ressource introuvable
 - `500`: erreur serveur
 
-## 5. Temps reel (Socket.io)
+## 5. Temps réel (Socket.io)
 
 Canal principal: discussion par film.
 
-Evenements utilises:
+Événements utilisés:
 
 - `joinFilm`
 - `sendMessage`

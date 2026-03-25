@@ -1,18 +1,18 @@
 # CineConnect
 
-Plateforme sociale autour du cinema: decouverte de films, notes/avis, favoris, liste personnelle et discussion en temps reel.
+Plateforme sociale autour du cinéma: découverte de films, notes/avis, favoris, liste personnelle et discussion en temps réel.
 
-Projet realise dans le cadre du module Web2 - HETIC.
+Projet réalisé dans le cadre du module Web2 - HETIC.
 
-## Presentation
+## Présentation
 
-[Voir la presentation de soutenance](https://view.genially.com/69c12229e48622b08152befb)
+[Voir la présentation de soutenance](https://view.genially.com/69c12229e48622b08152befb)
 
 ## Stack technique
 
 - Frontend: React, TanStack Router, TanStack Query, TailwindCSS, Vite
 - Backend: Node.js, Express, Drizzle ORM, JWT, Socket.io
-- Base de donnees: PostgreSQL
+- Base de données: PostgreSQL
 - Documentation API: Swagger (`/docs`)
 - Monorepo: pnpm workspaces
 
@@ -21,11 +21,11 @@ Projet realise dans le cadre du module Web2 - HETIC.
 ```txt
 /frontend   Application React
 /backend    API Express + Drizzle + Socket.io
-/shared     Espace de code partage (actuellement minimal)
-/docs       Rapport, architecture, schema BDD, API
+/shared     Espace de code partagé (actuellement minimal)
+/docs       Rapport, architecture, schéma BDD, API
 ```
 
-## Prerequis
+## Prérequis
 
 - Node.js 20+
 - pnpm 10+
@@ -102,30 +102,30 @@ pnpm --dir backend dev
 pnpm --dir backend start
 ```
 
-## Fonctionnalites principales
+## Fonctionnalités principales
 
 - Authentification JWT: inscription, connexion, profil, changement de mot de passe
-- Recuperation des films (OMDb cote front + persistance ciblee cote back)
-- Reviews: creation, edition, suppression, reactions like/dislike
+- Récupération des films (OMDb côté front + persistance ciblée côté back)
+- Reviews: création, édition, suppression, réactions like/dislike
 - Favoris et ma liste
-- Chat temps reel par film via Socket.io
+- Chat temps réel par film via Socket.io
 - Reset password par email
 
 ## Documentation du projet
 
 - Rapport: `docs/rapport.md`
 - Architecture: `docs/architecture.md`
-- Schema base de donnees: `docs/schema-bdd.md`
+- Schéma base de données: `docs/schema-bdd.md`
 - API: `docs/api.md`
 
 ## Organisation du projet
 
-Projet realise en solo avec GitHub.
-Recommande: une branche par fonctionnalite + revues personnelles avant fusion.
+Projet réalisé en solo avec GitHub.
+Recommandé: une branche par fonctionnalité + revues personnelles avant fusion.
 
-## Etat du projet
+## État du projet
 
 - Frontend: fonctionnel
 - Backend: fonctionnel
-- Swagger: routes principales documentees
+- Swagger: routes principales documentées
 - Documentation: fournie dans `docs/`

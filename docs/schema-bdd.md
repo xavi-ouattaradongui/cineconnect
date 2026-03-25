@@ -1,4 +1,4 @@
-# Schema Base de Donnees - CineConnect
+# Schéma Base de Données - CineConnect
 
 ## 1. Tables principales
 
@@ -76,7 +76,7 @@
 - `film_id` (FK -> films.id)
 - `last_seen_at`
 
-## 2. Cardinalites
+## 2. Cardinalités
 
 - 1 user -> N reviews
 - 1 film -> N reviews
@@ -88,7 +88,7 @@
 - N users <-> N films via mylists
 - N users <-> N films via user_chat_seen
 
-## 3. Diagramme relationnel simplifie
+## 3. Diagramme relationnel simplifié
 
 ```mermaid
 erDiagram
@@ -113,6 +113,6 @@ erDiagram
 
 ## 4. Notes de conception
 
-- Les films sont identifies metierement par `imdb_id`.
-- Les tables favorites/mylists jouent le role de tables de liaison user-film.
-- Le chat supporte reponse a message (`reply_to_id`) et soft delete (`deleted_at`).
+- Les films sont identifiés métierement par `imdb_id`.
+- Les tables favorites/mylists jouent le rôle de tables de liaison user-film.
+- Le chat supporte réponse à message (`reply_to_id`) et soft delete (`deleted_at`).

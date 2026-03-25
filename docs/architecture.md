@@ -4,10 +4,10 @@
 
 L'application suit une architecture client-serveur:
 
-- Frontend React: experience utilisateur, navigation, affichage
-- Backend Express: API REST, authentification JWT, logique metier
-- PostgreSQL: persistance des donnees metier
-- Socket.io: communication temps reel pour le chat film
+- Frontend React: expérience utilisateur, navigation, affichage
+- Backend Express: API REST, authentification JWT, logique métier
+- PostgreSQL: persistance des données métier
+- Socket.io: communication temps réel pour le chat film
 
 ## 2. Diagramme de flux
 
@@ -23,19 +23,19 @@ flowchart LR
 
 ## 3. Couches backend
 
-- `src/routes/*`: declaration des endpoints
-- `src/controllers/*`: logique metier par domaine
+- `src/routes/*`: déclaration des endpoints
+- `src/controllers/*`: logique métier par domaine
 - `src/middlewares/auth.middleware.js`: validation JWT
-- `src/db/schema/*`: modeles Drizzle
-- `src/sockets/chat.socket.js`: evenements chat temps reel
-- `src/docs/swagger.js`: generation OpenAPI
+- `src/db/schema/*`: modèles Drizzle
+- `src/sockets/chat.socket.js`: événements chat temps réel
+- `src/docs/swagger.js`: génération OpenAPI
 
 ## 4. Couches frontend
 
 - `src/routes/__root.jsx`: arbre de routes et protection auth
 - `src/pages/*`: pages fonctionnelles
-- `src/hooks/*`: hooks de donnees (React Query)
-- `src/contexts/*`: etats transverses (auth, favoris, liste)
+- `src/hooks/*`: hooks de données (React Query)
+- `src/contexts/*`: états transverses (auth, favoris, liste)
 - `src/services/api.js`: appels backend
 
 ## 5. Flux fonctionnels principaux
@@ -44,32 +44,32 @@ flowchart LR
 
 1. Le frontend envoie `POST /auth/login`.
 2. Le backend valide credentials et renvoie un JWT.
-3. Le token est stocke cote client.
-4. Les routes privees envoient `Authorization: Bearer <token>`.
+3. Le token est stocké côté client.
+4. Les routes privées envoient `Authorization: Bearer <token>`.
 
 ### Consultation et interaction film
 
-1. Le frontend recupere des informations film.
-2. Les utilisateurs connectes peuvent:
+1. Le frontend récupère des informations film.
+2. Les utilisateurs connectés peuvent:
    - publier une review (`POST /reviews`)
-   - reagir a une review (`POST /reviews/:id/reaction`)
+  - réagir à une review (`POST /reviews/:id/reaction`)
    - ajouter en favoris (`POST /favorites`)
-   - ajouter en liste (`POST /mylists`)
+  - ajouter en liste (`POST /mylists`)
 
-### Chat temps reel
+### Chat temps réel
 
 1. Le client se connecte via Socket.io.
 2. Il rejoint une room par film (`joinFilm`).
-3. Les messages sont diffuses aux utilisateurs de la room.
-4. Les messages sont persist es en base.
+3. Les messages sont diffusés aux utilisateurs de la room.
+4. Les messages sont persistés en base.
 
-## 6. Securite
+## 6. Sécurité
 
 - JWT sur endpoints sensibles (profil, reviews write, favoris, mylists, messages)
 - Validation des proprietaires sur update/delete (reviews/messages)
-- CORS configure selon `FRONTEND_URL`
+- CORS configuré selon `FRONTEND_URL`
 
-## 7. Documentation et observabilite
+## 7. Documentation et observabilité
 
 - Swagger UI disponible sur `GET /docs`
-- Logs demarrage serveur avec URL API et docs
+- Logs démarrage serveur avec URL API et docs
