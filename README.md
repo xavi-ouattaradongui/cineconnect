@@ -121,7 +121,7 @@ pnpm --dir backend start
 ## Organisation du projet
 
 Projet réalisé en solo avec GitHub.
-Recommandé: une branche par fonctionnalité + revues personnelles avant fusion.
+Deux branches : `master` (branche principale) et `xoxo` (branche de développement).
 
 ## État du projet
 
