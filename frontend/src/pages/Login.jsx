@@ -40,10 +40,11 @@ export default function Login() {
         <ThemeToggle />
       </div>
 
-      <div className="w-full max-w-md space-y-8">
+      <div className="w-full max-w-md rounded-3xl border-2 border-blue-700/70 bg-white px-8 py-8 shadow-2xl shadow-black/20 ring-1 ring-blue-700/25 dark:border-blue-600/70 dark:bg-black dark:shadow-black/60">
+        <div className="space-y-8">
         {/* Header */}
         <div className="text-center space-y-2">
-          <div className="flex items-center justify-center gap-2 mb-4">
+          <Link to="/" className="flex items-center justify-center gap-2 mb-4 hover:text-blue-500 dark:hover:text-blue-400 transition-colors">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="24"
@@ -59,7 +60,7 @@ export default function Login() {
               </g>
             </svg>
             <span className="text-2xl font-bold">CinéConnect</span>
-          </div>
+          </Link>
           <h1 className="text-3xl font-bold">Connexion</h1>
           <p className="text-gray-500 dark:text-gray-400">Accédez à votre compte</p>
         </div>
@@ -146,7 +147,7 @@ export default function Login() {
             <div className="w-full border-t border-gray-200 dark:border-white/10"></div>
           </div>
           <div className="relative flex justify-center text-sm">
-            <span className="px-2 bg-white dark:bg-black text-gray-500">Ou</span>
+            <span className="px-2 bg-white text-gray-500 dark:bg-black dark:text-gray-400">Ou</span>
           </div>
         </div>
 
@@ -160,6 +161,7 @@ export default function Login() {
             S'inscrire
           </Link>
         </p>
+        </div>
       </div>
     </div>
   );
