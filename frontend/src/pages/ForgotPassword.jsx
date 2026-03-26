@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "@tanstack/react-router";
 import { useNavigate } from "@tanstack/react-router";
 import { api } from "../services/api";
 import Loader from "../components/shared/Loader";
@@ -36,11 +37,11 @@ export default function ForgotPassword() {
         <ThemeToggle />
       </div>
 
-      <div className="w-full max-w-md">
+      <div className="w-full max-w-md rounded-3xl border-2 border-blue-700/70 bg-white px-8 py-8 shadow-2xl shadow-black/20 ring-1 ring-blue-700/25 dark:border-blue-600/70 dark:bg-black dark:shadow-black/60">
         <div className="space-y-8">
           {/* Header */}
           <div className="text-center space-y-2">
-            <div className="flex items-center justify-center gap-2 mb-4">
+            <Link to="/" className="flex items-center justify-center gap-2 mb-4 hover:text-blue-500 dark:hover:text-blue-400 transition-colors">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="24"
@@ -56,7 +57,7 @@ export default function ForgotPassword() {
                 </g>
               </svg>
               <span className="text-2xl font-bold">CinéConnect</span>
-            </div>
+            </Link>
             <h1 className="text-3xl font-bold">Réinitialiser mot de passe</h1>
             <p className="text-gray-500 dark:text-gray-400">Entrez votre email pour recevoir un lien de réinitialisation</p>
           </div>
