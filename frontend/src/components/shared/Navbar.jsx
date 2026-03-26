@@ -56,6 +56,7 @@ export default function Navbar({ onSearch }) {
   const { location } = useRouterState();
   const { user } = useAuth();
   const { data: categories = [] } = useCategories();
+  const usernameLabel = user?.username || user?.displayName || "Utilisateur";
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -131,7 +132,7 @@ export default function Navbar({ onSearch }) {
     }
     
     // Sinon, afficher les initiales (par défaut)
-    const name = user?.displayName || user?.username || "User";
+    const name = usernameLabel;
     const parts = name.split(/[\s_-]+/);
     const initials = parts.length > 1
       ? parts.map(part => part[0]).join("").toUpperCase().slice(0, 2)
@@ -303,7 +304,7 @@ export default function Navbar({ onSearch }) {
 
           {/* PROFILE / LOGIN */}
           {user ? (
-            <Link to="/profil" className="relative group">
+            <Link to="/profil" className="relative group flex items-center gap-2">
               <div
                 className={`h-8 w-8 rounded-full bg-gradient-to-br ${getAvatarColor()} p-[1px]`}
               >
@@ -313,7 +314,15 @@ export default function Navbar({ onSearch }) {
                   {getAvatarIcon()}
                 </div>
               </div>
-              <div className="absolute top-0 right-0 h-2.5 w-2.5 bg-green-500 rounded-full border-2 border-black"></div>
+              <div className="flex flex-col leading-tight">
+                <span className="text-xs font-semibold text-gray-900 dark:text-white line-clamp-1">
+                  {usernameLabel}
+                </span>
+                <span className="text-[10px] text-green-600 dark:text-green-400">
+                  En ligne
+                </span>
+              </div>
+              <div className="absolute top-0 left-6 h-2.5 w-2.5 bg-green-500 rounded-full border-2 border-white dark:border-black"></div>
             </Link>
           ) : (
             <Link

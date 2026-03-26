@@ -1,4 +1,4 @@
-import { Send, MessagesSquare } from "lucide-react";
+import { Send, Users } from "lucide-react";
 import { useRef, useEffect, useState } from "react";
 import AvatarBubble from "./AvatarBubble";
 
@@ -234,15 +234,15 @@ export default function ChatWidget({
       {isCollapsed && (
         <div className="flex items-center justify-between gap-2 w-full">
           <span className="text-xs text-gray-700 dark:text-gray-300 bg-white/90 dark:bg-black/40 px-2 py-1 rounded-md border border-gray-200 dark:border-white/10">
-            Cliquez pour discuter au tour de {movieTitle}
+            Rejoins la communauté de {movieTitle}
           </span>
           <button
             type="button"
             onClick={onToggleCollapse}
-            className="h-20 w-20 rounded-full bg-blue-600 text-white shadow-xl hover:bg-blue-500 animate-bounce flex items-center justify-center"
+            className="h-24 w-24 rounded-full bg-blue-600 text-white shadow-xl hover:bg-blue-500 animate-bounce flex items-center justify-center"
             title="Discuter"
           >
-            <MessagesSquare size={28} />
+            <Users size={45} />
           </button>
         </div>
       )}
