@@ -57,7 +57,7 @@ DATABASE_URL=postgres://USER:PASSWORD@localhost:5432/cineconnect
 JWT_SECRET=your_secret
 JWT_EXPIRES_IN=7d
 SENDGRID_API_KEY=...
-SENDGRID_FROM_EMAIL=noreply@cineconnect.com
+SENDGRID_FROM_EMAIL=cineconnect12@outlook.com
 ```
 
 ## Lancer le projet
