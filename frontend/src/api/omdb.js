@@ -1,4 +1,4 @@
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3001";
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 const DETAIL_CACHE = new Map();
 const BATCH_SIZE = 5;
 const BATCH_DELAY = 150;
