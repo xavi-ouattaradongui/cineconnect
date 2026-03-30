@@ -61,12 +61,16 @@ import express from "express";
 import {
   createFilm,
   getFilmByImdbId,
+  searchFilms,
+  getFilmDetails,
 } from "../controllers/films.controller.js";
 import { authMiddleware } from "../middlewares/auth.middleware.js";
 
 const router = express.Router();
 
 router.post("/", authMiddleware, createFilm);
+router.get("/search", searchFilms);
+router.get("/details/:imdbId", getFilmDetails);
 router.get("/:imdbId", getFilmByImdbId);
 
 export default router;
