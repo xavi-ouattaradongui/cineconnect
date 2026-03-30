@@ -95,7 +95,7 @@ export default function MovieDetails() {
 
   // Connexion au socket
   useEffect(() => {
-    const SOCKET_URL = import.meta.env.VITE_API_URL || "http://localhost:3001";
+    const SOCKET_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
     const socket = io(SOCKET_URL, { transports: ["websocket", "polling"] });
     socketRef.current = socket;
 
