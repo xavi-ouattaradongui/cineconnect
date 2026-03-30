@@ -152,9 +152,9 @@ export default function Navbar({ onSearch }) {
 
   return (
     <nav className="fixed top-0 w-full z-50 border-b border-gray-200 dark:border-white/5 bg-white/80 dark:bg-black/80 backdrop-blur-xl">
-      <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
         {/* LOGO */}
-        <div className="flex items-center gap-8">
+        <div className="flex items-center gap-4 sm:gap-8">
           <Link
             to="/"
             className="text-lg font-semibold tracking-tighter text-black dark:text-white flex items-center gap-2 hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
@@ -226,7 +226,7 @@ export default function Navbar({ onSearch }) {
         </div>
 
         {/* SEARCH & PROFILE */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 sm:gap-4">
           <button
             type="button"
             onClick={toggleTheme}
@@ -260,9 +260,9 @@ export default function Navbar({ onSearch }) {
               onChange={handleSearch}
               onFocus={() => setIsFocused(true)}
               onBlur={() => setTimeout(() => setIsFocused(false), 150)}
-              className="bg-transparent border-none outline-none text-sm text-black dark:text-white ml-2 placeholder:text-gray-500 w-48"
+              className="bg-transparent border-none outline-none text-sm text-black dark:text-white ml-2 placeholder:text-gray-500 w-40 lg:w-48"
             />
-            <div className="text-[10px] border border-gray-300 dark:border-white/10 rounded px-1 text-gray-500">
+            <div className="hidden lg:block text-[10px] border border-gray-300 dark:border-white/10 rounded px-1 text-gray-500">
               ⌘K
             </div>
 
@@ -314,7 +314,7 @@ export default function Navbar({ onSearch }) {
                   {getAvatarIcon()}
                 </div>
               </div>
-              <div className="flex flex-col leading-tight">
+              <div className="hidden sm:flex flex-col leading-tight">
                 <span className="text-xs font-semibold text-gray-900 dark:text-white line-clamp-1">
                   {usernameLabel}
                 </span>
@@ -327,12 +327,55 @@ export default function Navbar({ onSearch }) {
           ) : (
             <Link
               to="/login"
-              className="inline-flex items-center justify-center h-9 px-4 rounded-full border border-gray-200 dark:border-white/10 bg-white/70 dark:bg-white/5 text-sm font-medium text-gray-800 dark:text-gray-100 hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
+              className="inline-flex items-center justify-center h-9 px-3 sm:px-4 rounded-full border border-gray-200 dark:border-white/10 bg-white/70 dark:bg-white/5 text-sm font-medium text-gray-800 dark:text-gray-100 hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
             >
-              Se connecter
+              <span className="sm:hidden">Connexion</span>
+              <span className="hidden sm:inline">Se connecter</span>
             </Link>
           )}
         </div>
+      </div>
+
+      <div className="md:hidden border-t border-gray-200 dark:border-white/5 px-4 py-2">
+        <div className="flex items-center gap-2 overflow-x-auto text-xs text-gray-700 dark:text-gray-300 scrollbar-hide">
+          <Link
+            to="/"
+            className="shrink-0 px-3 py-1.5 rounded-full bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10"
+          >
+            Decouvrir
+          </Link>
+          {user && (
+            <Link
+              to="/ma-liste"
+              className="shrink-0 px-3 py-1.5 rounded-full bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10"
+            >
+              Ma Liste
+            </Link>
+          )}
+          <button
+            type="button"
+            onClick={() => setShowCategories(!showCategories)}
+            className="shrink-0 px-3 py-1.5 rounded-full bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 inline-flex items-center gap-1"
+          >
+            Categories
+            <ChevronDown size={12} className={`transition-transform ${showCategories ? "rotate-180" : ""}`} />
+          </button>
+        </div>
+        {showCategories && (
+          <div className="mt-2 rounded-lg bg-white dark:bg-zinc-900 border border-gray-200 dark:border-white/10 overflow-hidden">
+            {categories.map((category) => (
+              <Link
+                key={category}
+                to="/categorie/$category"
+                params={{ category }}
+                onClick={() => setShowCategories(false)}
+                className="block px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"
+              >
+                {getCategoryDisplayName(category)}
+              </Link>
+            ))}
+          </div>
+        )}
       </div>
     </nav>
   );

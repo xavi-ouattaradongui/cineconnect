@@ -230,25 +230,26 @@ export default function ChatWidget({
   }, [chatCollapsed, chatMessages, firstNewIndex, hasOwnNewMessage]);
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
+    <div className="fixed bottom-4 right-4 left-4 sm:left-auto sm:bottom-6 sm:right-6 z-50 flex flex-col items-end">
       {isCollapsed && (
-        <div className="flex items-center justify-between gap-2 w-full">
-          <span className="text-xs text-gray-700 dark:text-gray-300 bg-white/90 dark:bg-black/40 px-2 py-1 rounded-md border border-gray-200 dark:border-white/10">
+        <div className="flex items-center justify-end sm:justify-between gap-2 w-full">
+          <span className="hidden sm:inline text-xs text-gray-700 dark:text-gray-300 bg-white/90 dark:bg-black/40 px-2 py-1 rounded-md border border-gray-200 dark:border-white/10">
             Rejoins la communauté de {movieTitle}
           </span>
           <button
             type="button"
             onClick={onToggleCollapse}
-            className="h-24 w-24 rounded-full bg-blue-600 text-white shadow-xl hover:bg-blue-500 animate-bounce flex items-center justify-center"
+            className="h-14 w-14 sm:h-24 sm:w-24 rounded-full bg-blue-600 text-white shadow-xl hover:bg-blue-500 animate-bounce flex items-center justify-center"
             title="Discuter"
           >
-            <Users size={45} />
+            <Users size={28} className="sm:hidden" />
+            <Users size={45} className="hidden sm:block" />
           </button>
         </div>
       )}
 
       {!isCollapsed && (
-        <div className="mb-0 w-[38rem] bg-white dark:bg-[#16191D] border border-gray-200 dark:border-white/10 rounded-2xl shadow-2xl overflow-hidden flex flex-col">
+        <div className="mb-0 w-full sm:w-[38rem] max-w-[calc(100vw-2rem)] bg-white dark:bg-[#16191D] border border-gray-200 dark:border-white/10 rounded-2xl shadow-2xl overflow-hidden flex flex-col">
           {/* Header */}
           <div className="p-3 border-b border-gray-200 dark:border-white/5 flex items-center justify-between bg-gray-50 dark:bg-white/5">
             <div className="flex items-center gap-2 min-w-0">
@@ -270,7 +271,7 @@ export default function ChatWidget({
           {/* Messages */}
           {!isCollapsed && (
             <div
-              className="h-[32rem] p-3 overflow-y-auto space-y-3 bg-white dark:bg-[#0f1114]"
+              className="h-[50vh] sm:h-[32rem] p-3 overflow-y-auto space-y-3 bg-white dark:bg-[#0f1114]"
               onClick={() => setActionForId(null)}
             >
               {chatMessages.length === 0 ? (
