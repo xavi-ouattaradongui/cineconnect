@@ -9,7 +9,7 @@ export default function HeroSection({
 }) {
   if (heroPicking) {
     return (
-      <div className="relative w-full h-[70vh] overflow-hidden rounded-b-3xl bg-gray-200 dark:bg-white/5 animate-pulse" />
+      <div className="relative w-full h-[52vh] sm:h-[62vh] lg:h-[70vh] overflow-hidden rounded-b-3xl bg-gray-200 dark:bg-white/5 animate-pulse" />
     );
   }
 
@@ -18,7 +18,7 @@ export default function HeroSection({
   }
 
   return (
-    <div className="relative w-full h-[70vh] overflow-hidden rounded-b-3xl group">
+    <div className="relative w-full h-[52vh] sm:h-[62vh] lg:h-[70vh] overflow-hidden rounded-b-3xl group">
       <img
         src={fullMovie.Poster}
         alt={fullMovie.Title}
@@ -27,7 +27,7 @@ export default function HeroSection({
       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent"></div>
       <div className="absolute inset-0 bg-gradient-to-r from-black via-black/40 to-transparent"></div>
 
-      <div className="absolute bottom-0 left-0 p-8 w-full max-w-7xl mx-auto">
+      <div className="absolute bottom-0 left-0 p-4 sm:p-8 w-full max-w-7xl mx-auto">
         <div className="flex items-center gap-3 mb-3">
           <span className="bg-red-500/20 text-red-300 border border-red-500/30 backdrop-blur-md px-2 py-0.5 rounded text-[10px] font-medium tracking-wide uppercase">
             À la une
@@ -38,14 +38,14 @@ export default function HeroSection({
           </div>
         </div>
 
-        <h1 className="text-4xl sm:text-5xl font-semibold text-white tracking-tight mb-3">
+        <h1 className="text-2xl sm:text-4xl lg:text-5xl font-semibold text-white tracking-tight mb-3">
           {fullMovie.Title}
         </h1>
         <p className="text-gray-300 text-sm max-w-lg mb-6 leading-relaxed line-clamp-2">
           {fullMovie.Plot}
         </p>
 
-        <div className="flex gap-3">
+        <div className="flex flex-wrap gap-3">
           <Link
             to={`/film/${fullMovie.imdbID}`}
             className="hover:bg-gray-200 transition-colors flex text-sm font-medium text-black bg-white rounded-lg px-5 py-2.5 items-center gap-2"

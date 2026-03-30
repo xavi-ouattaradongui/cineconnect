@@ -16,7 +16,7 @@ export default function MovieHero({
   const hasRating = Number.isFinite(numericRating) && numericRating > 0;
 
   return (
-    <div className="relative w-full h-[60vh] lg:h-[70vh] overflow-hidden">
+    <div className="relative w-full h-[52vh] sm:h-[60vh] lg:h-[70vh] overflow-hidden">
       <div className="absolute inset-0">
         <img
           src={movie.Poster}
@@ -27,11 +27,11 @@ export default function MovieHero({
         <div className="absolute inset-0 bg-gradient-to-r from-black via-black/40 to-transparent"></div>
       </div>
 
-      <div className="absolute inset-0 max-w-7xl mx-auto px-6 pt-20 flex flex-col justify-end pb-12">
+      <div className="absolute inset-0 max-w-7xl mx-auto px-4 sm:px-6 pt-16 sm:pt-20 flex flex-col justify-end pb-8 sm:pb-12">
         {/* BACK BUTTON */}
         <button
           onClick={() => window.history.back()}
-          className="absolute top-28 flex items-center gap-2 text-xs font-medium text-gray-400 hover:text-white transition-colors group mb-8 w-fit"
+          className="absolute top-20 sm:top-28 flex items-center gap-2 text-xs font-medium text-gray-400 hover:text-white transition-colors group mb-8 w-fit"
         >
           <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
           Retour
@@ -59,10 +59,10 @@ export default function MovieHero({
                   </div>
                 ))}
               </div>
-              <h1 className="text-4xl md:text-6xl font-bold text-white tracking-tight">
+              <h1 className="text-2xl sm:text-4xl md:text-6xl font-bold text-white tracking-tight">
                 {movie.Title}
               </h1>
-              <p className="text-lg text-gray-400 italic font-light">{shortPlot}</p>
+              <p className="text-sm sm:text-lg text-gray-400 italic font-light">{shortPlot}</p>
             </div>
 
             {/* ACTION BUTTONS */}
