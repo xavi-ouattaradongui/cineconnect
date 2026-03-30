@@ -1,6 +1,4 @@
-import axios from "axios";
-
-const API_KEY = import.meta.env.VITE_OMDB_API_KEY;
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3001";
 const DETAIL_CACHE = new Map();
 const BATCH_SIZE = 5;
 const BATCH_DELAY = 150;
@@ -33,15 +31,19 @@ export const hasUsableMovieDetails = (movie) => {
 export const filterUsableMovies = (movies = []) =>
   movies.map(normalizeMovieData).filter(hasUsableMovieSummary);
 
-export const omdb = axios.create({
-  baseURL: "https://www.omdbapi.com/",
-  params: { apikey: API_KEY },
-});
+const backendFilmsBase = `${API_URL}/films`;
+
+const fetchJson = async (url) => {
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`Request failed with status ${response.status}`);
+  }
+  return response.json();
+};
 
 export const searchMovies = async (title, page = 1) => {
-  const { data } = await omdb.get("/", {
-    params: { s: title, page, type: "movie" },
-  });
+  const query = encodeURIComponent((title || "").trim());
+  const data = await fetchJson(`${backendFilmsBase}/search?q=${query}&page=${page}`);
   const filteredMovies = filterUsableMovies(data?.Search || []);
 
   return {
@@ -180,7 +182,7 @@ export const getMovieDetails = async (id) => {
     return DETAIL_CACHE.get(id);
   }
   try {
-    const { data } = await omdb.get("/", { params: { i: id, plot: "full" } });
+    const data = await fetchJson(`${backendFilmsBase}/details/${encodeURIComponent(id)}`);
     const movie = data?.Response === "False" ? null : normalizeMovieData(data);
     const validMovie = hasUsableMovieDetails(movie) ? movie : null;
     DETAIL_CACHE.set(id, validMovie);

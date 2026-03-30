@@ -1,4 +1,4 @@
-import { pgTable, serial, varchar, integer } from "drizzle-orm/pg-core";
+import { pgTable, serial, varchar, integer, text } from "drizzle-orm/pg-core";
 
 export const films = pgTable("films", {
   id: serial("id").primaryKey(),
@@ -6,4 +6,22 @@ export const films = pgTable("films", {
   title: varchar("title", { length: 255 }).notNull(),
   poster: varchar("poster", { length: 255 }),
   year: integer("year"),
+  type: varchar("type", { length: 30 }),
+  rated: varchar("rated", { length: 20 }),
+  released: varchar("released", { length: 40 }),
+  runtime: varchar("runtime", { length: 40 }),
+  genre: text("genre"),
+  director: text("director"),
+  writer: text("writer"),
+  actors: text("actors"),
+  plot: text("plot"),
+  language: text("language"),
+  country: text("country"),
+  awards: text("awards"),
+  metascore: varchar("metascore", { length: 20 }),
+  imdbRating: varchar("imdb_rating", { length: 20 }),
+  imdbVotes: varchar("imdb_votes", { length: 30 }),
+  boxOffice: varchar("box_office", { length: 60 }),
+  production: text("production"),
+  website: text("website"),
 });
