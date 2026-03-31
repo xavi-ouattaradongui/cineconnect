@@ -1,7 +1,7 @@
 # API - CineConnect
 
-Base URL locale: `http://localhost:3001`
-Swagger UI: `http://localhost:3001/docs`
+Base URL locale: `http://localhost:3000`
+Swagger UI: `http://localhost:3000/docs`
 
 ## 1. Authentification
 

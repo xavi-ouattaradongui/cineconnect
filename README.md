@@ -44,14 +44,14 @@ pnpm install
 ### Frontend (`frontend/.env`)
 
 ```env
-VITE_API_URL=http://localhost:3001
+VITE_API_URL=http://localhost:3000
 VITE_OMDB_API_KEY=...
 ```
 
 ### Backend (`backend/.env`)
 
 ```env
-PORT=3001
+PORT=3000
 FRONTEND_URL=http://localhost:5173
 DATABASE_URL=postgres://USER:PASSWORD@localhost:5432/cineconnect
 JWT_SECRET=your_secret
@@ -69,8 +69,8 @@ cd backend
 pnpm dev
 ```
 
-Backend disponible sur `http://localhost:3001`.
-Swagger disponible sur `http://localhost:3001/docs`.
+Backend disponible sur `http://localhost:3000`.
+Swagger disponible sur `http://localhost:3000/docs`.
 
 ### Frontend
 
