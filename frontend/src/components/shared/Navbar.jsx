@@ -18,6 +18,7 @@ import {
   Sun,
   Moon,
   ChevronDown,
+  Search,
 } from "lucide-react";
 
 const AVATAR_ICONS = {
@@ -51,6 +52,7 @@ export default function Navbar({ onSearch }) {
   const [isFocused, setIsFocused] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [showCategories, setShowCategories] = useState(false);
+  const [showMobileSearch, setShowMobileSearch] = useState(false);
   const categoriesRef = useRef(null);
   const router = useRouter();
   const { location } = useRouterState();
@@ -236,8 +238,9 @@ export default function Navbar({ onSearch }) {
           >
             {isDarkMode ? <Sun size={16} /> : <Moon size={16} />}
           </button>
-          {/* SEARCH */}
-          <div className="flex items-center bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/5 rounded-full px-3 py-1.5 focus-within:ring-1 focus-within:ring-gray-300 dark:focus-within:ring-white/20 transition-all relative">
+
+          {/* Desktop search */}
+          <div className="hidden md:flex items-center bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/5 rounded-full px-3 py-1.5 focus-within:ring-1 focus-within:ring-gray-300 dark:focus-within:ring-white/20 transition-all relative">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="16"
@@ -265,8 +268,6 @@ export default function Navbar({ onSearch }) {
             <div className="hidden lg:block text-[10px] border border-gray-300 dark:border-white/10 rounded px-1 text-gray-500">
               ⌘K
             </div>
-
-            {/* Suggestions */}
             {showDropdown && (
               <div className="absolute top-full left-0 mt-2 w-72 sm:w-80 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-white/10 rounded-lg shadow-xl overflow-hidden">
                 {isLoading ? (
@@ -301,6 +302,16 @@ export default function Navbar({ onSearch }) {
               </div>
             )}
           </div>
+
+          {/* Mobile search icon */}
+          <button
+            type="button"
+            className="flex md:hidden items-center justify-center w-9 h-9 rounded-full border border-gray-200 dark:border-white/10 bg-white/70 dark:bg-white/5 text-gray-700 dark:text-gray-200 hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
+            aria-label="Rechercher"
+            onClick={() => setShowMobileSearch((v) => !v)}
+          >
+            <Search size={20} />
+          </button>
 
           {/* PROFILE / LOGIN */}
           {user ? (
@@ -377,6 +388,59 @@ export default function Navbar({ onSearch }) {
           </div>
         )}
       </div>
+
+      {/* Mobile search input */}
+      {showMobileSearch && (
+        <div className="md:hidden px-4 py-2 bg-white dark:bg-black border-b border-gray-200 dark:border-white/5">
+          <div className="flex items-center bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/5 rounded-full px-3 py-1.5 focus-within:ring-1 focus-within:ring-gray-300 dark:focus-within:ring-white/20 transition-all relative">
+            <Search className="text-gray-400" size={16} />
+            <input
+              autoFocus
+              type="text"
+              placeholder="Rechercher un film..."
+              value={searchValue}
+              onChange={handleSearch}
+              onFocus={() => setIsFocused(true)}
+              onBlur={() => setTimeout(() => setIsFocused(false), 150)}
+              className="bg-transparent border-none outline-none text-sm text-black dark:text-white ml-2 placeholder:text-gray-500 w-full"
+            />
+            {showDropdown && (
+              <div className="absolute top-full left-0 mt-2 w-full bg-white dark:bg-zinc-900 border border-gray-200 dark:border-white/10 rounded-lg shadow-xl overflow-hidden z-50">
+                {isLoading ? (
+                  <div className="px-3 py-2 text-xs text-gray-400">
+                    Recherche...
+                  </div>
+                ) : suggestions.length > 0 ? (
+                  suggestions.map((m) => (
+                    <Link
+                      key={m.imdbID}
+                      to={`/film/${m.imdbID}`}
+                      className="flex items-center gap-3 px-3 py-2 hover:bg-white/5 transition-colors"
+                      onClick={() => setShowMobileSearch(false)}
+                    >
+                      <img
+                        src={m.Poster}
+                        alt={m.Title}
+                        className="h-10 w-7 object-cover rounded"
+                      />
+                      <div className="flex-1">
+                        <div className="text-sm text-gray-900 dark:text-white line-clamp-1">
+                          {m.Title}
+                        </div>
+                        <div className="text-xs text-gray-500">{m.Year}</div>
+                      </div>
+                    </Link>
+                  ))
+                ) : (
+                  <div className="px-3 py-2 text-xs text-gray-400">
+                    Aucun résultat
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </nav>
   );
 }
