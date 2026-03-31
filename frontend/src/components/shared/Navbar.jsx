@@ -237,7 +237,7 @@ export default function Navbar({ onSearch }) {
             {isDarkMode ? <Sun size={16} /> : <Moon size={16} />}
           </button>
           {/* SEARCH */}
-          <div className="hidden sm:flex items-center bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/5 rounded-full px-3 py-1.5 focus-within:ring-1 focus-within:ring-gray-300 dark:focus-within:ring-white/20 transition-all relative">
+          <div className="flex items-center bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/5 rounded-full px-3 py-1.5 focus-within:ring-1 focus-within:ring-gray-300 dark:focus-within:ring-white/20 transition-all relative">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="16"
