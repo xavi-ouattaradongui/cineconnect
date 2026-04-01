@@ -18,7 +18,7 @@ flowchart LR
   F -->|Socket.io| S[Socket.io Server]
   B --> D[(PostgreSQL)]
   S --> D
-  F --> O[API OMDb]
+  B --> O[API OMDb]
 ```
 
 ## 3. Couches backend
@@ -44,13 +44,14 @@ flowchart LR
 
 1. Le frontend envoie `POST /auth/login`.
 2. Le backend valide credentials et renvoie un JWT.
-3. Le token est stocké côté client.
+3. Le token est stocké côté client dans `localStorage`.
 4. Les routes privées envoient `Authorization: Bearer <token>`.
 
 ### Consultation et interaction film
 
-1. Le frontend récupère des informations film.
-2. Les utilisateurs connectés peuvent:
+1. Le frontend interroge le backend pour la recherche et les détails film.
+2. Le backend appelle OMDb si nécessaire, puis persiste les données utiles en base.
+3. Les utilisateurs connectés peuvent:
    - publier une review (`POST /reviews`)
   - réagir à une review (`POST /reviews/:id/reaction`)
    - ajouter en favoris (`POST /favorites`)

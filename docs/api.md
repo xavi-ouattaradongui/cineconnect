@@ -26,6 +26,8 @@ Authorization: Bearer <JWT>
 ### Films
 
 - `POST /films` (JWT)
+- `GET /films/search?q=<titre>&page=<n>`
+- `GET /films/details/:imdbId`
 - `GET /films/:imdbId`
 
 ### Reviews
@@ -84,7 +86,7 @@ Content-Type: application/json
 
 {
   "filmId": "tt0133093",
-  "rating": 9,
+  "rating": 5,
   "comment": "Excellent film",
   "title": "The Matrix",
   "poster": "https://...",
@@ -118,6 +120,8 @@ Content-Type: application/json
 ## 5. Temps réel (Socket.io)
 
 Canal principal: discussion par film.
+
+La recherche et les détails film transitent par le backend, qui interroge OMDb puis met en cache ou persiste les données utiles.
 
 Événements utilisés:
 
