@@ -51,7 +51,8 @@ export default function Navbar({ onSearch }) {
   const [searchValue, setSearchValue] = useState("");
   const [isFocused, setIsFocused] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const [showCategories, setShowCategories] = useState(false);
+  const [showDesktopCategories, setShowDesktopCategories] = useState(false);
+  const [showMobileCategories, setShowMobileCategories] = useState(false);
   const [showMobileSearch, setShowMobileSearch] = useState(false);
   const categoriesRef = useRef(null);
   const router = useRouter();
@@ -63,7 +64,7 @@ export default function Navbar({ onSearch }) {
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (categoriesRef.current && !categoriesRef.current.contains(event.target)) {
-        setShowCategories(false);
+        setShowDesktopCategories(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -201,21 +202,21 @@ export default function Navbar({ onSearch }) {
             {/* Dropdown Catégorie */}
             <div className="relative" ref={categoriesRef}>
               <button
-                onClick={() => setShowCategories(!showCategories)}
+                onClick={() => setShowDesktopCategories((prev) => !prev)}
                 className="text-gray-600 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 transition-colors flex items-center gap-1"
               >
                 Catégorie
-                <ChevronDown size={14} className={`transition-transform ${showCategories ? 'rotate-180' : ''}`} />
+                <ChevronDown size={14} className={`transition-transform ${showDesktopCategories ? 'rotate-180' : ''}`} />
               </button>
               
-              {showCategories && (
+              {showDesktopCategories && (
                 <div className="absolute top-full left-0 mt-2 w-48 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-white/10 rounded-lg shadow-xl overflow-hidden z-50">
                   {categories.map((category) => (
                     <Link
                       key={category}
                       to="/categorie/$category"
                       params={{ category }}
-                      onClick={() => setShowCategories(false)}
+                      onClick={() => setShowDesktopCategories(false)}
                       className="block px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"
                     >
                       {getCategoryDisplayName(category)}
@@ -365,21 +366,21 @@ export default function Navbar({ onSearch }) {
           )}
           <button
             type="button"
-            onClick={() => setShowCategories(!showCategories)}
+            onClick={() => setShowMobileCategories((prev) => !prev)}
             className="shrink-0 px-3 py-1.5 rounded-full bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 inline-flex items-center gap-1"
           >
             Categories
-            <ChevronDown size={12} className={`transition-transform ${showCategories ? "rotate-180" : ""}`} />
+            <ChevronDown size={12} className={`transition-transform ${showMobileCategories ? "rotate-180" : ""}`} />
           </button>
         </div>
-        {showCategories && (
+        {showMobileCategories && (
           <div className="mt-2 rounded-lg bg-white dark:bg-zinc-900 border border-gray-200 dark:border-white/10 overflow-hidden">
             {categories.map((category) => (
               <Link
                 key={category}
                 to="/categorie/$category"
                 params={{ category }}
-                onClick={() => setShowCategories(false)}
+                onClick={() => setShowMobileCategories(false)}
                 className="block px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"
               >
                 {getCategoryDisplayName(category)}
