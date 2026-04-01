@@ -109,29 +109,33 @@ export default function ExploreSection({
       
       <div className="relative overflow-hidden">
         <style>{`
-          @keyframes scroll-infinite {
-            0% {
-              transform: translateX(0);
+          @media (min-width: 768px) {
+            @keyframes scroll-infinite {
+              0% {
+                transform: translateX(0);
+              }
+              100% {
+                transform: translateX(-50%);
+              }
             }
-            100% {
-              transform: translateX(-50%);
+
+            .scroll-continuous {
+              animation: scroll-infinite 40s linear infinite;
             }
-          }
-          .scroll-continuous {
-            animation: scroll-infinite 40s linear infinite;
-          }
-          .scroll-continuous:hover {
-            animation-play-state: paused;
+
+            .scroll-continuous:hover {
+              animation-play-state: paused;
+            }
           }
         `}</style>
         
-        <div className="flex gap-8 items-center scroll-continuous">
+        <div className="flex gap-6 md:gap-8 items-center overflow-x-auto md:overflow-hidden scroll-smooth snap-x snap-mandatory md:snap-none scrollbar-hide scroll-continuous">
           {/* Première série */}
           {sections.map((section) => (
             <div
               key={section.id}
               onClick={() => handleSectionClick(section.id)}
-              className="whitespace-nowrap flex flex-row items-center gap-2 shrink-0 cursor-pointer text-gray-700 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400 transition-colors group"
+              className="whitespace-nowrap flex flex-row items-center gap-2 shrink-0 snap-start cursor-pointer text-gray-700 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400 transition-colors group"
             >
               <div className="text-2xl group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-colors">
                 {section.icon}
@@ -146,7 +150,7 @@ export default function ExploreSection({
             <div
               key={`${section.id}-duplicate`}
               onClick={() => handleSectionClick(section.id)}
-              className="whitespace-nowrap flex flex-row items-center gap-2 shrink-0 cursor-pointer text-gray-700 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400 transition-colors group"
+              className="hidden md:flex whitespace-nowrap flex-row items-center gap-2 shrink-0 cursor-pointer text-gray-700 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400 transition-colors group"
             >
               <div className="text-2xl group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-colors">
                 {section.icon}
