@@ -45,7 +45,6 @@ pnpm install
 
 ```env
 VITE_API_URL=http://localhost:3000
-VITE_OMDB_API_KEY=...
 ```
 
 ### Backend (`backend/.env`)
@@ -102,11 +101,15 @@ pnpm --dir backend start
 ## Fonctionnalités principales
 
 - Authentification JWT: inscription, connexion, profil, changement de mot de passe
-- Récupération des films (OMDb côté front + persistance ciblée côté back)
+- Recherche et détails films via le backend, avec intégration OMDb et persistance locale
 - Reviews: création, édition, suppression, réactions like/dislike
 - Favoris et ma liste
 - Chat temps réel par film via Socket.io
 - Reset password par email
+
+## Flux des données films
+
+Le frontend n'appelle pas OMDb directement. Il consomme les endpoints backend `GET /films/search` et `GET /films/details/:imdbId`, puis le backend interroge OMDb, met en cache les réponses utiles et persiste localement les films consultés.
 
 ## Documentation du projet
 

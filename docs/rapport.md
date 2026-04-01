@@ -28,10 +28,7 @@ L'architecture retenue repose sur un découpage frontal/backend avec une base re
 - `shared/`: espace réservé au code mutualisable entre front et back.
 - `docs/`: documentation projet (rapport, architecture, schéma BDD, API).
 
-Le frontend consomme deux sources de données:
-
-- l'API backend pour les données applicatives (auth, reviews, favoris, messages, catégories),
-- l'API OMDb pour la recherche et l'affichage des contenus cinéma.
+Le frontend consomme principalement l'API backend pour toutes les données applicatives (auth, films, reviews, favoris, messages, catégories). Le backend interroge ensuite OMDb pour la recherche et les détails film, avant de persister localement les données utiles.
 
 Le backend joue un rôle central: validation des requêtes, contrôle d'accès, persistance en base et diffusion d'événements chat en temps réel.
 
